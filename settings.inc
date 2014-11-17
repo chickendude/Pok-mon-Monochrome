@@ -1,0 +1,9 @@
+#define NEW_GAME_X	8
+#define NEW_GAME_Y	8
+#define new_game_offset_x	0
+#define new_game_offset_y	0
+#define NEW_GAME_MAP	map_test
+#define NEW_GAME_DIRECTION	player_down
+INSERT_RAM = 2000
+ramBuf = $9D95
+scrollBuf = ramBuf

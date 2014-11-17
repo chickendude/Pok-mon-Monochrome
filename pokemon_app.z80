@@ -1,0 +1,538 @@
+	.nolist
+#include "ti83plus.inc"
+#include "app.inc"
+
+#include "variables.inc"
+
+#include "gbavar.inc"
+#include "settings.inc"
+#define vmode_direct	0
+#define vmode_type	1
+#define vmode_type_no_pause	2
+#define screen_width	96
+#define screen_height	64
+#define pokemon_sprite_width	32
+#define pokemon_sprite_height	26
+#define pokemon_sprite_size	$1a04
+#define pokemon_sprite_battle_distance_from_screen	5
+#define cursor_speed	20
+#define scroll_cursor_speed	30
+#define text_typing_speed	6
+#define walk_speed	3
+#define walk_frequency	2
+#define fade_speed	2
+#define pokemon_encounter_frequency	20
+#define battle_flash_screen_frequency	4
+#define battle_blink_sprite_times	4
+#define battle_blink_sprite_speed	10
+#define battle_evolution_blink_sprite_times	26	; must be even
+#define battle_evolution_blink_sprite_speed	10
+#define trainer_tile	56	; tile # after which there's only trainers-related tiles
+#macro cp_hl_de()
+	or a
+	sbc hl,de
+	add hl,de
+#endmacro
+	.list
+defpage(0, "PokeMono")
+
+	di
+
+; SETUP
+	ld hl,INSERT_RAM			;
+	bcall(_EnoughMem)			; check if we have enough RAM
+	 jr nc,$+5					; if we do, great!
+		bjump(_JForceCmdNoChar) ; otherwise, ciao!
+	ex de,hl					; hl = amount of RAM to insert (EnoughMem returns amount of RAM in de)
+	ld de,$9D95					; de = where to insert the RAM
+	bcall(_InsertMem)			; insert the memory
+
+	ld h,d
+	ld l,e
+	inc de
+	ld (hl),0
+	ld bc,INSERT_RAM-1
+	ldir						; probably not really necessary, but set it all to 0
+
+	ld hl,saferam3
+	ld de,saferam3+1
+	ld (hl),0
+	ld bc,127
+	ldir
+
+	ld hl,$0202
+	ld (player_y),hl			; update player_y and player_x
+
+	ld a,(contrast)
+	ld (contrast_var),a
+	set textwrite,(IY+sgrflags)
+	res textEraseBelow,(IY+textflags)
+
+	call start
+
+	ld de,INSERT_RAM
+	ld hl,$9D95
+	bcall(_DelMem)				; delete the RAM we've inserted before quitting (no RAM leaks!)
+	bjump(_JForceCmdNoChar) 	; ciao !
+;####### end of program #########
+
+start:
+	call fade_out
+	bcall(_grbufclr)
+	xor a
+	ld b,a
+	ld c,a
+	call load_map				; load map 0, coords 0,0
+	call draw_map
+	call draw_player
+	call fastCopy
+	call clear_player
+	call fade_in
+main_loop:
+	call draw_map
+	call draw_player
+	call fastCopy
+	call clear_player
+	ld a,$FE					; groupe 1
+	call get_key				; flèches directionnelles
+	rra							; down
+	push af
+		call nc,walk_down
+	pop af
+	rra
+	push af
+		call nc,walk_left
+	pop af
+	rra
+	push af
+		call nc,walk_right
+	pop af
+	rra
+	 call nc,walk_up
+
+	ld a,$BF					;groupe 7
+	call get_key				;[2nd][Mode][Del],[Y=]->[Graph]
+	bit 4,a						;[Y=] ?
+	 call z,menu_start
+
+	ld a,$FD					;groupe 2
+	call get_key				;[Enter]->[Clear]
+	bit 6,a						;[Clear] ?
+	 jr nz,main_loop
+	ret
+
+walk_down:
+	ld bc,$0100					; y offset = +1
+	call get_player_map
+	ld a,(hl)					; a = tile id
+	call check_tile				; check if tile can be passed, events, etc.
+	 ret nz						; if nz, then we can't move there
+	ld a,(player_y)
+	ld hl,map_y
+	sub (hl)
+	cp 4
+	 jr nc,scroll_down
+walk_down_player:
+	ld b,7
+walk_down_loop:
+	push bc
+		ld hl,player_y_off
+		inc (hl)
+		call draw_map
+		call draw_player
+		call fastCopy
+	pop bc
+	djnz walk_down_loop
+	ld hl,player_y_off
+	ld (hl),b
+	ld hl,player_y
+	inc (hl)
+	ret
+scroll_down:
+	ld a,(mapHeight)
+	ld hl,map_y
+	sub (hl)
+	cp 8
+	 jr z,walk_down_player
+
+;*** check if you can move map down, if not, go back to walk_down_loop
+
+	ld hl,(mapWidth)			; we need to load the row below the map
+	ld h,0
+	add hl,hl					; .. so we need to multiply mapWidth by 8
+	add hl,hl
+	add hl,hl
+	push hl
+		call get_map_offset
+	pop de
+	add hl,de					; hl now points to the first tile beneath the screen
+	ld b,12						; there are 12 columns of tiles
+	ld de,scrollBuf				; where to load sprites to
+sd_new_row:
+	push bc						; save counter
+		push hl					; save map location
+			push de				; save scrollBuf location
+				ld l,(hl)		; get tile id
+				call get_tile	; hl = tile data
+			pop de
+			ld bc,8				; copy sprite data to scrollBuf
+			ldir
+		pop hl					; move to next byte in map
+		inc hl
+	pop bc						; repeat 8 times
+	djnz sd_new_row
+
+	ld b,8
+	exx
+		ld hl,scrollBuf			; fill in the bottom row of pixels
+	exx
+scroll_down_loop:
+	push bc
+		ld de,gbuf				; shift the gbuf up
+		ld hl,gbuf+12			; 
+		ld bc,756				; 756 bytes to shift (63 rows of 12 bytes each)
+		ldir
+		ld b,12					; copy 12 bytes from scrollBuf
+		exx
+			push hl				; save scrollBuf position
+			ld de,8
+		exx
+sd_fill_row:
+		exx
+			ld a,(hl)			; load byte from scrollBuf
+			add hl,de			; move to next sprite in scrollBuf
+		exx
+		ld (de),a
+		inc de
+		djnz sd_fill_row
+		call draw_player
+		call fastCopy
+		call clear_player
+		exx
+			pop hl				; recall original scrollBuf position
+			inc hl				; and move to next row of sprite data
+		exx
+	pop bc
+	djnz scroll_down_loop
+	ld hl,player_y
+	inc (hl)
+	ld hl,map_y
+	inc (hl)
+	ret
+
+walk_up:
+	ld bc,$FF00					; y offset = -1
+	call get_player_map			; b holds the offset to add to player's position
+	ld a,(hl)					; a holds tile id
+	call check_tile				; essentially a cpir of passable tiles
+	 ret nz						; if nz, then we can't move there
+	ld a,(player_y)
+	ld hl,map_y
+	sub (hl)
+	cp 4
+	 jr c,scroll_up
+walk_up_player:
+	ld b,7
+	ld hl,player_y
+	dec (hl)
+	ld hl,player_y_off
+	ld (hl),b
+walk_up_loop:
+	push bc
+		ld hl,player_y_off
+		dec (hl)
+		call draw_map
+		call draw_player
+		call fastCopy
+	pop bc
+	djnz walk_up_loop
+	ret
+scroll_up:
+	ld a,(map_y)
+	or a
+	 jr z,walk_up_player
+	call get_map_offset
+	ld de,(mapWidth)			; we need to load the row above the map
+	ld d,0
+	sbc hl,de					; hl now points to the first tile above the screen
+	ld b,12						; there are 12 columns of tiles
+	ld de,scrollBuf				; where to load sprites to
+su_new_row:
+	push bc						; save counter
+		push hl					; save map location
+			push de				; save scrollBuf location
+				ld l,(hl)		; get tile id
+				call get_tile	; hl = tile data
+			pop de
+			ld bc,8				; copy sprite data to scrollBuf
+			ldir
+		pop hl					; move to next byte in map
+		inc hl
+	pop bc						; repeat 8 times
+	djnz su_new_row
+
+	ld b,8
+	exx
+		ld hl,scrollBuf+(8*12)-1	; fill in the bottom row of pixels
+	exx
+scroll_up_loop:
+	push bc
+		ld hl,gbuf+756-1		; 
+		ld de,gbuf+768-1		; shift the gbuf down
+		ld bc,756				; 756 bytes to shift (63 rows of 12 bytes each)
+		lddr
+		ld b,12					; copy 12 bytes from scrollBuf
+		exx
+			push hl				; save scrollBuf position
+			ld de,-8
+		exx
+su_fill_row:
+		exx
+			ld a,(hl)			; load byte from scrollBuf
+			add hl,de			; move to next sprite in scrollBuf
+		exx
+		ld (de),a
+		dec de
+		djnz su_fill_row
+		call draw_player
+		call fastCopy
+		call clear_player
+		exx
+			pop hl				; recall original scrollBuf position
+			dec hl				; and move to next row of sprite data
+		exx
+	pop bc
+	djnz scroll_up_loop
+	ld hl,player_y
+	dec (hl)
+	ld hl,map_y
+	dec (hl)
+	ret
+
+walk_left:
+	ld bc,$00FF					; x offset = -1
+	call get_player_map			; c holds the offset to add to player's x position
+	ld a,(hl)					; a holds tile id
+	call check_tile				; essentially a cpir of passable tiles
+	 ret nz						; if nz, then we can't move there
+	ld a,(player_x)
+	ld hl,map_x
+	sub (hl)
+	cp 6
+	 jr c,scroll_left
+walk_left_player:
+	ld b,7
+	ld hl,player_x
+	dec (hl)
+	ld hl,player_x_off
+	ld (hl),b
+walk_left_loop:
+	push bc
+		ld hl,player_x_off
+		dec (hl)
+		call draw_map
+		call draw_player
+		call fastCopy
+	pop bc
+	djnz walk_left_loop
+	ret
+scroll_left:
+	ld a,(map_x)
+	or a
+	 jr z,walk_left_player
+	call get_map_offset
+	dec hl
+	ld b,8						; there are 8 rows of tiles
+	ld de,scrollBuf				; where to load sprites to
+sl_new_column:
+	push bc
+		push hl
+			push de
+				ld l,(hl)		; get tile id
+				call get_tile	; hl = tile data
+			pop de
+			ld bc,8
+			ldir
+		pop hl
+		ld bc,(mapWidth)
+		ld b,0
+		add hl,bc
+	pop bc
+	djnz sl_new_column
+
+	ld b,8
+scroll_left_out:
+	push bc
+		ld b,64
+		ld hl,gbuf
+		ld de,scrollBuf
+scroll_left_in:
+		ex de,hl
+			rr (hl)				; put new sprite data into the carry
+			inc hl
+		ex de,hl
+		rr (hl) \ inc hl		; 1
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		rr (hl) \ inc hl
+		djnz scroll_left_in	
+		call draw_player
+		call fastCopy
+		call clear_player
+	pop bc
+	djnz scroll_left_out
+	ld hl,player_x
+	dec (hl)
+	ld hl,map_x
+	dec (hl)
+	ret
+
+walk_right:
+	ld bc,$0001					; x offset = 1
+	call get_player_map			; c holds the offset to add to player's x position
+	ld a,(hl)					; a holds tile id
+	call check_tile				; essentially a cpir of passable tiles
+	 ret nz						; if nz, then we can't move there
+	ld a,(player_x)
+	ld hl,map_x
+	sub (hl)
+	cp 6
+	 jr nc,scroll_right
+walk_right_player:
+	ld b,7
+walk_right_loop:
+	push bc
+		ld hl,player_x_off
+		inc (hl)
+		call draw_map
+		call draw_player
+		call fastCopy
+	pop bc
+	djnz walk_right_loop
+	ld hl,player_x_off
+	ld (hl),b
+	ld hl,player_x
+	inc (hl)
+	ret
+scroll_right:
+	call get_map_offset
+	ld de,12					; we need to load the tile to the right of the screen
+	add hl,de
+	ld b,8						; there are 8 rows of tiles
+	ld de,scrollBuf				; where to load sprites to
+sr_new_column:
+	push bc
+		push hl
+			push de
+				ld l,(hl)		; get tile id
+				call get_tile	; hl = tile data
+			pop de
+			ld bc,8
+			ldir
+		pop hl
+		ld bc,(mapWidth)
+		ld b,0
+		add hl,bc
+	pop bc
+	djnz sr_new_column
+	ld b,8
+scroll_right_out:
+	push bc
+		ld b,64
+		ld hl,gbuf+768-1
+		ld de,scrollBuf+(8*8)-1
+scroll_right_in:
+		ex de,hl
+			rl (hl)				; put new sprite data into the carry
+			dec hl
+		ex de,hl
+		rl (hl) \ dec hl		; 1
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl
+		rl (hl) \ dec hl		; 12
+		djnz scroll_right_in
+		call draw_player
+		call fastCopy
+		call clear_player
+	pop bc
+	djnz scroll_right_out
+	ld hl,player_x
+	inc (hl)
+	ld hl,map_x
+	inc (hl)
+	ret
+
+
+;	<battle debug>
+;	call fade_out
+;	ld hl,new_game_map+2
+;	ld (mapAddr),hl
+;	xor a
+;	jp battle
+;	</debug>
+
+; <engine debug>
+;	ld hl,player_man_up
+;	ld (player_up),hl
+;	ld hl,player_man_left
+;	ld (player_left),hl
+;	ld hl,player_man_right
+;	ld (player_right),hl
+;	ld a,NEW_GAME_Y
+;	ld (player_y),a
+;	ld a,NEW_GAME_X
+;	ld (player_x),a
+;	ld hl,NEW_GAME_DIRECTION
+;	ld (player_direction),hl
+;	ld hl,NEW_GAME_MAP
+;	jp walk_engine
+; </engine>
+
+#include "menu.inc"
+#include "new.inc"
+#include "engine.inc"
+#include "gba.inc"
+#include "events.inc"
+#include "trainers.inc"
+#include "battle.inc"
+#include "battle_graphics.inc"
+#include "ai.inc"
+#include "routines.inc"
+#include "maths.inc"
+#include "stats.inc"
+#include "attacks.inc"
+#include "types.inc"
+#include "strings.inc"
+#ifdef FR
+	; il faudra sans doute que je rajoute les fichiers types.inc et pokemons.inc qui sont en partie en français !!!
+	.echo "Compiling in french."
+	#include "strings_fr.inc"
+#else
+	#ifdef EN
+		.echo "Compiling in english."
+		#include "strings_en.inc"
+	#else
+		.echo "Error : no language selected."
+	#endif
+#endif
+#include "sprites.inc"
+#include "tiles.inc"
+#include "maps.inc"
+#include "pokemons.inc"
+	.end
