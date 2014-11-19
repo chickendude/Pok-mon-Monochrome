@@ -15,7 +15,7 @@ battle_type = $+1	;	0 = pokémon sauvage
 	call generate_wild_pokemon
 
 battle_intro:
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 	call battle_draw_player_back
 	call battle_draw_frame				;draw the player and the little text frame at the bottom
 	ld hl,opponent_pokemon_stats		;début des données du groupe de pokémon méchants
@@ -57,13 +57,13 @@ battle_menu_pokemon_valid:
 	push de
 	push hl
 	call battle_draw_screen
-	call battle_draw_frame	; smaller than having to restore pencol/penrow, even if the frame is already drawn by the previous routine
+	call battle_draw_frame	; smaller than having to restore penCol/penRow, even if the frame is already drawn by the previous routine
 	pop hl
 	call battle_disp_player_pokemon_name
 ;	ld hl,battle_player_pokemon_intro2
 	call _v_type
 	ld de,$3802
-	ld (pencol),de
+	ld (penCol),de
 	ld hl,battle_player_pokemon_change
 	call battle_disp_vputs
 	pop de	; de = called pokémon stats pointer
@@ -222,8 +222,8 @@ battle_fight_menu_next_type_loop:
 	add hl,de
 	djnz battle_fight_menu_next_type_loop
 	ld de,$2a02
-	ld (pencol),de
-	bcall(_vputs)
+	ld (penCol),de
+	bcall(_VPutS)
 	pop af
 	ld c,a
 	ld hl,(battle_current_player_pokemon_address)
@@ -231,18 +231,18 @@ battle_fight_menu_next_type_loop:
 	inc hl
 	ld a,(hl)
 	ld de,$2a4b
-	ld (pencol),de
+	ld (penCol),de
 	call _vdispa
 	ld de,$2a53
-	ld (pencol),de
+	ld (penCol),de
 	ld a,$2f
-	bcall(_vputmap)
+	bcall(_VPutMap)
 	pop hl
 	inc hl	; ld de,attack_pp-attack_data
 	inc hl	; add hl,de
 	ld a,(hl)
 	ld de,$2a57
-	ld (pencol),de
+	ld (penCol),de
 	call _vdispa
 	jp fastCopy
 
@@ -313,7 +313,7 @@ check_attack_effectiveness:
 	add hl,hl
 	ld bc,type_index-2
 	add hl,bc
-	bcall(_ldhlind)
+	call ld_hl_hl
 	ex de,hl				;swap attack data into hl
 	ld a,(hl)				;enemy's pokemon id
 	call find_pokemon_data	;put attacked pokemon's data pointer in hl
@@ -416,7 +416,7 @@ battle_experience_distribution_loop:
 	ld a,vmode_type_no_pause
 	ld (_v_mode),a
 	ld hl,battle_str_experience_earned
-	call _vputs_ml
+	call _VPutS_ml
 	pop hl
 	pop af
 	push af
@@ -496,13 +496,13 @@ battle_inc_lvl:	; ici, hl=XP
 	ld a,vmode_type_no_pause
 	ld (_v_mode),a
 	ld hl,battle_str_level_up
-	call _vputs_ml
+	call _VPutS_ml
 	pop hl
 	push hl
 	ld a,(hl)
 	call _vdispa
 	ld a,$21
-	bcall(_vputmap)	; affiche "!"
+	bcall(_VPutMap)	; affiche "!"
 	call _v_disp_pause
 	pop hl
 	push hl
@@ -531,7 +531,7 @@ battle_check_evolution:
 	jp nz,battle_handle_next_experience_max
 ; gérer l'évolution du pokémon
 	push hl
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 	call battle_draw_frame	; clear entire screen then redraw the text frame
 	ld hl,(battle_current_player_pokemon_address)
 	push hl
@@ -580,7 +580,7 @@ evolution_loop:
 	ld hl,battle_str_evolution_done
 	ld a,vmode_type_no_pause
 	ld (_v_mode),a
-	call _vputs_ml
+	call _VPutS_ml
 	pop hl
 	push hl
 	call battle_disp_player_pokemon_name
@@ -630,7 +630,7 @@ battle_new_attack:
 	ld a,vmode_type_no_pause
 	ld (_v_mode),a
 	ld hl,battle_str_learn_attack
-	call _vputs_ml
+	call _VPutS_ml
 	pop hl
 	push hl
 	;call find_attack
@@ -642,12 +642,12 @@ battle_new_attack:
 	ld de,$3523
 	call draw_frame
 	ld de,$243b
-	ld (pencol),de
+	ld (penCol),de
 	xor a
 	ld (_v_mode),a
 ;	ld (menu_cursor),a
 	ld hl,battle_str_learn_attack_valid
-	call _vputs_ml
+	call _VPutS_ml
 	ld a,1
 ;	ld (menu_max_option),a
 	add a,35
@@ -708,22 +708,22 @@ battle_learn_new_attack_valid:
 	or a
 	jr z,battle_learn_new_attack_ok	; le slot est libre pour une nouvelle attaque
 	call battle_draw_screen	; ou pas
-	call battle_draw_frame	; smaller than having to do "ld de,$3202\	ld (pencol),de"
+	call battle_draw_frame	; smaller than having to do "ld de,$3202\	ld (penCol),de"
 
 	ld a,vmode_type_no_pause
 	ld (_v_mode),a
 	ld hl,battle_str_are_you_sure
-	call _vputs_ml
+	call _VPutS_ml
 	ld bc,$0f13
 	ld de,$4d23
 	call draw_frame
 	ld de,$2453
-	ld (pencol),de
+	ld (penCol),de
 	xor a
 	ld (_v_mode),a
 ;	ld (menu_cursor),a
 	ld hl,battle_str_yes_no
-	call _vputs_ml
+	call _VPutS_ml
 	ld a,1
 ;	ld (menu_max_option),a
 	add a,35

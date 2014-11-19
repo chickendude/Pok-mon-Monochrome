@@ -20,7 +20,7 @@ trainer_event:
 	ld hl,map_trainers
 	ld b,(map_trainers_end-map_trainers)/4
 	call find_map_data
-	bcall(_ldhlind)	; hl = trainers data relative to the current map
+	call ld_hl_hl	; hl = trainers data relative to the current map
 	pop bc
 	push hl
 	ld hl,(TRAINER_DATA_LENGTH)

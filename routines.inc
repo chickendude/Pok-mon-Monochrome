@@ -99,7 +99,7 @@ find_map_data:	; input : hl = list of map adress & pointers, b = iterations
 
 find_map_data_loop:	;compare the map address with the list of each pokémons encounterable by maps
 	push hl
-	bcall(_ldhlind)
+	call ld_hl_hl
 	cp_hl_de()
 	pop hl
 	inc hl	;first word (2 bytes) = map address
@@ -136,7 +136,7 @@ generate_wild_pokemon:
 	ret nz	;no data on encounterable Pokémons so no battle...
 
 generate_wild_pokemon_find_map_data_ok:
-	bcall(_ldhlind)	; on a les données des pokémons (ID et amplitudes des niveaux)
+	call ld_hl_hl	; on a les données des pokémons (ID et amplitudes des niveaux)
 	ld a,(hl)		; nombre maximum de pokémons
 	ld b,a
 	call random
@@ -171,7 +171,7 @@ generate_wild_pokemon_find_map_data_ok:
 	ld d,0
 	ld e,POKE_ATK_LIST-2 	;because we've already skipped two bytes (string name)
 	add hl,de
-	bcall(_ldhlind)			;hl now points to the list of attacks
+	call ld_hl_hl			;hl now points to the list of attacks
 	ld b,(hl)				;b = number of attacks pokemon can learn by level
 	inc hl					;start of attack list
 	ld c,0					;count how many attacks were processed
@@ -233,17 +233,17 @@ _vdispa:
 	push ix
 	ld h,0
 	ld l,a
-	bcall(_setxxxxop2)
-	bcall(_op2toop1)	; to be able to put more than 99 into op1
+	bcall(_SetXXXXOP2)
+	bcall(_OP2ToOP1)	; to be able to put more than 99 into op1
 	ld a,3
-	bcall(_dispop1a)
+	bcall(_DispOP1A)
 	pop ix
 	pop hl
 	pop de
 	ret
 
-_vputs_ml:	;	_v_mode: 0=text is directly drawn; 1=text is typing; 2=text is typing with no pause at end (cf battle)	|	string:$d6=new line; $07=pause and next text
-	ld a,(pencol)
+_VPutS_ml:	;	_v_mode: 0=text is directly drawn; 1=text is typing; 2=text is typing with no pause at end (cf battle)	|	string:$d6=new line; $07=pause and next text
+	ld a,(penCol)
 	push af
 	push hl
 
@@ -266,7 +266,7 @@ _v_replace_zero:
 	ld a,(_v_mode)
 	or a
 	 jr nz,$+5
-		bcall(_vputs)
+		bcall(_VPutS)
 	call nz,_v_type
 	pop de
 	pop af
@@ -286,7 +286,7 @@ _v_pause:
 	ld a,(_v_mode)
 	or a
 	 jr nz,$+5
-		bcall(_vputs)
+		bcall(_VPutS)
 	call nz,_v_type
 	push hl
 	call _v_disp_pause
@@ -340,7 +340,7 @@ _v_disp_end:
 	or a
 	push af
 	 jr nz,$+5
-		bcall(_vputs)
+		bcall(_VPutS)
 	pop af
 	push af
 	call nz,_v_type
@@ -356,10 +356,10 @@ _v_new_line:
 	pop bc
 	call z,_v_new_line_battle
 	ld a,b
-	ld (pencol),a
-	ld a,(penrow)
+	ld (penCol),a
+	ld a,(penRow)
 	add a,6
-	ld (penrow),a
+	ld (penRow),a
 
 _v_new_line_battle:
 	ld b,2
@@ -371,8 +371,8 @@ _v_new_text:	;	a:0=frame on the bottom ; 1=frame on the top ; 2=battle frame
 	push hl
 	push af
 	ld a,2
-	ld (pencol),a
-	ld (penrow),a
+	ld (penCol),a
+	ld (penRow),a
 	dec a
 	ld (_v_mode),a
 	pop af
@@ -381,7 +381,7 @@ _v_new_text:	;	a:0=frame on the bottom ; 1=frame on the top ; 2=battle frame
 	cp 1
 	jr z,dialogue_up
 	ld a,50
-	ld (penrow),a
+	ld (penRow),a
 	ld bc,$600f
 	ld de,$0031
 	jr dialogue_end
@@ -393,7 +393,7 @@ dialogue_up:
 
 dialogue_down:
 	ld a,44
-	ld (penrow),a
+	ld (penRow),a
 	ld bc,$1560
 	ld de,$002b
 
@@ -426,14 +426,14 @@ _v_type:
 	call wait
 	pop bc
 
-	bcall(_vputmap)
+	bcall(_VPutMap)
 	push hl
 	call fastCopy
 	pop hl
 	jr _v_type
 
 _v_type_skip:
-	bcall(_vputs)
+	bcall(_VPutS)
 	push hl
 	call fastCopy
 	pop hl
@@ -668,7 +668,7 @@ iRandomLp:
 	pop	hl
 	ret
 
-LD_HL_MHL:
+ld_hl_hl:
 	ld a,(hl)
 	inc hl
 	ld h,(hl)

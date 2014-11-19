@@ -13,7 +13,7 @@
 
 menu_beginning:
 	call fade_out
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 
 	ld bc,$240c			;c = width, b = height
 	xor a				;a = x
@@ -21,12 +21,12 @@ menu_beginning:
 	ld ix,title			;title sprite
 	call largeSprite
 	ld hl,$201d
-	ld (pencol),hl
+	ld (penCol),hl
 	ld hl,monochrome_str
-	bcall(_vputs)		;put "MONOCHROME" under the title sprite
+	bcall(_VPutS)		;put "MONOCHROME" under the title sprite
 
 	xor a				;default choice
-	ld de,$2b1d			;e = pencol, d = penrow
+	ld de,$2b1d			;e = penCol, d = penRow
 	ld hl,menu_beginning_str
 	call draw_menu		;draw the menu
 	call fade_in
@@ -59,7 +59,7 @@ menu_pokemon:
 
 menu_pokemon_no_cursor_reset:
 	push af
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 	ld de,player_pokemons
 	xor a
 
@@ -119,7 +119,7 @@ menu_pokemon_order:
 	jr menu_pokemon
 
 menu_pokemon_stats:
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 	call find_player_pokemon
 	call find_pokemon_stats
 	call get_pokemon_sprite_ix
@@ -254,12 +254,12 @@ draw_text_fastcopy:
 	ld (text_wait),a
 ;at the end of the string we'll jump to draw_text_continue, this just skips the fastCopy
 draw_menu_start:
-	ld (pencol),de
+	ld (penCol),de
 	ld a,e
 	ld (default_col),a
 
 draw_menu_loop:
-	ld de,(pencol)
+	ld de,(penCol)
 	ld a,(hl)
 	or a
 no_fastcopy = $+1
@@ -287,7 +287,7 @@ not_special:
 	jr c,insert_stat
 	push de
 	push ix
-		bcall(_vputmap)
+		bcall(_VPutMap)
 	pop ix
 	pop de
 	ld a,(text_wait)	;= 0 si pas de delai, != 0 s'il y en a
@@ -314,8 +314,8 @@ insert_stat:
 print_pokemon_name:
 	ld hl,current_pokemon
 	add hl,bc
-	bcall(_ldhlind)
-	bcall(_vputs)
+	call ld_hl_hl
+	bcall(_VPutS)
 
 insert_stat_end:
 	pop hl
@@ -345,7 +345,7 @@ text_new_x_y:
 	ld e,(hl)
 	inc hl
 	ld d,(hl)
-	ld (pencol),de
+	ld (penCol),de
 	inc hl
 	ret
 
@@ -364,7 +364,7 @@ text_add_menu:
 text_new_x:
 	inc hl
 	ld e,(hl)
-	ld (pencol),de
+	ld (penCol),de
 	inc hl
 	ret
 
@@ -374,7 +374,7 @@ text_new_line:
 	ld d,a
 default_col = $+1
 	ld e,0
-	ld (pencol),de
+	ld (penCol),de
 	inc hl
 	ld a,(hl)
 	ret
@@ -532,7 +532,7 @@ store_attack:
 ;			djnz attack_defense_loop
 ;trouver le string du nom du pokémon
 	pop hl
-	bcall(_ldhlind)
+	call ld_hl_hl
 	ld (current_pokemon),hl	;sauver l'adresse du string
 	ret
 

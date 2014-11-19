@@ -1,6 +1,6 @@
 new_game:
 	call fade_out
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 	call fastCopy
 	call fade_in
 
@@ -38,7 +38,7 @@ new_game_genre_select:
 	jr nz,new_game_genre_select
 
 	call fade_out
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 	ld ix,opponent_woman
 	ld a,(menu_cursor)
 	ld (player_gender),a	; 0 = man, 1 = woman

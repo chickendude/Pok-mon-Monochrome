@@ -1,14 +1,14 @@
 calculate_proportionality:	; output : a = int((hl/bc)*a)
 	push af
 	push bc
-	bcall(_setxxxxop2)
-	bcall(_op2toop1)
+	bcall(_SetXXXXOP2)
+	bcall(_OP2ToOP1)
 	pop hl
-	bcall(_setxxxxop2)
+	bcall(_SetXXXXOP2)
 	bcall(_fpdiv)
 	pop af
-	bcall(_setxxop2)
-	bcall(_fpmult)
+	bcall(_SetXXOP2)
+	bcall(_FPMult)
 	jp maths_functions_end
 
 calculate_damages:
@@ -48,26 +48,26 @@ calculate_damages:
 		call calculate_stats
 		ld h,0
 		ld l,a				; hl = DEF at level de
-		bcall(_setxxxxop2)
+		bcall(_SetXXXXOP2)
 		ld a,50
-		bcall(_setxxop1)
-		bcall(_fpmult)		; op1 = [Pokémon being attacked DEF at his level]*50
-		bcall(_op1toop4)	; because op3 is destroyed _fpmult/_fpdiv
+		bcall(_SetXXOP1)
+		bcall(_FPMult)		; op1 = [Pokémon being attacked DEF at his level]*50
+		bcall(_OP1ToOP4)	; because op3 is destroyed _FPMult/_fpdiv
 		ld a,2
-		bcall(_setxxop1)
+		bcall(_SetXXOP1)
 		ld a,5
-		bcall(_setxxop2)
+		bcall(_SetXXOP2)
 		bcall(_fpdiv)		; op1 = .4
 	pop hl
 	push hl
 		inc hl	; son niveau
 		ld l,(hl)
 		ld h,0
-		bcall(_setxxxxop2)
-		bcall(_fpmult)		; op1 = [Pokémon attacking level]*0.4
+		bcall(_SetXXXXOP2)
+		bcall(_FPMult)		; op1 = [Pokémon attacking level]*0.4
 		ld a,2
-		bcall(_setxxop2)
-		bcall(_fpadd)		; op1 = [Pokémon attacking level]*0.4+2
+		bcall(_SetXXOP2)
+		bcall(_FPAdd)		; op1 = [Pokémon attacking level]*0.4+2
 	pop hl
 	push hl
 		ld a,(hl)
@@ -83,8 +83,8 @@ calculate_damages:
 	call calculate_stats
 	ld h,0
 	ld l,a				; hl = ATT at level hl
-	bcall(_setxxxxop2)
-	bcall(_fpmult)		; op1 = ([Pokémon attacking level]*0.4+2)*[Pokémon attacking ATT at his level]
+	bcall(_SetXXXXOP2)
+	bcall(_FPMult)		; op1 = ([Pokémon attacking level]*0.4+2)*[Pokémon attacking ATT at his level]
 	ld a,(current_attack)
 	call find_attack_data
 	ld d,0
@@ -92,42 +92,42 @@ calculate_damages:
 	add hl,de
 	ld l,(hl)
 	ld h,d
-	bcall(_setxxxxop2)
-	bcall(_fpmult)		; op1 = (([Pokémon attacking level]*0.4+2)*[Attack power])*[Pokémon attacking ATT at his level]
-	bcall(_op4toop2)
+	bcall(_SetXXXXOP2)
+	bcall(_FPMult)		; op1 = (([Pokémon attacking level]*0.4+2)*[Attack power])*[Pokémon attacking ATT at his level]
+	bcall(_OP4ToOP2)
 	bcall(_fpdiv)		; op1 = (([Pokémon attacking level]*0.4+2)*[Attack power])*[Pokémon attacking ATT at his level]/([Pokémon being attacked DEF at his level]*50)
 	ld a,2
-	bcall(_setxxop2)
-	bcall(_fpadd)		; op1 = (([Pokémon attacking level]*0.4+2)*[Attack power])*[Pokémon attacking ATT at his level]/([Pokémon being attacked DEF at his level]*50+2)
+	bcall(_SetXXOP2)
+	bcall(_FPAdd)		; op1 = (([Pokémon attacking level]*0.4+2)*[Attack power])*[Pokémon attacking ATT at his level]/([Pokémon being attacked DEF at his level]*50+2)
 CE = $+1				; 0=pas très efficace, 1=normal, 2=super efficace
 	ld a,0
 	or a
 	jr z,calculate_damages_not_effective
-	bcall(_setxxop2)
-	bcall(_fpmult)		; op1 = (([Pokémon attacking level]*0.4+2)*[Attack power])*[Pokémon attacking ATT at his level]/([Pokémon being attacked DEF at his level]*50+2)*CE
+	bcall(_SetXXOP2)
+	bcall(_FPMult)		; op1 = (([Pokémon attacking level]*0.4+2)*[Attack power])*[Pokémon attacking ATT at his level]/([Pokémon being attacked DEF at his level]*50+2)*CE
 	jr calculate_damages_next
 
 calculate_damages_not_effective:
 	ld a,2
-	bcall(_setxxop2)
+	bcall(_SetXXOP2)
 	bcall(_fpdiv)		; op1 = (([Pokémon attacking level]*0.4+2)*[Attack power])*[Pokémon attacking ATT at his level]/([Pokémon being attacked DEF at his level]*50+2)*CE
 
 calculate_damages_next:
-	bcall(_op1toop4)	; op1=dégâts, mais on le passe dans op4 (pas 3, cf plus haut) le temps de faire les calculs suivants
+	bcall(_OP1ToOP4)	; op1=dégâts, mais on le passe dans op4 (pas 3, cf plus haut) le temps de faire les calculs suivants
 	ld b,16				; calcul de la marge de 15% (0.85 à 1 fois le résultat)
 	call random
 	add a,85
 	ld h,0
 	ld l,a
-	bcall(_setxxxxop2)
-	bcall(_op2toop1)	; car _setxxop1 ne marche pas si a=100 (jusqu'à 99 seulement)
+	bcall(_SetXXXXOP2)
+	bcall(_OP2ToOP1)	; car _SetXXOP1 ne marche pas si a=100 (jusqu'à 99 seulement)
 	ld hl,100
-	bcall(_setxxxxop2)
+	bcall(_SetXXXXOP2)
 	bcall(_fpdiv)
-	bcall(_op4toop2)
-	bcall(_fpmult)
+	bcall(_OP4ToOP2)
+	bcall(_FPMult)
 	bcall(_int)
-	bcall(_convop1)
+	bcall(_ConvOP1)
 	push af
 	ld b,16 ; chance de faire un coup critique = 1/16
 	call random
@@ -153,43 +153,43 @@ calculate_hp:
 	call calculate_stats_or_hp
 	ld h,0
 	ld l,a
-	bcall(_setxxxxop2)
-	bcall(_fpadd)
+	bcall(_SetXXXXOP2)
+	bcall(_FPAdd)
 	ld a,10
-	bcall(_setxxop2)
-	bcall(_fpadd)
+	bcall(_SetXXOP2)
+	bcall(_FPAdd)
 	jp maths_functions_end
 
 calculate_stats:	; output : op2 = int(2*hl*a/100+5), uses op5
 	push hl
-	bcall(_op1toop5)
+	bcall(_OP1ToOP5)
 	pop hl
 	call calculate_stats_or_hp
 	ld a,5
-	bcall(_setxxop2)
-	bcall(_fpadd)
-	bcall(_op1toop2)
-	bcall(_op5toop1)
+	bcall(_SetXXOP2)
+	bcall(_FPAdd)
+	bcall(_OP1ToOP2)
+	bcall(_OP5ToOP1)
 	ret
 
 calculate_stats_or_hp:
 	push af
 	push hl
 	ld a,2
-	bcall(_setxxop1)
+	bcall(_SetXXOP1)
 	pop hl
 	ld l,(hl)
 	ld h,0
-	bcall(_setxxxxop2)
-	bcall(_fpmult)
+	bcall(_SetXXXXOP2)
+	bcall(_FPMult)
 	pop af
 	push af
 	ld h,0
 	ld l,a
-	bcall(_setxxxxop2
-	bcall(_fpmult)
+	bcall(_SetXXXXOP2
+	bcall(_FPMult)
 	ld hl,100
-	bcall(_setxxxxop2)
+	bcall(_SetXXXXOP2)
 	bcall(_fpdiv)
 	pop af
 	ret
@@ -200,8 +200,8 @@ calculate_experience:	; output : a=experience de base du pokémon vaincu*niveau d
 	inc hl
 	ld l,(hl)
 	ld h,0
-	bcall(_setxxxxop2)
-	bcall(_op2toop1)	; on récupère le niveau du pokémon vaincu et on le met dans op1
+	bcall(_SetXXXXOP2)
+	bcall(_OP2ToOP1)	; on récupère le niveau du pokémon vaincu et on le met dans op1
 	pop hl
 	ld a,(hl)
 	call find_pokemon_data
@@ -209,19 +209,19 @@ calculate_experience:	; output : a=experience de base du pokémon vaincu*niveau d
 	add hl,de
 	ld l,(hl)
 	ld h,d
-	bcall(_setxxxxop2)	; on met l'experience de base dans op2
-	bcall(_fpmult)
+	bcall(_SetXXXXOP2)	; on met l'experience de base dans op2
+	bcall(_FPMult)
 	ld a,7
-	bcall(_setxxop2)
+	bcall(_SetXXOP2)
 	bcall(_fpdiv)
 	pop bc
 	ld a,c
-	bcall(_setxxop2)
+	bcall(_SetXXOP2)
 	bcall(_fpdiv)
 
 maths_functions_end:	; a=op1
 	bcall(_int)	; je me demande si c'est utile
-	bcall(_convop1)
+	bcall(_ConvOP1)
 	ret
 
 calculate_next_experience:	; input : none; output : de=XPmax

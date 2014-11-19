@@ -1,3 +1,9 @@
+PLAYER_DOWN		= 0
+PLAYER_LEFT		= 1
+PLAYER_RIGHT	= 2
+PLAYER_UP		= 3
+
+
 saferam1		=$86EC	;saveSScreen=768
 saferam2		=$8A3A	;statVars=531
 saferam3		=$8508	;textShadow=128
@@ -18,12 +24,12 @@ offsetY		= saferam3+8
 player_tile	= saferam3+9			; the tile that's behind the player (8 bytes)
 
 ; Player variables
-player_direction	= saferam3+20	;
+player_direction	= saferam3+20	; 0-3: DLRU
 walk_count			= saferam3+21	; how many pixels the player has gone (should go up to 8)
 walk_anim			= saferam3+22	; current animation frame (how many total? 4?)
-player_y			= saferam3+23
+player_y			= saferam3+23	; aligned to map
 player_x			= saferam3+24
-player_y_off		= saferam3+25
+player_y_off		= saferam3+25	; tile offset in pixels
 player_x_off		= saferam3+26
 
 ; Misc variables

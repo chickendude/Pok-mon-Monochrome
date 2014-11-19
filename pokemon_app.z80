@@ -65,8 +65,8 @@ defpage(0, "PokeMono")
 
 	ld a,(contrast)
 	ld (contrast_var),a
-	set textwrite,(IY+sgrflags)
-	res textEraseBelow,(IY+textflags)
+	set textWrite,(IY+sGrFlags)
+	res textEraseBelow,(IY+textFlags)
 
 	call start
 
@@ -78,7 +78,7 @@ defpage(0, "PokeMono")
 
 start:
 	call fade_out
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 	xor a
 	ld b,a
 	ld c,a
@@ -121,19 +121,40 @@ main_loop:
 	 jr nz,main_loop
 	ret
 
+;###########################
+;# force_down, force_up, etc. are used
+;# .. to skip tile checking. convenient 
+;# .. for use in events, eg. tiles
+;# .. that activate when you step on them
+;###########################
+
+player_walk:
+	ld a,(player_direction)
+	or a
+	 jr z,force_down
+	dec a
+	 jp z,force_left
+	dec a
+	 jp z,force_right
+	jp force_up
+
+
 walk_down:
+	xor a
+	ld (player_direction),a
 	ld bc,$0100					; y offset = +1
 	call get_player_map
 	ld a,(hl)					; a = tile id
 	call check_tile				; check if tile can be passed, events, etc.
 	 ret nz						; if nz, then we can't move there
+force_down:
 	ld a,(player_y)
 	ld hl,map_y
 	sub (hl)
 	cp 4
 	 jr nc,scroll_down
 walk_down_player:
-	ld b,7
+	ld b,8
 walk_down_loop:
 	push bc
 		ld hl,player_y_off
@@ -221,11 +242,14 @@ sd_fill_row:
 	ret
 
 walk_up:
+	ld a,PLAYER_UP
+	ld (player_direction),a
 	ld bc,$FF00					; y offset = -1
 	call get_player_map			; b holds the offset to add to player's position
 	ld a,(hl)					; a holds tile id
 	call check_tile				; essentially a cpir of passable tiles
 	 ret nz						; if nz, then we can't move there
+force_up:
 	ld a,(player_y)
 	ld hl,map_y
 	sub (hl)
@@ -310,11 +334,14 @@ su_fill_row:
 	ret
 
 walk_left:
+	ld a,PLAYER_LEFT
+	ld (player_direction),a
 	ld bc,$00FF					; x offset = -1
 	call get_player_map			; c holds the offset to add to player's x position
 	ld a,(hl)					; a holds tile id
 	call check_tile				; essentially a cpir of passable tiles
 	 ret nz						; if nz, then we can't move there
+force_left:
 	ld a,(player_x)
 	ld hl,map_x
 	sub (hl)
@@ -396,11 +423,14 @@ scroll_left_in:
 	ret
 
 walk_right:
+	ld a,PLAYER_RIGHT
+	ld (player_direction),a
 	ld bc,$0001					; x offset = 1
 	call get_player_map			; c holds the offset to add to player's x position
 	ld a,(hl)					; a holds tile id
 	call check_tile				; essentially a cpir of passable tiles
 	 ret nz						; if nz, then we can't move there
+force_right:
 	ld a,(player_x)
 	ld hl,map_x
 	sub (hl)
@@ -507,7 +537,6 @@ scroll_right_in:
 #include "menu.inc"
 #include "new.inc"
 #include "engine.inc"
-#include "gba.inc"
 #include "events.inc"
 #include "trainers.inc"
 #include "battle.inc"

@@ -9,7 +9,7 @@ load_map:
 	ld b,0
 	ld hl,map_table
 	add hl,bc			; find the map in the map table
-	call LD_HL_MHL		; ld hl,(hl)
+	call ld_hl_hl		; ld hl,(hl)
 ; HL points to start of map data	
 	ld a,(hl)			; save map width and height
 	ld (mapWidth),a
@@ -195,14 +195,14 @@ clear_player:
 	exx
 		ld de,player_tile	; where to save the tile the player will cover
 	exx		
-draw_sprite_mask:
+clear_sprite:
 	exx
 		ld a,(de)
 		inc de
 	exx
 	ld (hl),a
 	add hl,de 				; next row
-	djnz draw_sprite_mask
+	djnz clear_sprite
 	ret
 
 ;###########################
@@ -261,14 +261,41 @@ get_player_map:
 	add hl,de
 	ret
 
-;re-used routines from before
-
 ;###########################
-check_tile:	; z if tile is practicable
-	ld hl,practicable_tiles
-	ld bc,practicable_tiles_end-practicable_tiles
+check_tile:	; z if tile is passable
+;# checks a tile for events and if it can be passed
+;# input:
+;# -a = tile ID
+;# output:
+;# -z is set if you can walk through the tile
+;# -nz means an event has taken place and we should quit
+;#	.. the routine or the tile is not passable
+;###########################
+; first check for events
+	ld hl,event_tiles
+	ld b,(event_tiles_end-event_tiles)/3	;chaque évènement occupe trois octets
+		cp (hl)
+		inc hl
+		 jr z,load_event
+		inc hl
+		inc hl
+	 djnz $-6
+; now check if we can pass through the tile
+	ld hl,passable_tiles
+	ld bc,passable_tiles_end-passable_tiles
 	cpir
 	ret
+
+load_event:
+	call ld_hl_hl				; get the routine to jump to in HL
+	call jp_hl					; call the routine
+	xor a
+	inc a						; set nz
+	ret
+	
+#comment
+
+;################### OLD ROUTINES ############################
 check_event_block_tile:
 	;ld hl,event_block_tiles	; pour le moment, pas nécessaire (après check_tile_loop hl pointe sur event_block_tiles)
 	ld b,(event_block_tiles_end-event_block_tiles)/3
@@ -282,7 +309,7 @@ check_event_tile_loop:
 	cp (hl)
 	 jr nz,check_event_tile_skip	; la taille d'un bcall n'est pas la même sur 83 que sur 83+
 	inc hl
-	bcall(_ldhlind)
+	call ld_hl_hl
 	jp (hl)
 check_event_tile_skip:
 	inc hl
@@ -290,10 +317,6 @@ check_event_tile_skip:
 	inc hl
 	djnz check_event_tile_loop
 	ret
-
-#comment
-
-;################### OLD ROUTINES ############################
 
 
 walk_engine:	; hl:map addr
@@ -354,7 +377,7 @@ walk_down:
 	ld a,8				;vérifier qu'il n'y a rien dessous
 	add a,c
 	ld c,a
-	call gbaCollision	;a = no. de tile
+	call gbaCollision	;returns a = no. de tile
 	call check_tile
 	jp nz,draw_map		;nz = un tile praticable n'a pas été rencontré
 

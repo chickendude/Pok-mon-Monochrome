@@ -89,7 +89,7 @@ battle_draw_player_next:
 
 ;- Routines d'affichages de différentes choses durant les combats -------------------------------------------------
 battle_draw_screen:
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 	call battle_draw_frame
 ;############# peut-être pas nécéssaire ############
 battle_current_opponent_pokemon_address = $+1	;###
@@ -209,8 +209,8 @@ battle_draw_player_pokemon_state:	; input : hl = player pokemon state
 	pop af
 	call battle_draw_pokemon_state
 	ld de,$2a1f
-	ld (pencol),de
-	bcall(_vputs)
+	ld (penCol),de
+	bcall(_VPutS)
 	ret
 
 battle_draw_opponent_pokemon_state:	; input : hl = opponent pokemon state
@@ -224,8 +224,8 @@ battle_draw_opponent_pokemon_state:	; input : hl = opponent pokemon state
 	pop af
 	call battle_draw_pokemon_state
 	ld de,$1136
-	ld (pencol),de
-	bcall(_vputs)
+	ld (penCol),de
+	bcall(_VPutS)
 	ret
 
 battle_draw_pokemon_state:
@@ -374,9 +374,9 @@ battle_draw_evolution:
 	jp fastCopy
 
 ;- Routines graphiques pour le texte ------------------------------------------------------------------------------
-battle_draw_frame:	; affiche le cadre des textes et positionne pencol/penrow
+battle_draw_frame:	; affiche le cadre des textes et positionne penCol/penrow
 	ld de,$3202
-	ld (pencol),de
+	ld (penCol),de
 	ld bc,$0f60
 	ld de,$0031
 	jp draw_frame
@@ -426,6 +426,6 @@ battle_disp_evolution_things:
 	inc hl
 	call _v_type
 	ld de,$3802
-	ld (pencol),de
+	ld (penCol),de
 	ret
 ;------------------------------------------------------------------------------------------------------------------
