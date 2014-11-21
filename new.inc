@@ -80,8 +80,9 @@ new_game_valid_skip_man:
 	ld (map_y),a
 	xor a
 	ld (player_direction),a
-	ld hl,new_game_map
-	jr walk_engine
+	xor a
+	ld bc,$0000
+	jp start
 
 draw_new_game_genre_select_cursor_no_screen_update:	;to avoid flickering !
 	ld a,(menu_cursor)

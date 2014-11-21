@@ -17,10 +17,9 @@ inc_a:
 	ret
 
 find_player_pokemon: ; output : hl=selected pokemon ID from the pokemon menu, de=player_pokemons
+	ld hl,(selected_pokemon)
 	ld h,0
-menu_pokemon_id = $+1
-	ld l,0
-	ld de,player_pokemons
+	ld de,player_party
 	add hl,de
 	ret
 
@@ -266,7 +265,7 @@ _v_replace_zero:
 	ld a,(_v_mode)
 	or a
 	 jr nz,$+5
-		bcall(_VPutS)
+		call draw_string
 	call nz,_v_type
 	pop de
 	pop af
@@ -286,7 +285,7 @@ _v_pause:
 	ld a,(_v_mode)
 	or a
 	 jr nz,$+5
-		bcall(_VPutS)
+		call draw_string
 	call nz,_v_type
 	push hl
 	call _v_disp_pause
@@ -340,7 +339,7 @@ _v_disp_end:
 	or a
 	push af
 	 jr nz,$+5
-		bcall(_VPutS)
+		call draw_string
 	pop af
 	push af
 	call nz,_v_type
@@ -433,7 +432,7 @@ _v_type:
 	jr _v_type
 
 _v_type_skip:
-	bcall(_VPutS)
+	call draw_string
 	push hl
 	call fastCopy
 	pop hl

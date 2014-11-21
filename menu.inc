@@ -49,6 +49,8 @@ exit:
 menu_start:
 ;# Draws the start menu on top of the map
 ;###########################
+	call draw_map				; [engine.inc]
+	call draw_player			; [engine.inc]
 	ld bc,$2d25				; bc = $HHWW (in pixels)
 	ld de,$3b00				; de = $XXYY
 	call draw_frame			; [routines.inc]
@@ -129,17 +131,26 @@ draw_dialogue:
 	ld de,$2C02
 	jr draw_menu_start
 
-draw_menu_return:	;reads the chosen option (menu_cursor)
-	ld (menu_cursor),a
-	ld a,(hl)
-	inc hl
+
+;###########################
+draw_menu_return:
+;# Draws a menu that doesn't need routines
+;# Input:
+;# - a = default menu item to select
+;###########################
+	ld (menu_cursor),a			; save default cursor position
+	ld a,(hl)					; read number of menu items
+	inc hl						; hl now points to start of text
 	ld ix,menu_coordinates+1
-	ld (ix-1),a	;how many options
+	ld (ix-1),a					; number of menu options
 	jr draw_text_fastcopy
 
 ;###########################
 draw_menu:
-;# draws and sets up a menu
+;# Draws and sets up a menu that runs
+;# .. routines after selecting a menu item
+;# Input:
+;# - a = default menu item to select
 ;###########################
 	ld (menu_cursor),a			; the default item to select
 	ld a,(hl)					; how many menu items there are
@@ -152,7 +163,6 @@ draw_menu:
 	ld b,0						; 
 	add hl,bc					; hl now points to menu text
 ;	jr draw_text_fastcopy
-
 ;###########################
 draw_text_fastcopy:
 ;# Draws text and updates the LCD after
@@ -169,14 +179,14 @@ draw_menu_start:
 	ld (penCol),de
 	ld a,e
 	ld (default_col),a
-draw_menu_loop:
+draw_string:
 	ld de,(penCol)				; some of the special routines use penCol
 	ld a,(hl)					; read the next character
 	or a						; 0 = EOS
 	 ret z						; quit if EOS
 	cp NEWXY					; the last special routine, 
 	 jr c,not_special			; .. if a < last special routine, it's not a special character
-		ld bc,draw_menu_loop	; ** we will return to draw_menu_loop **
+		ld bc,draw_string		; ** we will return to draw_menu_loop **
 		push bc					; ** .. after running the special routine **
 	 	push hl
 			ld hl,text_routine_table	; table holding special text routines (newline, pause, change x/y, etc.)
@@ -203,7 +213,7 @@ not_special:
 	bit textDelay,(iy+pokeFlags); reset if no delay, set for typewriter effect
 	 call nz,text_delay			; a short delay, also updates LCD
 	inc hl						; next character in string
-	jr draw_menu_loop
+	jr draw_string
 
 ;a = stat à afficher
 insert_stat:
@@ -212,7 +222,7 @@ insert_stat:
 	dec c
 	cp _LVL
 	push hl
-	jr c,print_pokemon_name
+	 jr c,print_pokemon_name
 	ld hl,current_pokemon
 	add hl,bc
 	ld a,(hl)
@@ -224,12 +234,11 @@ print_pokemon_name:
 	ld hl,current_pokemon
 	add hl,bc
 	call ld_hl_hl
-	bcall(_VPutS)
-
+	call draw_string
 insert_stat_end:
 	pop hl
 	inc hl
-	jr draw_menu_loop
+	jr draw_string
 
 ;$00 = end of a dialogue or end of a menu option
 ;NEWX ($ff) = new X coordinate
@@ -271,20 +280,20 @@ text_add_menu:
 	ret
 
 text_new_x:
-	inc hl
+	inc hl				; the next byte holds the new x value
 	ld e,(hl)
-	ld (penCol),de
-	inc hl
+	ld (penCol),de		; update penCol
+	inc hl				; ready to read next byte in string
 	ret
 
 text_new_line:
 	ld a,d
-	add a,6				;penRow+6
-	ld de,(default_col)
-	ld d,a
-	ld (penCol),de
+	add a,6				; penRow+6
+	ld de,(default_col)	; put the default column in e
+	ld d,a				; and store the new row into d
+	ld (penCol),de		; update penCol
 	inc hl
-	ld a,(hl)
+;	ld a,(hl)
 	ret
 
 text_pause:
@@ -460,10 +469,32 @@ text_delay:
 menu_select:
 	call release_key
 	scf					;set the carry flag so we can determine 2nd to alpha
+	ret
 
-menu_select_smc:
-	nop					;ou nop ou ret, selon on appelle menu_key ou menu_key_return
-	pop hl				;nettoyer la pile (le call)
+;sortie : a = l'option choisie (menu_cursor), nc=alpha has been pushed, c=2nd
+;###########################
+menu_key_return:
+;# Lets user pick a choice and
+;# .. returns the item selected in a.
+;# NOTE: Doesn't run any routines after
+;# .. selecting an item, just returns
+;# .. the value in a.
+;###########################
+	call menu_key_basic
+	ld a,(menu_cursor)
+	ret
+
+;###########################
+menu_key:
+;# Waits for a key press then handles
+;# .. the cursor. Exits if [Alpha] is
+;# .. pressed. Jumps to the selected
+;# .. item's corresponding routine if
+;# .. [2nd] is pressed.
+;###########################
+	call menu_key_basic
+	 ret nc				; nc means [Alpha] was pressed
+	pop hl				; clear the stack (menu_key was called)
 	ld a,(menu_cursor)
 	add a,a
 	ld c,a
@@ -476,23 +507,7 @@ menu_select_smc:
 	ld l,a
 	jp (hl)
 
-;sortie : a = l'option choisie (menu_cursor), nc=alpha has been pushed, c=2nd
-menu_key_return:
-	ld a,$c9			;ret
-	call menu_key+1
-	ld a,(menu_cursor)
-	ret
-
-;###########################
-menu_key:
-;# Waits for a key press then handles
-;# .. the cursor. Exits if [Alpha] is
-;# .. pressed. Jumps to the selected
-;# .. item's corresponding routine if
-;# .. [2nd] is pressed.
-;###########################
-	xor a				;nop
-	ld (menu_select_smc),a
+menu_key_basic:
 	call check_sub_menu
 	call draw_cursor	;draw the cursor (XORed sprite)
 menu_key_loop:
@@ -667,111 +682,53 @@ get_cursor_coords:
 #define CP_EXP		24
 #define CP_SPRITE	25
 
-current_pokemon:
-	.dw 0	;pokemon name string address
-	.fill 8,0	;(string de l'attaque)*4
-	;put more strings here
-	.db 0		;lvl
-	.db 0		;hp
-	.db 0		;total hp
-	.db 0		;att
-	.db 0		;def
-	.db 0		;state
-	.dw 0		;atk 1 id, pp
-	.dw 0		;atk 2 id, pp
-	.dw 0		;atk 3 id, pp
-	.dw 0		;atk 4 id, pp
-	.dw 0	;exp
-	.dw 0	;sprite address
-
-current_pokemon_player:
-	.dw 0	;pokemon name string address
-	.fill 8,0	;(string de l'attaque)*4
-	;put more strings here
-	.db 0		;lvl
-	.db 0		;hp
-	.db 0		;total hp
-	.db 0		;att
-	.db 0		;def
-	.db 0		;state
-	.dw 0		;atk 1 id, pp
-	.dw 0		;atk 2 id, pp
-	.dw 0		;atk 3 id, pp
-	.dw 0		;atk 4 id, pp
-	.dw 0	;exp
-	.dw 0	;sprite address
-
-current_pokemon_enemy:
-	.dw 0	;pokemon name string address
-	.fill 8,0	;(string de l'attaque)*4
-	;put more strings here
-	.db 0		;lvl
-	.db 0		;hp
-	.db 0		;total hp
-	.db 0		;att
-	.db 0		;def
-	.db 0		;state
-	.dw 0		;atk 1 id, pp
-	.dw 0		;atk 2 id, pp
-	.dw 0		;atk 3 id, pp
-	.dw 0		;atk 4 id, pp
-	.dw 0	;exp
-	.dw 0	;sprite address
-
-
-
 ;############### OLD ROUTINES
 
 menu_pokemon:
-	xor a
-menu_pokemon_no_cursor_reset:
+	ld hl,menu_pokemon_list				; [strings_XX.inc]
+	ld de,pokemon_menu					; buffer in RAM to hold and manipulate the string
+	ld bc,POKEMON_MENU_SIZE				; copy the string into RAM
+	ldir
+	xor a								; set cursor to 0 (first menu item)
+menu_pokemon_return:
 	push af
-	bcall(_GrBufClr)
-	ld de,player_pokemons
-	xor a
-
+		bcall(_GrBufClr)
+		ld de,player_party				; holds current configuration of player's party, 6 bytes
+		ld hl,pokemon_menu_id			; location of first pokémon's id in the string
+		ld b,0							; counter
 menu_pokemon_listing:
-	ld b,a
-	ld a,(de)
-	or a
-	jr z,menu_pokemon_listing_end
-	ld a,b
-	push af
-	push de
-	ld hl,POKEMON_LIST_STR_LENGTH
-	ld b,a
-	call slow_mult_hl_b
-	ld de,menu_pokemon_list_first_id
-	add hl,de
-	pop de
-	ld a,(de)
-	ld (hl),a
-	inc de
-	pop af
-	inc a
-	cp POKEMON_LIST_LENGTH
-	jr nz,menu_pokemon_listing
-	ld b,a
-
+		ld a,(de)						; read pokemon's id in your party (1-6)
+		or a
+		 jr z,menu_pokemon_listing_end	; if it's a zero, then there are no more pokémon left in your party
+		ld (hl),a						; copy pokémon's id into the string
+		inc de							; move to next pokémon in the list
+		push de
+			ld de,POKEMON_LIST_STR_LENGTH
+			add hl,de					; jump to next pokemon in string
+		pop de
+		inc b
+		ld a,b
+		cp MAX_PARTY
+		 jr nz,menu_pokemon_listing
 menu_pokemon_listing_end:
-	ld a,b
-	ld (menu_pokemon_list),a
-	ld bc,$1560				;b = height, c = width
-	ld de,$002b				;d = x, e = y
-	call draw_frame
-	pop af					;option par défaut
-	ld de,$0005				;coordonnées
-	ld hl,menu_pokemon_list	;le texte à afficher
+		ld a,b
+		ld (pokemon_menu),a				; save number of pokémon in your party
+		ld bc,$1560						; bc = $HHWW
+		ld de,$002b						; de = $XXYY
+		call draw_frame
+	pop af								; default selected menu item
+	ld de,$0005							; coordonnées
+	ld hl,pokemon_menu					; the menu to draw (loaded in saferam)
 	call draw_menu_return
-	call menu_key_return	;pas d'actions, retourner ici
-	jp nc,menu_start		;Alpha (cancel) has been pushed
-	ld (menu_pokemon_id),a
-	ld bc,$151f				;b = height, c = width
-	ld de,$4117				;d = x, e = y
+	call menu_key_return				;pas d'actions, retourner ici
+	 jp nc,menu_start					; [Alpha] (cancel) has been pushed
+	ld (selected_pokemon),a
+	ld bc,$151f							;bc = $HHWW
+	ld de,$4117							;de = $XXYY
 	call draw_frame
-	xor a					;option par défaut
-	ld de,$1847				;coordonnées
-	ld hl,menu_pokemon_options	;le texte à afficher
+	xor a								;option par défaut
+	ld de,$1847							;coordonnées
+	ld hl,menu_pokemon_options			;le texte à afficher
 	call draw_menu
 	call menu_key
 	jr menu_pokemon
@@ -809,7 +766,6 @@ pause_temporaire______________:
 	ld a,$bf	;check 2nd
 	call get_key
 	bit 5,a
-	jr nz,pause_temporaire______________
-
-	ld a,(menu_pokemon_id)	;set the cursor to the last selected pokemon
-	jp menu_pokemon_no_cursor_reset
+	 jr nz,pause_temporaire______________
+	ld a,(selected_pokemon)	;set the cursor to the last selected pokemon
+	jp menu_pokemon_return

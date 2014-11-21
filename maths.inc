@@ -324,6 +324,7 @@ hl_div_c:
 	djnz $-7
 	ret
 
+mult_hl_b:
 slow_mult_hl_b:
 	push de
 		ld e,l

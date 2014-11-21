@@ -31,3 +31,18 @@
 #define _PP3	CP_ATK3PP+1
 #define _PP4	CP_ATK4PP+1
 #define _EXP	CP_EXP+1
+
+#ifdef FR
+; il faudra sans doute que je rajoute les fichiers types.inc et pokemons.inc qui sont en partie en français !!!
+	.echo "Compiling in french."
+	#include "strings_fr.inc"
+#else
+#ifdef EN
+	.echo "Compiling in english."
+	#include "strings_en.inc"
+#else
+	.echo "Error: no language selected."
+	.echo "Using default French files."
+	#include "strings_fr.inc"
+#endif
+#endif

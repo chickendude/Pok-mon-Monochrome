@@ -27,8 +27,11 @@ menu_coordinates = scrapSpace	; where menu coordinates are stored at, first byte
 								; .. followed by two bytes per item holding cursor's X and Y when item is selected
 menu_cursor		= scrapSpace+17	; the currently selected menu item
 cursor_wait		= scrapSpace+18
-default_col		= scrapSpace+19	; 
+default_col		= scrapSpace+19	; default penCol value when reaching a newline
 option_list		= scrapSpace+20	; [2 bytes]: pointer to menu's routine list
+pokemon_menu	= scrapSpace+22	; around 110 bytes
+pokemon_menu_id	= pokemon_menu+POKEMON_MENU_ID_OFFSET	; where first pokémon's id is located in the menu
+selected_pokemon= scrapSpace+132	; which pokemon was selected in the pokemon menu
 
 ; Map variables
 mapAddr		= saferam3				;128 bytes
@@ -48,6 +51,28 @@ player_y			= saferam3+23	; aligned to map
 player_x			= saferam3+24
 player_y_off		= saferam3+25	; tile offset in pixels
 player_x_off		= saferam3+26
+
+; Pokémon variables
+player_party	= ramBuf+1000			; [6 bytes]
+current_pokemon	= ramBuf+1006			; currently [28 bytes], i'll leave 30 bytes for now
+;	.dw 0	;pokemon name string address
+;	.fill 8,0	;(attack string)*4
+;	;put more strings here
+;	.db 0		;lvl
+;	.db 0		;hp
+;	.db 0		;total hp
+;	.db 0		;att
+;	.db 0		;def
+;	.db 0		;state
+;	.dw 0		;atk 1 id, pp
+;	.dw 0		;atk 2 id, pp
+;	.dw 0		;atk 3 id, pp
+;	.dw 0		;atk 4 id, pp
+;	.dw 0		;exp
+;	.dw 0		;sprite address
+current_pokemon_player	= ramBuf+1036	; current player's pokemon data
+current_pokemon_enemy	= ramBuf+1066	; current enemy data
+;						= ramBuf+1096	;
 
 ; Misc variables
 randData			= saferam3+60	; used for Ion's random routine

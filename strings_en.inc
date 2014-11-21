@@ -198,7 +198,7 @@ menu_beginning_str:
 	.db MN,"Quit",0
 
 gender_str:
-	.db "Are you a boy or a girl ?",0
+	.db "Are you a boy or a girl?",0
 null_text = $-1
 
 new_game_str:
@@ -219,11 +219,11 @@ menu_start_str:
 	.dw draw_map
 	.db MN,"Pok",$96,"dex",NEWL
 	.db MN,"Pok",$96,"mon",NEWL
-	.db MN,"Objets",NEWL
-	.db MN,"Joueur",NEWL
-	.db MN,"Sauver",NEWL
+	.db MN,"Objects",NEWL
+	.db MN,"Player",NEWL
+	.db MN,"Save",NEWL
 	.db MN,"Options",NEWL
-	.db MN,"Retour",0
+	.db MN,"Return",0
 
 menu_battle:
 	.db 4

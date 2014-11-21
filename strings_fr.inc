@@ -364,8 +364,8 @@ menu_pokemon_list_first_id:
 	.db MN,PKMN,0,_NAME,NEWX,54,_LVL,NEWX,68,_HP,NEWX,80,"/",_HPTOT,NEWL
 menu_pokemon_list_length_start:
 	.db MN,PKMN,0,_NAME,NEWX,54,_LVL,NEWX,68,_HP,NEWX,80,"/",_HPTOT,0
-menu_pokemon_list_length_end:
-#define POKEMON_LIST_STR_LENGTH	menu_pokemon_list_length_end-menu_pokemon_list_length_start
+menu_pokemon_list_end:
+#define POKEMON_LIST_STR_LENGTH	menu_pokemon_list_end-menu_pokemon_list_length_start
 
 menu_pokemon_options:
 	.db 3

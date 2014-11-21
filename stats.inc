@@ -3,10 +3,9 @@
 player_map:	; idem
 	.db 0
 
-player_pokemons:
+player_pokemons:		;** this has been changed to player_party, see [variables.inc]
 	.db 3,2,1,0,0,0
 player_pokemons_length:
-#define POKEMON_LIST_LENGTH	player_pokemons_length-player_pokemons
 
 pokemon_stats:	; ID pokédex, lvl, PV, state (0=normal; 1=poison; 2=sleep; 3=para), (Attack ID, PP)*4, XP (2 bytes)
 	.db 0

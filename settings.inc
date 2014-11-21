@@ -9,7 +9,14 @@
 ; Tiles/Maps
 #define NUM_EVENTS (event_tiles_end-event_tiles)/3
 #define NUM_PASSABLE_TILES passable_tiles_end-passable_tiles
-; Text settings
+
+; Party settings
+MAX_PARTY	= 6					; maximum number of pokémon you can have in your party
+
+; Text constants
+POKEMON_MENU_SIZE		= menu_pokemon_list_end - menu_pokemon_list			; [strings_XX.inc]
+POKEMON_MENU_ID_OFFSET	= menu_pokemon_list_first_id - menu_pokemon_list	; [strings_XX.inc]
+
 #define vmode_direct	0
 #define vmode_type	1
 #define vmode_type_no_pause	2
