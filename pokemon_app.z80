@@ -1,33 +1,9 @@
 	.nolist
 #include "ti83plus.inc"
 #include "app.inc"
+#include "variables.inc"		; variables saved in saferam
+#include "settings.inc"			; contains constants
 
-#include "variables.inc"
-
-#include "gbavar.inc"
-#include "settings.inc"
-#define vmode_direct	0
-#define vmode_type	1
-#define vmode_type_no_pause	2
-#define screen_width	96
-#define screen_height	64
-#define pokemon_sprite_width	32
-#define pokemon_sprite_height	26
-#define pokemon_sprite_size	$1a04
-#define pokemon_sprite_battle_distance_from_screen	5
-#define cursor_speed	20
-#define scroll_cursor_speed	30
-#define text_typing_speed	6
-#define walk_speed	3
-#define walk_frequency	2
-#define fade_speed	2
-#define pokemon_encounter_frequency	20
-#define battle_flash_screen_frequency	4
-#define battle_blink_sprite_times	4
-#define battle_blink_sprite_speed	10
-#define battle_evolution_blink_sprite_times	26	; must be even
-#define battle_evolution_blink_sprite_speed	10
-#define trainer_tile	56	; tile # after which there's only trainers-related tiles
 #macro cp_hl_de()
 	or a
 	sbc hl,de
@@ -93,32 +69,45 @@ main_loop:
 	call draw_player
 	call fastCopy
 	call clear_player
-	ld a,$FE					; groupe 1
-	call get_key				; flèches directionnelles
-	rra							; down
+
+	ld a,$BF					; group 7
+	call get_key				; contains: [2nd][Mode][Del],[Y=]->[Graph]
+	bit 4,a						; was [Y=] pressed?
+	 call z,menu_start
+
+	ld a,$FD					; group 2
+	call get_key				; [Enter]->[Clear]
+	bit 6,a						; was [Clear] pressed?
+	 ret z						; if so, exit
+
+	ld hl,walk_anim				; move to next animation frame
+	ld a,(hl)
+	inc a
+	and $1						; there are only two animations
+	ld (hl),a
+
+	ld hl,main_loop
+	push hl						; load main_loop onto the stack so that ret jumps there
+
+	ld a,$FE					; group 1
+	call get_key				; check arrow keys
+	rrca							; down
 	push af
 		call nc,walk_down
 	pop af
-	rra
+	rrca
 	push af
 		call nc,walk_left
 	pop af
-	rra
+	rrca
 	push af
 		call nc,walk_right
 	pop af
-	rra
+	rrca
 	 call nc,walk_up
-
-	ld a,$BF					;groupe 7
-	call get_key				;[2nd][Mode][Del],[Y=]->[Graph]
-	bit 4,a						;[Y=] ?
-	 call z,menu_start
-
-	ld a,$FD					;groupe 2
-	call get_key				;[Enter]->[Clear]
-	bit 6,a						;[Clear] ?
-	 jr nz,main_loop
+	cp $FF						; if a key was pressed we don't need to reset the animation
+	 ret nz
+	ld (walk_anim),a			; if no key was pressed, reset player's animation ($FF)
 	ret
 
 ;###########################
@@ -553,15 +542,18 @@ scroll_right_in:
 	.echo "Compiling in french."
 	#include "strings_fr.inc"
 #else
-	#ifdef EN
-		.echo "Compiling in english."
-		#include "strings_en.inc"
-	#else
-		.echo "Error : no language selected."
-	#endif
+#ifdef EN
+	.echo "Compiling in english."
+	#include "strings_en.inc"
+#else
+	.echo "Error: no language selected."
+	.echo "Using default French files."
+	#include "strings_fr.inc"
+#endif
 #endif
 #include "sprites.inc"
 #include "tiles.inc"
 #include "maps.inc"
 #include "pokemons.inc"
+.echo "Current size: ",$-$4000," bytes."
 	.end

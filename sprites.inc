@@ -12,11 +12,6 @@ player_down:
 #include "sprites/player_down02.bmp"
 #include "sprites/player_down03.bmp"
 
-player_man_up:
-#include "sprites/player_man_up01.bmp"
-#include "sprites/player_man_up02.bmp"
-#include "sprites/player_man_up03.bmp"
-
 player_man_left:
 #include "sprites/player_man_left01.bmp"
 #include "sprites/player_man_left02.bmp"
@@ -27,10 +22,10 @@ player_man_right:
 #include "sprites/player_man_right02.bmp"
 #include "sprites/player_man_right03.bmp"
 
-player_woman_up:
-#include "sprites/player_woman_up01.bmp"
-#include "sprites/player_woman_up02.bmp"
-#include "sprites/player_woman_up03.bmp"
+player_man_up:
+#include "sprites/player_man_up01.bmp"
+#include "sprites/player_man_up02.bmp"
+#include "sprites/player_man_up03.bmp"
 
 player_woman_left:
 #include "sprites/player_woman_left01.bmp"
@@ -41,6 +36,11 @@ player_woman_right:
 #include "sprites/player_woman_right01.bmp"
 #include "sprites/player_woman_right02.bmp"
 #include "sprites/player_woman_right03.bmp"
+
+player_woman_up:
+#include "sprites/player_woman_up01.bmp"
+#include "sprites/player_woman_up02.bmp"
+#include "sprites/player_woman_up03.bmp"
 
 opponent_man:
 #include "sprites/opponent_man.bmp"

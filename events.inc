@@ -22,6 +22,7 @@ event_cliff:
 	jp player_walk
 
 event_grass:
+	call player_walk
 	ld b,pokemon_encounter_frequency
 	call random
 	or a

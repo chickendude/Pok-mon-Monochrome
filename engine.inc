@@ -124,7 +124,26 @@ draw_player:
 	ld de,12
 	exx
 		ld hl,player_down	; player's sprite ***
-		ld de,player_tile	; where to save the tile the player will cover
+		ld a,(player_direction)
+		rlca
+		rlca
+		rlca
+		rlca				; x16 (8 for sprite, 8 for mask)
+		ld e,a
+		ld d,0
+		add hl,de			; add offset to find proper sprite according to
+		add hl,de			; .. player's direction
+		add hl,de			; .. x3 because each direction has three sprites
+		ld a,(walk_anim)	; check what frame we are on
+		inc a				; if a = $FF, we are standing still
+		 jr z,$+8
+			rlca
+			rlca
+			rlca
+			rlca			; a*16
+			ld e,a
+			add hl,de		; hl points to the current animation sprite
+		ld de,player_tile	; where to save the tile the player will cover (used when scrolling the map)
 	exx
 	ld a,(player_x_off)
 	ld c,a
@@ -273,7 +292,7 @@ check_tile:	; z if tile is passable
 ;###########################
 ; first check for events
 	ld hl,event_tiles
-	ld b,(event_tiles_end-event_tiles)/3	;chaque évènement occupe trois octets
+	ld b,NUM_EVENTS				;chaque évènement occupe trois octets
 		cp (hl)
 		inc hl
 		 jr z,load_event
@@ -282,15 +301,15 @@ check_tile:	; z if tile is passable
 	 djnz $-6
 ; now check if we can pass through the tile
 	ld hl,passable_tiles
-	ld bc,passable_tiles_end-passable_tiles
+	ld bc,NUM_PASSABLE_TILES
 	cpir
 	ret
 
 load_event:
-	call ld_hl_hl				; get the routine to jump to in HL
-	call jp_hl					; call the routine
-	xor a
-	inc a						; set nz
+	call ld_hl_hl			; get the routine to jump to in HL
+	call jp_hl				; call the routine
+	xor a					; 
+	inc a					; set nz
 	ret
 	
 #comment
