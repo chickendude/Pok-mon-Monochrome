@@ -3,15 +3,32 @@ PLAYER_LEFT		= 1
 PLAYER_RIGHT	= 2
 PLAYER_UP		= 3
 
+; Flags
+pokeFlags = asm_Flag1
+rectXOR			= 0		; set = XOR, reset = OR (for drawing rectangles)
+textDelay		= 0		; set = typewriter text (updates LCD), reset = no delay
 
-saferam1		=$86EC	;saveSScreen=768
-saferam2		=$8A3A	;statVars=531
-saferam3		=$8508	;textShadow=128
-saferam4		=$8478	;OPs=66
-saferam5		=$84D3	;iMathPtrs=10
-saferamp		=$9872	;appBackUpScreen=768
-saferamp2		=$8251	;bootTemp=52
-gbuf			=$9340
+; Saferam and buffers
+saferam1		= $86EC	; saveSScreen=768
+saferam2		= $8A3A	; statVars=531
+saferam3		= $8508	; textShadow=128
+saferam4		= $8478	; OPs=66
+saferam5		= $84D3	; iMathPtrs=10
+saferamp		= $9872	; appBackUpScreen=768
+saferamp2		= $8251	; bootTemp=52
+gbuf			= $9340
+ramBuf			= $9D95	; we've inserted RAM here, see [settings.inc] to find out how much
+scrollBuf		= ramBuf		; this is where we load the extra column/row when we scroll the screen
+scrapSpace		= ramBuf+500	; space that can be used for multiple purposes (volatile)
+flipSpriteBuf	= scrapSpace	; where the sprites get flipped to
+
+; Menu variables
+menu_coordinates = scrapSpace	; where menu coordinates are stored at, first byte holds number of menu items
+								; .. followed by two bytes per item holding cursor's X and Y when item is selected
+menu_cursor		= scrapSpace+17	; the currently selected menu item
+cursor_wait		= scrapSpace+18
+default_col		= scrapSpace+19	; 
+option_list		= scrapSpace+20	; [2 bytes]: pointer to menu's routine list
 
 ; Map variables
 mapAddr		= saferam3				;128 bytes

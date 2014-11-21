@@ -70,16 +70,16 @@ new_game_valid_skip_man:
 	call draw_dialogue
 
 ;initialize variables
-	ld a,new_game_y
+	ld a,NEW_GAME_Y
 	ld (player_y),a
-	ld a,new_game_x
+	ld a,NEW_GAME_X
 	ld (player_x),a
 	ld a,new_game_offset_x
-	ld (screenOffsetX),a
+	ld (map_x),a
 	ld a,new_game_offset_y
-	ld (screenOffsetY),a
-	ld hl,new_game_direction
-	ld (player_direction),hl
+	ld (map_y),a
+	xor a
+	ld (player_direction),a
 	ld hl,new_game_map
 	jr walk_engine
 

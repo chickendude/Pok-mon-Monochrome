@@ -494,6 +494,8 @@ ldhlind_no_little_indian:
 	ld h,a
 	ret
 
+;####################### Rectangles and dialog boxes #######################
+
 draw_frame:
 	call rectangle_filled_solid
 	inc d
@@ -504,83 +506,76 @@ draw_frame:
 	dec c
 	jp rectangle_filled_xor
 
-; Rectangle filled routine by chickendude
-#ifdef TI83
-#define GBUF_LSB	$29
-#define GBUF_MSB	$8E
-#endif
-#ifdef TI83P
 #define GBUF_LSB	$40
 #define GBUF_MSB	$93
-#endif
 
 ;b = height
 ;c = width
 ;d = starting x
 ;e = starting y
-rectangle_filled_white:
-	call rectangle_filled_solid
+rectangle_filled_white:			; this just draws a filled rectangle then XORs the same rectangle over top
+	call rectangle_filled_solid	; .. essentially drawing two rectangles
 
-rectangle_filled_xor:
-	ld a,$AE		;xor (hl)
+rectangle_filled_xor:			; draw a filled rectangle with XOR logic
+	set rectXOR,(iy+pokeFlags)	; set the XOR flag
 	jr rectangle_filled2
 
-rectangle_filled_solid:
-	ld a,$B6		;or (hl)
+rectangle_filled_solid:			; draw a filled rectangle with OR logic (everything to black)
+	res rectXOR,(iy+pokeFlags)	; reset XOR flag (use OR)
 
 rectangle_filled2:
 	push de
 	push bc
-	ld (or_xor),a	;use smc for xor/solid fill
-	ld a,d			;starting x
-	and $7			;what bit do we start on?
-	ex af,af'
-	ld a,d			;starting x
-	ld l,e			;ld hl,e
-	ld h,0			; ..
-	ld d,h			;set d = 0
-	add hl,de		;starting y * 12
-	add hl,de		;x3
-	add hl,hl		;x6
-	add hl,hl		;x12
-	rra				;a = x coord / 8
-	rra				;
-	rra				;
-	and %00011111	;starting x/8 (starting byte in gbuf)
-	add a,GBUF_LSB
-	ld e,a			;
-	ld d,GBUF_MSB	;
-	add hl,de		;hl = offset in gbuf
-	ex af,af'
-	ld d,a
-	ld a,%10000000
-	jr z,$+6
-	rra
-	dec d
-	jr nz,$-2
-	ld e,12
-
+		ld a,d			;starting x
+		and $7			;what bit do we start on?
+		ex af,af'
+		ld a,d			;starting x
+		ld l,e			;ld hl,e
+		ld h,0			; ..
+		ld d,h			;set d = 0
+		add hl,de		;starting y * 12
+		add hl,de		;x3
+		add hl,hl		;x6
+		add hl,hl		;x12
+		rra				;a = x coord / 8
+		rra				;
+		rra				;
+		and %00011111	;starting x/8 (starting byte in gbuf)
+		add a,GBUF_LSB
+		ld e,a			;
+		ld d,GBUF_MSB	;
+		add hl,de		;hl = offset in gbuf
+		ex af,af'
+		ld d,a
+		ld a,%10000000
+		jr z,$+6
+		rra
+		dec d
+		jr nz,$-2
+		ld e,12
 rectangle_loop_x:
-	push af
-	push bc
-	push hl
-	ld c,a
-
+		push af
+		push bc
+		push hl
+			ld c,a
 rectangle_loop_y:
-or_xor = $
-	or (hl)			;smc will modify this to or/xor
-	ld (hl),a
-	ld a,c
-	add hl,de
-	djnz rectangle_loop_y
-	pop hl
-	pop bc
-	pop af
-	rrca
-	jr nc,$+3
-	inc hl
-	dec c
-	jr nz,rectangle_loop_x
+			bit rectXOR,(iy+pokeFlags)	; check if the rectangle XOR flag is set
+			 jr nz,$+5					; jr ------>--------->------->-------\
+				or (hl)					; if rectXOR is reset, use OR logic   |
+				jr $+3					;                                     |
+			xor (hl)					; if rectXOR is set, use XOR logic <-/
+			ld (hl),a
+			ld a,c
+			add hl,de
+			djnz rectangle_loop_y
+		pop hl
+		pop bc
+		pop af
+		rrca
+		jr nc,$+3
+		inc hl
+		dec c
+		 jr nz,rectangle_loop_x
 rectangle_end:
 	pop bc
 	pop de
@@ -592,44 +587,45 @@ find_and_flip_sprite:
 	call battle_find_sprite
 	ld bc,pokemon_sprite_size
 
-; Flip sprite routine by chickendude
-; INPUT :
-; ix:sprite; b:height; c:width/8
-; OUTPUT :
-; ix=flipped sprite
-; destroys a, de, hl
-; uses saferam3
+;###########################
 flip_sprite:
+;# Input:
+;# - ix=sprite
+;# - b=height
+;# - c=width/8
+;# Output:
+;# - ix=flipped sprite
+;# destroys a, de, hl
+;# uses flipSpriteBuf
+;###########################
 	push bc
-	push ix
-	pop de
-	ld hl,saferam3
-
+		push ix						; put ix into de
+		pop de
+		ld hl,flipSpriteBuf			; where to store the sprite
 flip_sprite_outer:
 ;de = original sprite
 ;hl = buffer
-	push bc		;save b (sprite height)
-	ld b,0		;bc = width in bytes
-	add hl,bc	;go to very right of first sprite and draw leftward
-	push hl
-	ld b,8
-
+		push bc						; save b (sprite height)
+			ld b,0					; bc = width in bytes
+			add hl,bc				; go to very right of first sprite and draw leftward
+			push hl
+				ld b,8
 flip_sprite_loop:
-	dec hl		;go left in buffer
-	push bc		;c gets overwritten so we need to save it
-	ld a,(de)	;first byte in a
-	rrca		;rotate a to the right and rotate the carry left into c
-	rl c
-	djnz $-3
-	ld (hl),c	;save flipped byte
-	inc de		;next byte of sprite
-	pop bc		;c = counter (number of bytes to flip)
-	dec c
-	jr nz,flip_sprite_loop
-	pop hl
-	pop bc		;restore b (height)
-	djnz flip_sprite_outer
-	ld ix,saferam3
+				dec hl				; go left in buffer
+				push bc				; c gets overwritten so we need to save it
+						ld a,(de)	; first byte in a
+						rrca		; rotate a to the right 
+						rl c		; .. and rotate the carry left into c
+					 djnz $-3
+					ld (hl),c		; save flipped byte
+					inc de			; next byte of sprite
+				pop bc				; c = counter (number of bytes to flip)
+				dec c
+				 jr nz,flip_sprite_loop
+			pop hl
+		pop bc						; restore b (height)
+		djnz flip_sprite_outer
+		ld ix,flipSpriteBuf
 	pop bc
 	ret
 

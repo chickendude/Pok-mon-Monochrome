@@ -1,10 +1,10 @@
 ; Settings for a new game
-#define NEW_GAME_X	8
-#define NEW_GAME_Y	8
-#define new_game_offset_x	0
-#define new_game_offset_y	0
-#define NEW_GAME_MAP	map_test
-#define NEW_GAME_DIRECTION	player_down
+#define NEW_GAME_X	8			; player's starting X
+#define NEW_GAME_Y	8			; player's starting Y
+#define new_game_offset_x	0	; starting map X
+#define new_game_offset_y	0	; starting map Y
+#define NEW_GAME_MAP	map_test	; the first map to load
+#define NEW_GAME_DIRECTION	player_down	;
 
 ; Tiles/Maps
 #define NUM_EVENTS (event_tiles_end-event_tiles)/3
@@ -34,5 +34,3 @@
 #define trainer_tile	56	; tile # after which there's only trainers-related tiles
 
 INSERT_RAM = 2000
-ramBuf = $9D95
-scrollBuf = ramBuf
