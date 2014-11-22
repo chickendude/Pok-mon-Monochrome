@@ -140,18 +140,18 @@ clefairy_attacks:
 pokemon_general_stats:
 bulbasaur:
 	.dw bulbasaur_txt
-	.db 45	;HP
-	.db 49	;Att
-	.db 49	;Def
+	.db 45			;HP
+	.db 49			;Att
+	.db 49			;Def
 	;Sp. Atk
 	;Sp. Def
 	;Speed
-	.db 64	;Base EXP
+	.db 64			;Base EXP
 	.db TYPE_GRASS	;Type 1
 	.db TYPE_POISON	;Type 2
-	.db 2	;EXP curve
+	.db 2			;EXP curve
 	.dw bulbasaur_attacks
-	.db 16	;niveau d'évolution
+	.db 16			;niveau d'évolution
 ivysaur:
 	.dw ivysaur_txt
 	.db 60			;HP

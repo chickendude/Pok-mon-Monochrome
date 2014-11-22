@@ -17,28 +17,32 @@ MAX_PARTY	= 6					; maximum number of pokémon you can have in your party
 POKEMON_MENU_SIZE		= menu_pokemon_list_end - menu_pokemon_list			; [strings_XX.inc]
 POKEMON_MENU_ID_OFFSET	= menu_pokemon_list_first_id - menu_pokemon_list	; [strings_XX.inc]
 
-; Menu defines
-#define CP_NAME		0	; strings
-#define CP_ATK1STR	2
-#define CP_ATK2STR	4
-#define CP_ATK3STR	6
-#define CP_ATK4STR	8
-#define CP_LVL		10	; numbers
-#define CP_HP		11
-#define CP_HPTOT	12
-#define CP_ATK		13
-#define CP_DEF		14
-#define CP_STATE	15
-#define CP_ATK1		16
-#define CP_ATK1PP	17
-#define CP_ATK2		18
-#define CP_ATK2PP	19
-#define CP_ATK3		20
-#define CP_ATK3PP	21
-#define CP_ATK4		22
-#define CP_ATK4PP	23
-#define CP_EXP		24
-#define CP_SPRITE	25
+; Current Pokémon defines
+#define CP_NAME			0	; strings
+#define CP_ATK1STR		2
+#define CP_ATK2STR		4
+#define CP_ATK3STR		6
+#define CP_ATK4STR		8
+#define CP_LVL			10	; numbers
+#define CP_HP			11
+#define CP_HPTOT		12
+#define CP_ATK			13
+#define CP_DEF			14
+#define CP_STATE		15
+#define CP_ATK1			16
+#define CP_ATK1PP		17
+#define CP_ATK1PPMAX	18
+#define CP_ATK2			19
+#define CP_ATK2PP		20
+#define CP_ATK2PPMAX	21
+#define CP_ATK3			22
+#define CP_ATK3PP		23
+#define CP_ATK3PPMAX	24
+#define CP_ATK4			25
+#define CP_ATK4PP		26
+#define CP_ATK4PPMAX	27
+#define CP_EXP			28
+#define CP_SPRITE		29
 
 
 #define vmode_direct	0
@@ -48,7 +52,7 @@ POKEMON_MENU_ID_OFFSET	= menu_pokemon_list_first_id - menu_pokemon_list	; [strin
 #define screen_height	64
 #define pokemon_sprite_width	32
 #define pokemon_sprite_height	26
-#define pokemon_sprite_size	$1a04
+#define POKEMON_SPRITE_SIZE	$1a04
 #define pokemon_sprite_battle_distance_from_screen	5
 #define CURSOR_SPEED	20
 #define scroll_cursor_speed	30

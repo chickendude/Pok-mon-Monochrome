@@ -1,3 +1,11 @@
+wait_key:
+	call release_key
+	xor a
+	call get_key
+	inc a
+	 jr z,$-4
+	ret
+
 get_key:
 	out (1),a
 	push af				; delay for slow keyboard drivers
@@ -9,7 +17,7 @@ release_key:
 	xor a
 	call get_key
 	inc a
-	jr nz,release_key
+	 jr nz,release_key
 	ret
 
 inc_a:
@@ -25,19 +33,15 @@ find_player_pokemon: ; output : hl=selected pokemon ID from the pokemon menu, de
 
 find_pokemon_stats:	; hl=pokemon index # ; output : hl=pokemon stats
 	ld a,(hl)
-
 find_pokemon_stats_a:
 	or a
-	ret z
-	ld hl,pokemon_stats
-	ld bc,pokemon_stats_length-pokemon_stats
-
+	 ret z
+	ld b,a
+	ld hl,pokemon_stats-(pokemon_stats_length-pokemon_stats)
+	ld de,pokemon_stats_length-pokemon_stats
 find_pokemon_stats_loop:
-	add hl,bc
-	dec a
-	jp nz,find_pokemon_stats_loop
-	or a
-	sbc hl,bc
+	add hl,de
+	djnz find_pokemon_stats_loop
 	ret
 
 find_pokemon_attack:	; input : hl=pokemon stats, c=attack id ; output : z:attack found, nz:attack not found, hl=attack data
@@ -70,7 +74,7 @@ find_attack_data:
 	ld l,a
 	ld h,0
 	add hl,hl
-	ld bc,attack_index-2	;on commence à 1, parce que 0 = un attaque vide
+	ld bc,attack_index-2		; the first attack id is 1, 0 = an empty attack
 	add hl,bc
 	ld a,(hl)
 	inc hl
@@ -112,10 +116,9 @@ find_map_data_loop:	;compare the map address with the list of each pokémons enco
 is_already_captured:	; input : a=id ; output : z:already captured, nz:not captured
 	ld hl,pokemon_stats
 	ld b,(pokemon_stats_end-pokemon_stats)/(pokemon_stats_length-pokemon_stats)
-
 is_already_captured_loop:
 	cp (hl)
-	ret z
+	 ret z
 	ld d,0
 	ld e,pokemon_stats_length-pokemon_stats
 	add hl,de
@@ -132,8 +135,7 @@ generate_wild_pokemon:
 	ld hl,map_pokemons
 	ld b,(map_pokemons_end-map_pokemons)/4
 	call find_map_data
-	ret nz	;no data on encounterable Pokémons so no battle...
-
+	 ret nz	;no data on encounterable Pokémons so no battle...
 generate_wild_pokemon_find_map_data_ok:
 	call ld_hl_hl	; on a les données des pokémons (ID et amplitudes des niveaux)
 	ld a,(hl)		; nombre maximum de pokémons
@@ -570,7 +572,7 @@ rectangle_end:
 
 find_and_flip_sprite:
 	call battle_find_sprite
-	ld bc,pokemon_sprite_size
+	ld bc,POKEMON_SPRITE_SIZE
 
 ;###########################
 flip_sprite:

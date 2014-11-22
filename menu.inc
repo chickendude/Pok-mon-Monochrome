@@ -217,7 +217,7 @@ not_special:					; .. we'll return there after the special routine finishes
 	inc hl						; next character in string
 	jr draw_string
 
-;a = stat à afficher
+;a = stat id to display
 insert_stat:
 	ld c,a
 	ld b,0
@@ -237,6 +237,11 @@ print_pokemon_name:
 	add hl,bc
 	call ld_hl_hl
 	call draw_string
+	ld de,null_text				; if we've reached a string pointing to null_text
+	sbc hl,de					; .. don't draw anything else in the string
+	 jr nz,insert_stat_end
+	pop bc						; clear stack and exit
+	ret
 insert_stat_end:
 	pop hl
 	inc hl
@@ -246,7 +251,7 @@ insert_stat_end:
 ;NEWX ($ff) = new X coordinate
 ;NEWL ($fe) = new line
 ;BRK ($fd) = pause
-;PKMN ($fc) = load a pokémon to draw its stats
+;PKMN ($fc) = load a pokémon from your party to draw its stats
 ;MN ($fb) = new option
 ;ENEM ($fa) = load an opponent pokémon to draw its stats
 ;NEWXY ($f9) = new XY coordinates
@@ -423,8 +428,9 @@ store_attack:
 			inc hl
 			ex de,hl
 		exx
-		ldi					;attack id
-		ldi					;attack PP
+		ldi							; attack id
+		ldi							; attack PP
+		ldi							; attack max PP
 		djnz load_attacks
 ;copier les stats precalculés du pokémon (hp total, attack, defense)
 	pop hl
@@ -555,8 +561,13 @@ menu_key_loop:
 		ret
 	dec (hl)			;compteur-1
 	 ret p				;quitter si positif (>=0)
-	ld (hl),CURSOR_SPEED
 	push af
+		ld a,(sub_menu_flag)	; if a submenu is active, don't delay so long
+		or a
+		ld a,CURSOR_SPEED
+		 jr z,$+4
+			ld a,CURSOR_SPEED/4
+		ld (hl),a
 		call draw_cursor_no_screen_update	;erase the cursor (XORed sprite)
 	pop af
 ;*****************************
@@ -670,12 +681,12 @@ get_cursor_coords:
 	ret
 
 menu_pokemon:
-	ld hl,menu_pokemon_list				; [strings_XX.inc]
-	call string_to_RAM					; load the string into RAM so we can modify it
 	xor a								; set cursor to 0 (first menu item)
 menu_pokemon_return:
 	ld (menu_cursor),a
 	push af								; default selected pokémon
+		ld hl,menu_pokemon_list				; [strings_XX.inc]
+		call string_to_RAM					; load the string into RAM so we can modify it
 		bcall(_GrBufClr)
 		ld de,player_party				; holds current configuration of player's party, 6 bytes
 		ld hl,RAM_string
@@ -704,11 +715,11 @@ mp_count_end:
 	ld de,$4117							; de = $XXYY
 	call draw_frame
 	xor a								; default option is 0
-	ld de,$1847							;coordonnées
-	ld hl,menu_pokemon_options			;le texte à afficher
+	ld de,$1847							; 
+	ld hl,menu_pokemon_options			; the pokémon options menu
 	call draw_menu						; draw a menu with routines
 	call menu_key						; if we return here, [Alpha] was pressed
-	ld a,(selected_pokemon)
+	ld a,(selected_pokemon)				; load the selected pokémon into the cursor
 	jr menu_pokemon_return
 
 menu_pokemon_order:
@@ -724,28 +735,29 @@ menu_pokemon_stats:
 	bcall(_GrBufClr)
 	call find_player_pokemon
 	call find_pokemon_stats
-	call get_pokemon_sprite_ix
-	ld bc,pokemon_sprite_size
-	call flip_sprite
-	ld a,4
-	ld l,0
-	call largeSprite
-	ld ix,battle_bar
-	ld bc,$1007
-	ld a,39
-	ld l,7
-	call largeSprite
-	ld bc,$2160				;b = height, c = width
-	ld de,$001f				;d = x, e = y
+	push hl							; save pointer to pokemon's stats
+		call get_pokemon_sprite_ix
+		ld bc,POKEMON_SPRITE_SIZE
+		call flip_sprite
+		ld a,4
+		ld l,0
+		call largeSprite
+		ld ix,battle_bar
+		ld bc,$1007
+		ld a,39
+		ld l,7
+		call largeSprite
+	pop hl
+	call load_pokemon_data			; loads pokémon into current_pokemon
+	ld bc,$2760						; b = height, c = width
+	ld de,$0019						; d = x, e = y
 	call draw_frame
+	ld de,$0102						; $YYXX (e = penCol, d = penRow)
+	ld hl,stats_text
+	call draw_text_fastcopy
 	call fastCopy
-
-pause_temporaire______________:
-	ld a,$bf	;check 2nd
-	call get_key
-	bit 5,a
-	 jr nz,pause_temporaire______________
-	ld a,(selected_pokemon)	;set the cursor to the last selected pokemon
+	call wait_key					; pause
+	ld a,(selected_pokemon)			; set the cursor to the last selected pokemon
 	jp menu_pokemon_return
 
 ; copies a string into RAM, up to 200 bytes
