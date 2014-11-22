@@ -226,20 +226,6 @@ wait_loop:
 jp_hl:
 	jp (hl)
 
-_vdispa:
-	push de
-	push hl
-	push ix
-	ld h,0
-	ld l,a
-	bcall(_SetXXXXOP2)
-	bcall(_OP2ToOP1)	; to be able to put more than 99 into op1
-	ld a,3
-	bcall(_DispOP1A)
-	pop ix
-	pop hl
-	pop de
-	ret
 
 _VPutS_ml:	;	_v_mode: 0=text is directly drawn; 1=text is typing; 2=text is typing with no pause at end (cf battle)	|	string:$d6=new line; $07=pause and next text
 	ld a,(penCol)

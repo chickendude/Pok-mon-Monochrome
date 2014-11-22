@@ -352,7 +352,7 @@ barrier_atk:
 bide_atk:
 bind_atk:
 bite_atk:
-	.db TYPE_NORMAL,0,25,60,100,"MORSURE",0
+	.db TYPE_NORMAL,0,25,60,100,"Morsure",0
 blizzard_atk:
 body_slam_atk:
 bone_club_atk:
@@ -395,10 +395,10 @@ fly_atk:
 focus_energy_atk:
 fury_attack_atk:
 fury_swipes_atk:
-	.db TYPE_NORMAL,0,15,18,80,"COMBO-GRIFFE",0
+	.db TYPE_NORMAL,0,15,18,80,"Combo-Griffe",0
 glare_atk:
 growl_atk:		;**maybe use state 5 to lower attack ???**
-	.db TYPE_NORMAL,0,40,0,100,"RUGISSEMENT",0
+	.db TYPE_NORMAL,0,40,0,100,"Rugissement",0
 growth_atk:
 guillotine_atk:
 gust_atk:
@@ -412,7 +412,7 @@ hydro_pump_atk:
 hyper_beam_atk:
 hyper_fang_atk:
 hypnosis_atk:
-	.db TYPE_NORMAL,3,20,0,60,"HYPNOSE",0
+	.db TYPE_NORMAL,3,20,0,60,"Hypnose",0
 ice_beam_atk:
 ice_punch_atk:
 jump_kick_atk:
@@ -438,13 +438,13 @@ mist_atk:
 night_shade_atk:
 	.db TYPE_GHOST,0,15,40,100,"T",$93,"N",$92,"BRES",0	; cette attaque retire normalement le nombre de PV égal au niveau de l'attaquant
 pay_day_atk:
-	.db TYPE_NORMAL,0,20,40,100,"JACKPOT",0
+	.db TYPE_NORMAL,0,20,40,100,"Jackpot",0
 peck_atk:
 petal_dance_atk:
 pin_missile_atk:
 poison_gas_atk:
 poison_sting_atk:
-	.db TYPE_POISON,1,35,15,100,"DARD-VENIN",0
+	.db TYPE_POISON,1,35,15,100,"Dard-Venin",0
 poisonpowder_atk:
 pound_atk:
 psybeam_atk:
@@ -463,7 +463,7 @@ rock_throw_atk:
 rolling_kick_atk:
 sand_attack_atk:
 scratch_atk:
-	.db TYPE_NORMAL,0,35,40,100,"GRIFFE",0
+	.db TYPE_NORMAL,0,35,40,100,"Griffe",0
 screech_atk:
 seismic_toss_atk:
 selfdestruct_atk:
@@ -473,7 +473,7 @@ skull_bash_atk:
 sky_attack_atk:
 slam_atk:
 slash_atk:
-	.db TYPE_NORMAL,0,20,70,100,"TRANCHE",0
+	.db TYPE_NORMAL,0,20,70,100,"Tranche",0
 sleep_powder_atk:
 sludge_atk:
 smog_atk:
@@ -495,10 +495,10 @@ super_fang_atk:
 supersonic_atk:
 surf_atk:
 swift_atk:									;******************************
-	.db TYPE_NORMAL,0,20,60,0,"METEORES",0	;** vérifier la précision (je ne sais plus pourquoi j'ai mis 0)
+	.db TYPE_NORMAL,0,20,60,0,"Meteores",0	;** vérifier la précision (je ne sais plus pourquoi j'ai mis 0)
 swords_dance_atk:
 tackle_atk:
-	.db TYPE_NORMAL,0,35,50,95,"CHARGE",0
+	.db TYPE_NORMAL,0,35,50,95,"Charge",0
 tail_whip_atk:
 take_down_atk:
 teleport_atk:
@@ -514,7 +514,7 @@ tri_attack_atk:
 twineedle_atk:
 vicegrip_atk:
 vine_whip_atk:
-	.db TYPE_GRASS,0,10,35,100,"FOUET LIANES",0
+	.db TYPE_GRASS,0,10,35,100,"Fouet Lianes",0
 water_gun_atk:
 waterfall_atk:
 whirlwind_atk:

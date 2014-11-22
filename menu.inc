@@ -1,13 +1,14 @@
 ;LIST OF IMPORTANT ROUTINES :
-;	draw_text	draw a normal text
-;	draw_menu	draw a menu with routines
+;	draw_text			draw a normal text, de = penCol/penRow
+;	draw_string			vPutS replacement (uses penCol/penRow)
+;	draw_menu			draw a menu with routines
 ;	draw_menu_return	draw a menu without routines
-;	draw_dialogue	draw a dialogue box (3 text rows)
-;	draw_battle_dialogue = draw a smaller dialogue box (2 text rows)
-;	setupSubMenu	load a submenu that displays informations according to the selected choice
+;	draw_dialogue		draw a dialogue box (3 text rows)
+;	draw_battle_dialogue	draw a smaller dialogue box (2 text rows)
+;	setupSubMenu		load a submenu that displays informations according to the selected choice
 ;	setup_sub_menu_l_r	load a submenu that displays informations according to the selected choice with two parts (left and right)
-;	menu_key		handle the cursor, jump to a routine automatically
-;	menu_key_return	handle the cursor, return the choice number in 'a'
+;	menu_key			handle the cursor, jump to a routine automatically
+;	menu_key_return		handle the cursor, return the choice number in 'a'
 
 ; Menus are set up as follows:
 ;menu_X:
@@ -62,49 +63,49 @@ menu_start:
 	call menu_key			; wait for a key, handles the cursor, returns if [Alpha] was pressed
 	jp draw_map				; if we return here, we've exited the menu, so now go back to the map
 
+
+;hl = left menu pointer
+;ix = right menu pointer (only for setup_sub_menu_l_r)
+;bc = dimensions
+;de = coordinates
 setup_sub_menu_l_r:
 	ld (sub_menu_left),hl
 	ld (sub_menu_right),ix
 	ld a,1
 	ld (sub_menu_flag),a
-
-setupSubMenu:
+setup_sub_menu:
 	ld (sub_menu_dim),bc
 	ld (sub_menu_coord),de
-	ld (sub_menu_addr),hl
+	ld (sub_menu_addr),hl		; start with left menu
 	ld hl,sub_menu_flag
 	inc (hl)
-	ret
+;	ret
 
 update_sub_menu:
-sub_menu_dim = $+1
-	ld bc,$0000			;b = height, c = width
-sub_menu_coord = $+1
-	ld de,$0000			;d = x, e = y
+	ld bc,(sub_menu_dim)		; b = height, c = width
+	ld de,(sub_menu_coord)		; d = x, e = y
 	call draw_frame
 	ld a,d
 	ld d,e
-	ld e,a				;de = frame coordinates
-sub_menu_addr = $+1
-	ld hl,$0000
+	ld e,a						; de = frame coordinates
+	ld hl,(sub_menu_addr)		; hl = pointer to menu
 	ld a,(menu_cursor)
 	ld b,a
 	or a
-	jp z,draw_menu_start
-sub_menu_loop:
+	 jp z,draw_menu_start
+sub_menu_loop:					; chercher le bon string
 	ld a,(hl)
 	inc hl
 	or a
-	jr nz,sub_menu_loop
+	 jr nz,sub_menu_loop
 	djnz sub_menu_loop
 	jp draw_menu_start
 
 check_sub_menu:
 ;vérifier si on a installé un submenu
-sub_menu_flag = $+1
-	ld b,0
-	dec b
-	ret m
+	ld a,(sub_menu_flag)
+	or a
+	 ret z
 	jr update_sub_menu
 
 draw_battle_dialogue:
@@ -136,7 +137,9 @@ draw_dialogue:
 draw_menu_return:
 ;# Draws a menu that doesn't need routines
 ;# Input:
-;# - a = default menu item to select
+;# - a	= default menu item to select
+;# - de	= coordinates $XXYY
+;# - hl	= menu to draw
 ;###########################
 	ld (menu_cursor),a			; save default cursor position
 	ld a,(hl)					; read number of menu items
@@ -178,7 +181,7 @@ draw_text:
 draw_menu_start:
 	ld (penCol),de
 	ld a,e
-	ld (default_col),a
+	ld (default_col),a			; penCol coord to load when we reach a NEWL
 draw_string:
 	ld de,(penCol)				; some of the special routines use penCol
 	ld a,(hl)					; read the next character
@@ -201,8 +204,7 @@ draw_string:
 		pop hl					; hl = adress in the string
 		push bc					; bc = routine adress where we want to jump
 		ret						; don't forget the "push bc" (draw_menu_loop)
-								; .. we'll return there after the special routine finishes
-not_special:
+not_special:					; .. we'll return there after the special routine finishes
 	cp _EXP+1					; if <= _EXP, we are inserting a stat
 	 jr c,insert_stat
 	push de
@@ -227,7 +229,7 @@ insert_stat:
 	add hl,bc
 	ld a,(hl)
 	or a
-	call nz,_vdispa
+	call nz,draw_number
 	jr insert_stat_end
 
 print_pokemon_name:
@@ -308,10 +310,10 @@ pause_text_loop:
 	ei
 	halt
 	di
-	ld a,$bf	;check 2nd
+	ld a,$BF				;check 2nd
 	call get_key
 	bit 5,a
-	jr z,load_next_text
+	 jr z,load_next_text
 	ld hl,cursor_wait
 	dec (hl)
 	jr nz,pause_text_loop
@@ -337,6 +339,7 @@ dialogue_jump = $+1
 text_load_enemy:
 	inc hl
 	push hl
+		ld a,(hl)
 		ld de,opponent_pokemon_stats
 		call text_load_pokemon_data
 		ld hl,current_pokemon
@@ -351,11 +354,14 @@ text_load_pokemon:
 	inc hl
 	ld a,(hl)
 	or a
-	ret z
+	 ret z
 	push hl
 		ld de,pokemon_stats
 		call text_load_pokemon_data
-		ld hl,current_pokemon		;copy current_pokemon to current_pokemon_player
+	 jr nc,$+4						; if carry was set, the pokémon slot is empty (there are no more pokémon)
+	pop af							; .. clear the stack, and leave (hl) = 0
+	ret								; .. so that we exit the text routine
+		ld hl,current_pokemon		; copy current_pokemon to current_pokemon_player
 		ld de,current_pokemon_player
 		ld bc,CP_SPRITE+1
 		ldir
@@ -363,54 +369,61 @@ text_load_pokemon:
 	inc hl
 	ret
 
+;hl = pointer to pokémon's position in player's party
 text_load_pokemon_data:
+	ld c,(hl)				; offset of pokemon in party to load (1st, 2nd, 3rd, etc.)
+	ld b,0
+	ld hl,player_party-1	; offset starts at 1, so we need to compensate with -1
+	add hl,bc				; hl points to the pokémon's id
+	ld a,(hl)				; if the pokémon slot is empty
+	or a					; .. set the carry flag and quit
+	scf
+	 ret z
+	ld l,a					; party id
+	dec l					; because the first pokemon id=1 not 0
+	ld h,b					; hl = party id (0-5)
+	ld b,STATS_LENGTH		; multiply party_id * pokemon_data_size
+	call slow_mult_hl_b
+	add hl,de				; hl points to the pokémon's data
 	push ix
-		ld l,(hl)			;party id
-		dec l				;because the first pokemon id=1 not 0
-		ld h,0
-		ld b,STATS_LENGTH
-		call slow_mult_hl_b
-		add hl,de
 		call load_pokemon_data
 	pop ix
 	ret
 
-load_pokemon_data:			;mettre les données du pokémon dans current_pokemon
-	push hl
-		inc hl				;sauter l'id du pokémon (on va l'utiliser plus tard pour le nom du pokémon)
-;copier les stats du pokémon
+;hl = pointer to pokémon's data, see [stats.inc]
+load_pokemon_data:					; load pokémon data to current_pokemon
+	push hl							; save pointer to d
+		inc hl						; skip pokémon id (used later for pokémon name)
 		ld de,current_pokemon+CP_LVL
-		ld a,(hl)			;level
+		ld a,(hl)					; level
 		ldi
-		ldi					;lvl et hp actuels
-		inc hl				;sauter pokemon type
-;maintenant les attaques
-		ex af,af'			;a = pokémon level
-		ld b,4
+		ldi							; current level and HP
+		inc hl						; skip pokemon state
+;now load the attacks
+		ex af,af'					; a' = pokémon level
+		ld bc,$04FF					; can have up to four attacks, c is for the ldi
 		exx
 			ld de,current_pokemon+CP_ATK1STR
 		exx
-		ld de,current_pokemon+CP_ATK1
+		ld de,current_pokemon+CP_ATK1	; de = where to store attack ID and PP
 load_attacks:
-		ld a,(hl)			;attack type
+		ld a,(hl)					; attack id
 		exx
-			ld hl,null_text
-			or a
-			 jr z,store_attack
-			call find_attack_data
-			ld bc,5			;nombre d'octets avant le string
-			add hl,bc
+			ld hl,null_text			; default is a pointer to a 0
+			or a					; if attack id = 0,
+			 jr z,store_attack		; .. store a null text pointer
+			call find_attack_data	; otherwise load attack pointer [routines.inc]
+			ld bc,ATK_NAME			; there are 5 bytes of data before the string
+			add hl,bc				; hl points to string
 store_attack:
 			ex de,hl
-			ld (hl),e
+			ld (hl),e				; store string pointer
 			inc hl
 			ld (hl),d
 			inc hl
 			ex de,hl
-			inc hl
-			inc hl
 		exx
-		ldi					;attack type
+		ldi					;attack id
 		ldi					;attack PP
 		djnz load_attacks
 ;copier les stats precalculés du pokémon (hp total, attack, defense)
@@ -468,7 +481,9 @@ text_delay:
 
 menu_select:
 	call release_key
-	scf					;set the carry flag so we can determine 2nd to alpha
+	xor a
+	ld (sub_menu_flag),a
+	scf					;set the carry flag so we can distinguish 2nd from alpha
 	ret
 
 ;sortie : a = l'option choisie (menu_cursor), nc=alpha has been pushed, c=2nd
@@ -513,13 +528,15 @@ menu_key_basic:
 menu_key_loop:
 	ei
 	halt
-;	halt
 	di
-	ld a,$df			;check ALPHA
+	ld a,$DF			;check ALPHA
 	call get_key
 	rla
-	 ret nc
-	ld a,$bf			;check 2nd ($bf = key group #7 : Y=, WINDOW, ZOOM, TRACE, GRAPH, 2nd, MODE, DEL)
+	 jr c,$+7
+		xor a
+		ld (sub_menu_flag),a
+		ret
+	ld a,$BF			;check [2nd] ($bf = key group #7 : Y=, WINDOW, ZOOM, TRACE, GRAPH, 2nd, MODE, DEL)
 	call get_key
 	cp 223				;2nd
 	 jr z,menu_select
@@ -527,7 +544,7 @@ menu_key_loop:
 	ld hl,menu_key_loop	;*
 	push hl				;* where to jump
 ;*************************
-	ld a,$fe			;check arrows
+	ld a,$FE			;check arrows
 	call get_key
 	or $f0				;erase bits 4-7
 	ld b,a
@@ -538,7 +555,7 @@ menu_key_loop:
 		ret
 	dec (hl)			;compteur-1
 	 ret p				;quitter si positif (>=0)
-	ld (hl),cursor_speed
+	ld (hl),CURSOR_SPEED
 	push af
 		call draw_cursor_no_screen_update	;erase the cursor (XORed sprite)
 	pop af
@@ -560,20 +577,18 @@ menu_key_loop:
 cursor_up:
 	ld a,(hl)
 	or a
-	ret z
+	 ret z
 	ld b,a					;actual menu_cursor
 	call get_cursor_coords	;DE isn't destroyed
 	ld a,(hl)				;X coordinate
-
 find_next_up:
 	dec b
 	ret m
 	dec hl
 	dec hl
 	cp (hl)
-	jr z,found_up
+	 jr z,found_up
 	jr find_next_up
-
 found_up:
 	ld a,b
 	ld (menu_cursor),a
@@ -590,7 +605,6 @@ cursor_down:
 	ld b,a					;nombre de coordonnées à chercher
 	call get_cursor_coords	;ne modifie pas la valeur de DE
 	ld a,(hl)				;coordonnée X
-
 find_next_down:
 	inc c
 	inc hl
@@ -599,7 +613,6 @@ find_next_down:
 	jr z,found_down
 	djnz find_next_down
 	ret
-
 found_down:
 	ld a,c
 	ld (menu_cursor),a
@@ -609,11 +622,9 @@ cursor_left:
 	ld a,(sub_menu_flag)
 	cp 2
 	 jr nz,move_cursor_left
-sub_menu_left = $+1
-	ld hl,$0000
+	ld hl,(sub_menu_left)
 	ld (sub_menu_addr),hl
 	ret
-
 move_cursor_left:
 	ld a,(hl)
 	or a
@@ -625,11 +636,9 @@ cursor_right:
 	ld a,(sub_menu_flag)
 	cp 2
 	 jr nz,move_cursor_right
-sub_menu_right = $+1		;if there is a special submenu, pressing right will load a second menu
-	ld hl,$0000
+	ld hl,(sub_menu_right)	;if there is a special submenu, pressing right will load a second menu
 	ld (sub_menu_addr),hl
 	ret
-
 move_cursor_right:
 	ld a,(menu_coordinates)	;# de coordinées
 	dec a
@@ -660,78 +669,47 @@ get_cursor_coords:
 	add hl,de
 	ret
 
-#define CP_NAME		0	; strings
-#define CP_ATK1STR	2
-#define CP_ATK2STR	4
-#define CP_ATK3STR	6
-#define CP_ATK4STR	8
-#define CP_LVL		10	; numbers
-#define CP_HP		11
-#define CP_HPTOT	12
-#define CP_ATK		13
-#define CP_DEF		14
-#define CP_STATE	15
-#define CP_ATK1		16
-#define CP_ATK1PP	17
-#define CP_ATK2		18
-#define CP_ATK2PP	19
-#define CP_ATK3		20
-#define CP_ATK3PP	21
-#define CP_ATK4		22
-#define CP_ATK4PP	23
-#define CP_EXP		24
-#define CP_SPRITE	25
-
-;############### OLD ROUTINES
-
 menu_pokemon:
 	ld hl,menu_pokemon_list				; [strings_XX.inc]
-	ld de,pokemon_menu					; buffer in RAM to hold and manipulate the string
-	ld bc,POKEMON_MENU_SIZE				; copy the string into RAM
-	ldir
+	call string_to_RAM					; load the string into RAM so we can modify it
 	xor a								; set cursor to 0 (first menu item)
 menu_pokemon_return:
-	push af
+	ld (menu_cursor),a
+	push af								; default selected pokémon
 		bcall(_GrBufClr)
 		ld de,player_party				; holds current configuration of player's party, 6 bytes
-		ld hl,pokemon_menu_id			; location of first pokémon's id in the string
-		ld b,0							; counter
-menu_pokemon_listing:
+		ld hl,RAM_string
+		ld b,MAX_PARTY					; max number of pokémon you can have
+mp_count_party:							; count how many pokémon we have in our party
 		ld a,(de)						; read pokemon's id in your party (1-6)
 		or a
-		 jr z,menu_pokemon_listing_end	; if it's a zero, then there are no more pokémon left in your party
-		ld (hl),a						; copy pokémon's id into the string
-		inc de							; move to next pokémon in the list
-		push de
-			ld de,POKEMON_LIST_STR_LENGTH
-			add hl,de					; jump to next pokemon in string
-		pop de
-		inc b
-		ld a,b
-		cp MAX_PARTY
-		 jr nz,menu_pokemon_listing
-menu_pokemon_listing_end:
-		ld a,b
-		ld (pokemon_menu),a				; save number of pokémon in your party
+		 jr z,mp_count_end				; if it's a zero, then there are no more pokémon left in your party
+		inc de							; check next pokémon in party
+		inc (hl)						; increase menu count (aka no. of pokemon in party)
+		djnz mp_count_party
+mp_count_end:
 		ld bc,$1560						; bc = $HHWW
 		ld de,$002b						; de = $XXYY
-		call draw_frame
+		ld hl,menu_pokemon_list_left
+		ld ix,menu_pokemon_list_right
+		call setup_sub_menu_l_r
 	pop af								; default selected menu item
-	ld de,$0005							; coordonnées
-	ld hl,pokemon_menu					; the menu to draw (loaded in saferam)
-	call draw_menu_return
-	call menu_key_return				;pas d'actions, retourner ici
-	 jp nc,menu_start					; [Alpha] (cancel) has been pushed
-	ld (selected_pokemon),a
-	ld bc,$151f							;bc = $HHWW
-	ld de,$4117							;de = $XXYY
+	ld de,$0005							; $XXYY
+	ld hl,RAM_string					; the menu to draw (loaded in saferam)
+	call draw_menu_return				; this menu doesn't have any special routines to run when you make a selection
+	call menu_key_return				; return here after making a selection
+	 jp nc,menu_start					; nc means [Alpha] (cancel) has been pushed
+	ld (selected_pokemon),a				; save our selection
+	ld bc,$161F							; bc = $HHWW
+	ld de,$4117							; de = $XXYY
 	call draw_frame
-	xor a								;option par défaut
+	xor a								; default option is 0
 	ld de,$1847							;coordonnées
 	ld hl,menu_pokemon_options			;le texte à afficher
-	call draw_menu
-	call menu_key
-	jr menu_pokemon
+	call draw_menu						; draw a menu with routines
+	call menu_key						; if we return here, [Alpha] was pressed
+	ld a,(selected_pokemon)
+	jr menu_pokemon_return
 
 menu_pokemon_order:
 	call find_player_pokemon
@@ -769,3 +747,29 @@ pause_temporaire______________:
 	 jr nz,pause_temporaire______________
 	ld a,(selected_pokemon)	;set the cursor to the last selected pokemon
 	jp menu_pokemon_return
+
+; copies a string into RAM, up to 200 bytes
+; hl = pointer to string
+; copied to RAM_string
+string_to_RAM:
+	ld de,RAM_string		; buffer in RAM to hold and manipulate the string
+	ld bc,200				; copy the string into RAM
+	ldir
+
+
+;draws a one-byte number in a
+draw_number:
+_vdispa:
+	push de
+	push hl
+	push ix
+	ld h,0
+	ld l,a
+	bcall(_SetXXXXOP2)
+	bcall(_OP2ToOP1)	; to be able to put more than 99 into op1
+	ld a,3
+	bcall(_DispOP1A)
+	pop ix
+	pop hl
+	pop de
+	ret

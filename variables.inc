@@ -6,7 +6,7 @@ PLAYER_UP		= 3
 ; Flags
 pokeFlags = asm_Flag1
 rectXOR			= 0		; set = XOR, reset = OR (for drawing rectangles)
-textDelay		= 0		; set = typewriter text (updates LCD), reset = no delay
+textDelay		= 1		; set = typewriter text (updates LCD), reset = no delay
 
 ; Saferam and buffers
 saferam1		= $86EC	; saveSScreen=768
@@ -29,9 +29,14 @@ menu_cursor		= scrapSpace+17	; the currently selected menu item
 cursor_wait		= scrapSpace+18
 default_col		= scrapSpace+19	; default penCol value when reaching a newline
 option_list		= scrapSpace+20	; [2 bytes]: pointer to menu's routine list
-pokemon_menu	= scrapSpace+22	; around 110 bytes
-pokemon_menu_id	= pokemon_menu+POKEMON_MENU_ID_OFFSET	; where first pokémon's id is located in the menu
-selected_pokemon= scrapSpace+132	; which pokemon was selected in the pokemon menu
+RAM_string		= scrapSpace+22	; we'll alot around 200 bytes for this
+selected_pokemon= scrapSpace+222	; which pokemon was selected in the pokemon menu
+sub_menu_dim	= scrapSpace+223	; dimensions of the submenu
+sub_menu_coord	= scrapSpace+225	; coordinates of the submenu
+sub_menu_addr	= scrapSpace+227	; pointer to currently displayed submenu
+sub_menu_left	= scrapSpace+229	; pointer to left submenu
+sub_menu_right	= scrapSpace+231	; pointer to right submenu
+sub_menu_flag	= scrapSpace+234	; 
 
 ; Map variables
 mapAddr		= saferam3				;128 bytes
