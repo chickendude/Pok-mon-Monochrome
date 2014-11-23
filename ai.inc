@@ -57,7 +57,7 @@ battle_player_damages_loop:
 		call battle_draw_player_pokemon_health_bar+3
 		ld de,$2342
 		ld hl,HP_txt
-		call draw_text_fastcopy	;draw the new HP and call fastcopy
+		call draw_text_fast_copy	;draw the new HP and call fastcopy
 	pop hl
 	pop bc
 	djnz battle_player_damages_loop

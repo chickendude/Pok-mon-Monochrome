@@ -98,7 +98,7 @@ find_type:
 	ret
 
 find_map_data:	; input : hl = list of map adress & pointers, b = iterations
-	ld de,(mapAddr)
+	ld de,(map_addr)
 
 find_map_data_loop:	;compare the map address with the list of each pokémons encounterable by maps
 	push hl
@@ -230,7 +230,7 @@ jp_hl:
 
 
 _VPutS_ml:	;	_v_mode: 0=text is directly drawn; 1=text is typing; 2=text is typing with no pause at end (cf battle)	|	string:$d6=new line; $07=pause and next text
-	ld a,(penCol)
+	ld a,(pencol)
 	push af
 	push hl
 
@@ -317,8 +317,8 @@ _v_disp_pause_blink:
 	ld l,54
 	ld b,8
 	ld ix,scroll_cursor_sprite
-	call putSprite
-	jp fastCopy
+	call put_sprite
+	jp fast_copy
 
 _v_disp_end:
 	pop hl
@@ -343,10 +343,10 @@ _v_new_line:
 	pop bc
 	call z,_v_new_line_battle
 	ld a,b
-	ld (penCol),a
-	ld a,(penRow)
+	ld (pencol),a
+	ld a,(penrow)
 	add a,6
-	ld (penRow),a
+	ld (penrow),a
 
 _v_new_line_battle:
 	ld b,2
@@ -358,8 +358,8 @@ _v_new_text:	;	a:0=frame on the bottom ; 1=frame on the top ; 2=battle frame
 	push hl
 	push af
 	ld a,2
-	ld (penCol),a
-	ld (penRow),a
+	ld (pencol),a
+	ld (penrow),a
 	dec a
 	ld (_v_mode),a
 	pop af
@@ -368,7 +368,7 @@ _v_new_text:	;	a:0=frame on the bottom ; 1=frame on the top ; 2=battle frame
 	cp 1
 	jr z,dialogue_up
 	ld a,50
-	ld (penRow),a
+	ld (penrow),a
 	ld bc,$600f
 	ld de,$0031
 	jr dialogue_end
@@ -380,13 +380,13 @@ dialogue_up:
 
 dialogue_down:
 	ld a,44
-	ld (penRow),a
+	ld (penrow),a
 	ld bc,$1560
 	ld de,$002b
 
 dialogue_end:
 	call draw_frame	; bcall(_DrawRectBorder not available on 83
-	call fastCopy
+	call fast_copy
 	pop hl
 	pop bc
 	pop de
@@ -415,14 +415,14 @@ _v_type:
 
 	bcall(_VPutMap)
 	push hl
-	call fastCopy
+	call fast_copy
 	pop hl
 	jr _v_type
 
 _v_type_skip:
 	call draw_string
 	push hl
-	call fastCopy
+	call fast_copy
 	pop hl
 	ret
 
@@ -469,7 +469,7 @@ flash_screen:
 	ld bc,$4060
 	ld de,0
 	call rectangle_filled_xor
-	call fastCopy
+	call fast_copy
 	pop bc
 	djnz flash_screen
 	ret
@@ -504,11 +504,11 @@ rectangle_filled_white:			; this just draws a filled rectangle then XORs the sam
 	call rectangle_filled_solid	; .. essentially drawing two rectangles
 
 rectangle_filled_xor:			; draw a filled rectangle with XOR logic
-	set rectXOR,(iy+pokeFlags)	; set the XOR flag
+	set rectxor,(iy+pokeflags)	; set the XOR flag
 	jr rectangle_filled2
 
 rectangle_filled_solid:			; draw a filled rectangle with OR logic (everything to black)
-	res rectXOR,(iy+pokeFlags)	; reset XOR flag (use OR)
+	res rectxor,(iy+pokeflags)	; reset XOR flag (use OR)
 
 rectangle_filled2:
 	push de
@@ -546,11 +546,11 @@ rectangle_loop_x:
 		push hl
 			ld c,a
 rectangle_loop_y:
-			bit rectXOR,(iy+pokeFlags)	; check if the rectangle XOR flag is set
+			bit rectxor,(iy+pokeflags)	; check if the rectangle XOR flag is set
 			 jr nz,$+5					; jr ------>--------->------->-------\
-				or (hl)					; if rectXOR is reset, use OR logic   |
+				or (hl)					; if rectxor is reset, use OR logic   |
 				jr $+3					;                                     |
-			xor (hl)					; if rectXOR is set, use XOR logic <-/
+			xor (hl)					; if rectxor is set, use XOR logic <-/
 			ld (hl),a
 			ld a,c
 			add hl,de
@@ -583,12 +583,12 @@ flip_sprite:
 ;# Output:
 ;# - ix=flipped sprite
 ;# destroys a, de, hl
-;# uses flipSpriteBuf
+;# uses flipspritebuf
 ;###########################
 	push bc
 		push ix						; put ix into de
 		pop de
-		ld hl,flipSpriteBuf			; where to store the sprite
+		ld hl,flipspritebuf			; where to store the sprite
 flip_sprite_outer:
 ;de = original sprite
 ;hl = buffer
@@ -612,7 +612,7 @@ flip_sprite_loop:
 			pop hl
 		pop bc						; restore b (height)
 		djnz flip_sprite_outer
-		ld ix,flipSpriteBuf
+		ld ix,flipspritebuf
 	pop bc
 	ret
 
@@ -629,7 +629,7 @@ RAND:
 	push	hl
 	push	de
 	push	bc
-;	ld b,127	ld	hl,(randData)
+;	ld b,127	ld	hl,(rand_data)
 	ld	hl, ($FE8D)
 	ld	a, r
 	ld	d, a
@@ -677,7 +677,7 @@ mEH_noAdd:
 
 ;#### Ion routines ####
 
-fastCopy:
+fast_copy:
 	ld	a,$80			; 7
 	out	($10),a			; 11
 	ld	hl,gbuf-12-(-(12*64)+1)		; 10
@@ -685,14 +685,14 @@ fastCopy:
 	ld	c,a				; 4
 	inc	hl				; 6 waste
 	dec	hl				; 6 waste
-fastCopyAgain:
+fast_copyAgain:
 	ld	b,64			; 7
 	inc	c				; 4
 	ld	de,-(12*64)+1	; 10
 	out	($10),a			; 11
 	add	hl,de			; 11
 	ld	de,10			; 10
-fastCopyLoop:
+fast_copyLoop:
 	add	hl,de			; 11
 	inc	hl				; 6 waste
 	inc	hl				; 6 waste
@@ -700,23 +700,23 @@ fastCopyLoop:
 	ld	a,(hl)			; 7
 	out	($11),a			; 11
 	dec	de				; 6
-	djnz	fastCopyLoop	; 13/8
+	djnz	fast_copyLoop	; 13/8
 	ld	a,c				; 4
 	cp	$2B+1			; 7
-	jr	nz,fastCopyAgain	; 10/1
+	jr	nz,fast_copyAgain	; 10/1
 	ret					; 10
 
 random:
 	push	hl
 	push	de
-	ld	hl,(randData)
+	ld	hl,(rand_data)
 	ld	a,r
 	ld	d,a
 	ld	e,(hl)
 	add	hl,de
 	add	a,l
 	xor	h
-	ld	(randData),hl
+	ld	(rand_data),hl
 	sbc	hl,hl
 	ld	e,a
 	ld	d,h
@@ -733,7 +733,7 @@ randomLoop:
 ; l=yc
 ; a=xc
 ; ix holds pointer
-putSprite:
+put_sprite:
 	ld	e,l
 	ld	h,$00
 	ld	d,h
@@ -750,18 +750,18 @@ putSprite:
 	add	hl,de
 	ld	de,gbuf
 	add	hl,de
-putSpriteLoop1:
+put_spriteLoop1:
 sl1:	ld	d,(ix)
 	ld	e,$00
 	ld	a,c
 	or	a
-	jr	z,putSpriteSkip1
-putSpriteLoop2:
+	jr	z,put_spriteSkip1
+put_spriteLoop2:
 	srl	d
 	rr	e
 	dec	a
-	jr	nz,putSpriteLoop2
-putSpriteSkip1:
+	jr	nz,put_spriteLoop2
+put_spriteSkip1:
 	ld	a,(hl)
 	xor	d
 	ld	(hl),a
@@ -772,7 +772,7 @@ putSpriteSkip1:
 	ld	de,$0B
 	add	hl,de
 	inc	ix
-	djnz	putSpriteLoop1
+	djnz	put_spriteLoop1
 	ret
 
 ;-----> Draw a picture
@@ -783,7 +783,7 @@ putSpriteSkip1:
 ;	c=width		(in bytes, e.g. 2 would be 16)
 ;Output: nothing
 ; All registers are destroyed except bc', de', hl'
-largeSprite:
+large_sprite:
 	di
 	ex	af,af'
 	ld	a,c
@@ -805,20 +805,20 @@ largeSprite:
 	add	hl,de
 	ld	de,gbuf
 	add	hl,de
-largeSpriteLoop1:
+large_spriteLoop1:
 	push	hl
-largeSpriteLoop2:
+large_spriteLoop2:
 	ld	d,(ix)
 	ld	e,$00
 	ld	a,c
 	or	a
-	jr	z,largeSpriteSkip1
-largeSpriteLoop3:
+	jr	z,large_spriteSkip1
+large_spriteLoop3:
 	srl	d
 	rr	e
 	dec	a
-	jr	nz,largeSpriteLoop3
-largeSpriteSkip1:
+	jr	nz,large_spriteLoop3
+large_spriteSkip1:
 	ld	a,(hl)
 	xor	d
 	ld	(hl),a
@@ -832,13 +832,13 @@ largeSpriteSkip1:
 	push	af
 	ex	af,af'
 	pop	af
-	jr	nz,largeSpriteLoop2
+	jr	nz,large_spriteLoop2
 	pop	hl
 	pop	af
 	push	af
 	ex	af,af'
 	ld	de,$0C
 	add	hl,de
-	djnz	largeSpriteLoop1
+	djnz	large_spriteLoop1
 	pop	af
 	ret

@@ -13,7 +13,7 @@ event_cliff_left:
 	dec a
 	 ret nz
 event_cliff:
-	ld hl,player_y_off			; give the player the appearance of jumping
+	ld hl,player_y_offset			; give the player the appearance of jumping
 	ld (hl),-3
 	push hl
 		call player_walk

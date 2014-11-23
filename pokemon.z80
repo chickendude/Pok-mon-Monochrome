@@ -1,0 +1,154 @@
+	.nolist
+#include "ti83plus.inc"
+#include "app.inc"
+#include "constants.inc"
+#include "variables.inc"
+#include "settings.inc"
+#macro cp_hl_de()
+	or a
+	sbc hl,de
+	add hl,de
+#endmacro
+
+	.list
+	defpage(0, "PokeMono")
+	di
+
+; SETUP
+	ld hl,INSERT_RAM			;
+	bcall(_enoughmem)			; check if we have enough RAM
+	 jr nc,$+5					; if we do, great!
+		bjump(_jforcecmdnochar) ; otherwise, ciao!
+	ex de,hl					; hl = amount of RAM to insert (EnoughMem returns amount of RAM in de)
+	ld de,usermem					; de = where to insert the RAM
+	bcall(_insertmem)			; insert the memory
+
+; Clearing the inserted RAM
+	ld h,d
+	ld l,e
+	inc de
+	ld (hl),0
+	ld bc,INSERT_RAM-1
+	ldir						; probably not really necessary, but set it all to 0
+; Clearing saferam
+	ld hl,saferam3
+	ld de,saferam3+1
+	ld (hl),0
+	ld bc,127
+	ldir
+
+; DEBUGGING - initial player party
+	ld ix,player_party
+	ld (ix),3
+	ld (ix+1),2
+	ld (ix+2),1
+
+	ld hl,$0202
+	ld (player_y),hl			; update player_y and player_x
+
+	ld a,(contrast)
+	ld (contrast_var),a
+	set textwrite,(iy+sgrflags)
+	res texterasebelow,(iy+textflags)
+
+	call start
+
+	ld de,INSERT_RAM
+	ld hl,usermem
+	bcall(_delmem)				; delete the RAM we've inserted before quitting (no RAM leaks!)
+	bjump(_jforcecmdnochar) 	; ciao !
+;####### end of program #########
+
+start:
+	call fade_out				; [routines.inc]
+	bcall(_grbufclr)
+	xor a
+	ld b,a
+	ld c,a
+	call load_map				; load map 0, coords 0,0 [engine.inc]
+	call draw_map				; [engine.inc]
+	call draw_player			; [engine.inc]
+	call fast_copy				; [routines.inc]
+	call clear_player			; [engine.inc]
+	call fade_in				; [routines.inc]
+main_loop:
+	call draw_map				; [engine.inc]
+	call draw_player			; [engine.inc]
+	call fast_copy				; [routines.inc]
+
+	ld a,$bf					; group 7
+	call get_key				; contains: [2nd][Mode][Del],[Y=]->[Graph]
+	bit 4,a						; was [Y=] pressed?
+	 call z,menu_start			; then run the menu [menu.inc]
+
+	call clear_player			; remove player from map (for scrolling purposes) [engine.inc]
+
+	ld a,$fd					; group 2
+	call get_key				; [Enter]->[Clear]
+	bit 6,a						; was [Clear] pressed?
+	 ret z						; if so, exit
+
+	ld hl,walk_anim				; move to next animation frame
+	ld a,(hl)					; 
+	inc a						; 
+	and $1						; limit to two animations: %00 and %01
+	ld (hl),a					; save the new value
+
+	ld hl,main_loop				;
+	push hl						; load main_loop onto the stack so that ret jumps there
+
+	ld a,$fe					; group 1
+	call get_key				; check arrow keys
+	rrca						; down
+	push af						; since we return from the call, we need to preserve a
+		call nc,walk_down
+	pop af
+	rrca
+	push af
+		call nc,walk_left
+	pop af
+	rrca
+	push af
+		call nc,walk_right
+	pop af
+	rrca
+	 call nc,walk_up
+	cp $ff						; if a key was pressed we don't need to reset the animation
+	 ret nz
+	ld (walk_anim),a			; if no key was pressed, reset player's animation ($FF)
+	ret
+
+#include "menu.inc"
+#include "new.inc"
+#include "engine.inc"
+#include "events.inc"
+#include "trainers.inc"
+#include "battle.inc"
+#include "battle_graphics.inc"
+#include "ai.inc"
+#include "routines.inc"
+#include "maths.inc"
+#include "stats.inc"
+#include "attacks.inc"
+#include "types.inc"
+#ifdef FR
+; il faudra sans doute que je rajoute les fichiers types.inc et pokemons.inc qui sont en partie en français !!!
+	.echo "Compiling in french."
+	#include "strings_fr.inc"
+#else
+	#ifdef EN
+		.echo "Compiling in english."
+		#include "strings_en.inc"
+	#else
+		.echo "Error: no language selected."
+		.echo "Using default French files."
+		#include "strings_fr.inc"
+	#endif
+#endif
+#include "sprites.inc"
+#include "tiles.inc"
+#include "maps.inc"
+#include "pokemons.inc"
+
+	.echo "Current size: ",$-$4000," bytes."
+	.end

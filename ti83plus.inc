@@ -1,4907 +1,4898 @@
-.nolist
-;TI-83 Plus Include File
-;05/07/2007
+;ti-83 plus include file
+;$05/07/2007
 
-;Included for TASM Compatibility
-;-------------------------------
-#define equ .equ
-#define EQU .equ
-#define end .end
-#define END .end
-
-;System Variable Equates
+;system variable equates
 ;------------------------------
-XSCLt			equ 2
-YSCLt			equ 3
-XMINt			equ 0Ah
-XMAXt			equ 0Bh
-YMINt			equ 0Ch
-YMAXt			equ 0Dh
-TMINt			equ 0Eh
-TMAXt			equ 0Fh
-THETMINt		equ 10h
-THETMAXt		equ 11h
-TBLMINt			equ 1Ah
-PLOTSTARTt		equ 1Bh
-NMAXt			equ 1Dh
-NMINt			equ 1Fh
-TBLSTEPt		equ 21h
-TSTEPt			equ 22h
-THETSTEPt		equ 23h
-DELTAXt			equ 26h
-DELTAYt			equ 27h
-XFACTt			equ 28h
-YFACTt			equ 29h
-FINNt			equ 2Bh
-FINIt			equ 2Ch
-FINPVt			equ 2Dh
-FINPMTt			equ 2Eh
-FINFVt			equ 2Fh
-FINPYt			equ 30h
-FINCYt			equ 31h
-PLOTSTEPt		equ 34h
-XRESt			equ 36h
+#define xsclt	$02
+#define ysclt	$03
+#define xmint	$0a
+#define xmaxt	$0b
+#define ymint	$0c
+#define ymaxt	$0d
+#define tmint	$0e
+#define tmaxt	$0f
+#define thetmint	$10
+#define thetmaxt	$11
+#define tblmint	$1a
+#define plotstartt	$1b
+#define nmaxt	$1d
+#define nmint	$1f
+#define tblstept	$21
+#define tstept	$22
+#define thetstept	$23
+#define deltaxt	$26
+#define deltayt	$27
+#define xfactt	$28
+#define yfactt	$29
+#define finnt	$2b
+#define finit	$2c
+#define finpvt	$2d
+#define finpmtt	$2e
+#define finfvt	$2f
+#define finpyt	$30
+#define fincyt	$31
+#define plotstept	$34
+#define xrest	$36
 
-;Run indicators
+;run indicators
 ;------------------------------------
-busyPause		equ 10101010b
-busyNormal		equ 11110000b
+#define busypause	%10101010
+#define busynormal	%11110000
 
-;Banked Call Equates/Macros
+;banked call equates/macros
 ;-----------------------------------------------
-rBR_CALL		equ 28h
-BRT_JUMP0		equ 50h
-#define bcall(xxxx) rst 28h \ .dw xxxx
-#define bjump(xxxx) call 50h \ .dw xxxx
+#define rbr_call	$28
+#define brt_jump0	$50
+#define bcall(xxxx) rst rbr_call\	.dw xxxx
+#define bjump(xxxx) call brt_jump0\	.dw xxxx
 
-;Common Restart Routines
+;common restart routines
 ;------------------------------
-rOP1TOOP2		equ 08h
-rFINDSYM		equ 10h
-rPUSHREALO1		equ 18h
-rMOV9TOOP1		equ 20h
-rFPADD			equ 30h
+#define rop1toop2	$08
+#define rfindsym	$10
+#define rpushrealo1	$18
+#define rmov9toop1	$20
+#define rfpadd	$30
 
-;Error Handler Equates/Macros
+;error handler equates/macros
 ;-------------------------------------------
-APP_PUSH_ERRORH		equ 59h
-APP_POP_ERRORH		equ 5Ch
-#define AppOnErr(xxxx) ld hl,xxxx \ call 59h
-#define AppOffErr call 5Ch
+#define app_push_errorh	$59
+#define app_pop_errorh	$5c
+#define apponerr(xxxx) ld hl,xxxx\	call app_push_error
+#define appofferr call app_pop_error
 
-;Page 1Bh ROM Calls
+;page $1b rom calls
 ;--------------------------------
-_JErrorNo		equ 4000h
-_FontHook		equ 4003h
-_call_character_hook	equ 4006h ;calls character(localize) hook
-_ldHLind		equ 4009h ;l=a=(hl),h=(hl+1)
-_CpHLDE			equ 400Ch
-_DivHLBy10		equ 400Fh
-_DivHLByA		equ 4012h
-_kdbScan		equ 4015h
-_GetCSC			equ 4018h ;key board scan codes
-_coorMon		equ 401Bh ;
-_Mon			equ 401Eh ;system monitor, customized through the context vectors
-_monForceKey		equ 4021h ;
-_sendKPress		equ 4024h
-_JForceCmdNoChar	equ 4027h
-_JForceCmd		equ 402Ah ;
-_sysErrHandler		equ 402Dh ;loads error context? sp=(onSP)
-_newContext		equ 4030h ;(kbdKey)=0, loads context, restores page in 4000h-7fffh
-_newContext0		equ 4033h ;loads context
-_cxPutAway		equ 4036h ;
-_cxPutAway2		equ 4039h ;same but also does a B_CALL CanAlphIns
-_cxPPutAway		equ 403Ch
-_cxSizeWind		equ 403Fh
-_cxErrEP		equ 4042h
-_cxMain			equ 4045h
-_monErrHand		equ 4048h ;installs errorhandler to start of ROM call, loads error context, jumps to mon
-_AppInit		equ 404Bh ;loads vector data at hl to cxMain and the rest of the vectors
-_resetRam		equ 404Eh
-_lcd_busy		equ 4051h ;wait till bit 1 of port 2 is set
-_Min			equ 4054h ;op1 = lowest number between op1 and op2
-_Max			equ 4057h ;op1 = highest number between op1 and op2 
-_Trunc			equ 4060h
-_InvSub			equ 4063h
-_Times2			equ 4066h
-_Plus1			equ 4069h ;op1=op1+1
-_Minus1			equ 406Ch
-_FPSub			equ 406Fh
-_FPAdd			equ 4072h
-_DToR			equ 4075h
-_RToD			equ 4078h
-_Cube			equ 407Bh
-_TimesPt5		equ 407Eh
-_FPSquare		equ 4081h
-_FPMult			equ 4084h ;op1=op1*op2
-_LJRND			equ 4087h ;adjusts op1 if 0s precede the actual number... rounding? when
-_InvOP1SC		equ 408Ah
-_InvOP1S		equ 408Dh
-_InvOP2S		equ 4090h
-_frac			equ 4093h
-_fprecip		equ 4096h
-_fpdiv			equ 4099h
-_SqRoot			equ 409Ch
-_RndGuard		equ 409Fh
-_RnFx			equ 40A2h
-_int			equ 40A5h
-_Round			equ 40A8h
-_LnX			equ 40ABh
-_LogX			equ 40AEh
-_LJNORND		equ 40B1h ;like _LJRND but no rounding
-_EToX			equ 40B4h
-_TenX			equ 40B7h
-_SinCosRad		equ 40BAh
-_Sin			equ 40BDh
-_cos			equ 40C0h
-_Tan			equ 40C3h
-_SinHCosH		equ 40C6h
-_TanH			equ 40C9h
-_cosh			equ 40CCh
-_SinH			equ 40CFh
-_ACosRad		equ 40D2h
-_ATanRad		equ 40D5h
-_ATan2Rad		equ 40D8h
-_ASinRad		equ 40DBh
-_ACos			equ 40DEh
-_ATan			equ 40E1h
-_ASin			equ 40E4h
-_ATan2			equ 40E7h
-_ATanH			equ 40EAh
-_ASinH			equ 40EDh
-_ACosH			equ 40F0h
-_PtoR			equ 40F3h
-_RToP			equ 40F6h
-_HLTimes9		equ 40F9h
-_CkOP1Cplx		equ 40FCh
-_CkOP1Real		equ 40FFh
-_Angle			equ 4102h
-_COP1Set0		equ 4105h
-_CpOP4OP3		equ 4108h
-_Mov9OP2Cp		equ 410Bh
-_AbsO1O2Cp		equ 410Eh
-_cpop1op2		equ 4111h
-_OP3ToOP4		equ 4114h
-_OP1ToOP4		equ 4117h
-_OP2ToOP4		equ 411Ah
-_OP4ToOP2		equ 411Dh
-_OP1ToOP3		equ 4123h
-_OP5ToOP2		equ 4126h
-_OP5ToOP6		equ 4129h
-_OP5ToOP4		equ 412Ch
-_OP1ToOP2		equ 412Fh
-_OP6ToOP2		equ 4132h
-_OP6ToOP1		equ 4135h
-_OP4ToOP1		equ 4138h
-_OP5ToOP1		equ 413Bh
-_OP3ToOP1		equ 413Eh
-_OP6ToOP5		equ 4141h
-_OP4ToOP5		equ 4144h
-_OP3ToOP5		equ 4147h
-_OP2ToOP5		equ 414Ah
-_OP2ToOP6		equ 414Dh
-_OP1ToOP6		equ 4150h
-_OP1ToOP5		equ 4153h
-_OP2ToOP1		equ 4156h
-_Mov11B			equ 4159h
-_Mov10B			equ 415Ch
-_Mov9B			equ 415Fh
-_mov9B2			equ 4162h ;points to _mov9B
-_Mov8B			equ 4165h
-_Mov7B			equ 4168h
-_Mov7B2			equ 416Bh ;same pointer as _Mov7B
-_OP2ToOP3		equ 416Eh
-_OP4ToOP3		equ 4171h
-_OP5ToOP3		equ 4174h
-_OP4ToOP6		equ 4177h
-_Mov9ToOP1		equ 417Ah
-_Mov9OP1OP2		equ 417Dh
-_Mov9ToOP2		equ 4180h
-_MovFrOP1		equ 4183h
-_OP4Set1		equ 4186h
-_OP3Set1		equ 4189h
-_OP2Set8		equ 418Ch
-_OP2Set5		equ 418Fh
-_OP2SetA		equ 4192h
-_OP2Set4		equ 4195h
-_OP2Set3		equ 4198h
-_OP1Set1		equ 419Bh
-_OP1Set4		equ 419Eh
-_OP1Set3		equ 41A1h
-_OP3Set2		equ 41A4h
-_OP1Set2		equ 41A7h
-_OP2Set2		equ 41AAh
-_OP2Set1		equ 41ADh
-_Zero16D		equ 41B0h
-_OP5Set0		equ 41B3h
-_OP4Set0		equ 41B6h
-_OP3Set0		equ 41B9h
-_OP2Set0		equ 41BCh
-_OP1Set0		equ 41BFh
-_OPSet0			equ 41C2h ;hl = location to write floating point 0
-_ZeroOP1		equ 41C5h
-_ZeroOP2		equ 41C8h
-_ZeroOP3		equ 41CBh
-_ZeroOP			equ 41CEh
-_ClrLp			equ 41D1h
-_ShRAcc			equ 41D4h ;move high nibble in a to low nibble
-_ShLAcc			equ 41D7h ;move low nibble in a to high nibble
-_ShR18			equ 41DAh ;insert a 0 nibble at high nibble of (hl), shift 9 bytes 1 nibble to right
-_SHR18A			equ 41DDh ;insert low nibble in a at high nibble of (hl), shift 9 bytes 1 nibble to right
-_SHR16			equ 41E0h ;insert a 0 nibble at highnibble of (hl), shift 8 bytes 1 nibble to right
-_SHR14			equ 41E3h ;insert low nibble in a at high nibble of (hl), shift 7 bytes 1 nibble to right
-_SHL16			equ 41E6h ;insert nibble of 0 in low nibble of (hl), shift 8 bytes (before and including (hl)) to the left 1 nibble
-_SHL14			equ 41E9h ;insert low nibble of a in low nibble of (hl), shift 7 bytes (before and including (hl)) to the left 1 nibble
-_SRDO1			equ 41ECh
-_SHRDRND		equ 41EFh
-_MANTPA			equ 41F2h ;adds the value of a to hl which points to the end of the bcd 7 bytes long
-_ADDPROP		equ 41F5h ;adds the value of a to hl which points to the end of the bcd (b bytes long)
-_ADDPROPLP		equ 41F8h ;adds the value of a and carry to hl which points to the end of the bcd (b bytes long)
-_ADD16D 		equ 41FBh ;adds the bcd numbers at (hl-7) and (de-7)
-_ADD14D			equ 41FEh ;adds the bcd numbers at (hl-6) and (de-6)
-_SUB16D			equ 4201h ;subtracts bcd numbers at (hl-7) and (de-7)
-_SUB14D			equ 4204h ;subtracts bcd numbers at (hl-6) and (de-6)
-_OP2ExOP6		equ 4207h
-_OP5ExOP6		equ 420Ah
-_OP1ExOP5		equ 420Dh
-_OP1ExOP6		equ 4210h
-_OP2ExOP4		equ 4213h
-_OP2ExOP5		equ 4216h
-_OP1ExOP3		equ 4219h
-_OP1ExOP4		equ 421Ch
-_OP1ExOP2		equ 421Fh
-_ExLp			equ 4222h
-_CkOP1C0		equ 4225h
-_CkOP1FP0		equ 4228h
-_CkOP2FP0		equ 422Bh
-_PosNo0Int		equ 422Eh
-_CKPosInt		equ 4231h
-_CKInt			equ 4234h
-_CKOdd			equ 4237h
-_CKOP1M			equ 423Ah
-_GETCONOP1		equ 423Dh ;a=0 opX=57.29577951308232 (1 radian in degrees)
-_GETCONOP2		equ 4240h ;a=1 opX=1.570796326794897 (90 deg = pi/2)
-				  ;a=2 opX=.7853981633974483 (45 deg = pi/4)
-				  ;a=3 opX=.4342944819032518 (log e)
-				  ;a=4 opX=3.141592653589800 (pi)
-				  ;a=5 opX=.0174532925199433 (pi/180 = 1 degree in radians)
-				  ;a=6 opX=2.302585092994046 (ln 10)
-_PIDIV2			equ 4243h ;not code, but a pointer to:	.db 80h,15h,70h,79h,63h,26h,79h,48h,97h
-_PIDIV4			equ 4246h ;				.db 7fh,78h,53h,98h,16h,33h,97h,44h,83h
-_PItimes2		equ 4249h ;not code, but a pointer to a 2*pi in non-OP format (no exponent byte)
-_PI			equ 424Ch ;not code, but a pointer to a pi in non-OP format (no exponent byte)
-_ExpToHex		equ 424Fh
-_OP1ExpToDec		equ 4252h
-_ckop2pos		equ 4255h
-_CkOP1Pos		equ 4258h
-_ClrOP2S		equ 425Bh
-_ClrOP1S		equ 425Eh
-_FDIV100		equ 4261h ;op1=op1/100
-_FDIV10			equ 4264h ;op1=op1/10
-_DecO1Exp		equ 4267h ;decrease exponent by 1, this can go from 0 to FF
-_INCO1EXP		equ 426Ah ;op1=op1*10
-_INCEXP			equ 426Dh ;hl points to the floating point's exponent to be multiplied by 10
-_CkValidNum		equ 4270h
-_GETEXP			equ 4273h ;a=op1's exponent, carry set if negative exponent, z if e0
-_HTimesL		equ 4276h
-_EOP1NotReal		equ 4279h
-_ThetaName		equ 427Ch
-_RName			equ 427Fh
-_REGEQNAME		equ 4282h
-_RECURNNAME		equ 4285h
-_XName			equ 4288h
-_YName			equ 428Bh
-_TName			equ 428Eh
-_REALNAME		equ 4291h
-_SETesTOfps		equ 4294h ;moves the word at fps to es
-_markTableDirty		equ 4297h ;looks up table variable and marks VAT entry as "dirty" or selected
-_OP1MOP2EXP		equ 429Ah ;op1's exponent = op1's expoent - op2's exponent
-_OP1EXPMinusE		equ 429Dh ;a=(op1+1)-e
-_CHKERRBREAK		equ 42A0h
-_isA2ByteTok		equ 42A3h
-_GETLASTENTRY		equ 42A6h
-_GETLASTENTRYPTR	equ 42A9h
-_REGCLRCHNG		equ 42ACh
-_RESETWINTOP		equ 42AFh ;takes into account grfsplitoverride and grfsplit flags
-_SetYUp			equ 42B2h ;loads 7 to port 10... what does this do?
-_SetXUp			equ 42B5h ;loads 5 to port 10...
-_ISO1NONTLSTorPROG	equ 42B8h ;checks if op1 contains a list, program, group, or appvar obj name
-_ISO1NONTEMPLST		equ 42BBh ;checks if op1 contains a list (why would op1+1 contain 01, or 0d for a var name?)
-_IS_A_LSTorCLST		equ 42BEh ;checks if a = 1 or 0Dh
-_CHK_HL_999		equ 42C1h ;returns nc if less than 999, throws invalid dim error if greater than or equal to 999
-_equ_or_newequ		equ 42C4h
-_errd_op1notpos		equ 42C7h
-_ErrD_OP1Not_R		equ 42CAh
-_ErrD_OP1NotPosInt 	equ 42CDh
-_ErrD_OP1_LE_0		equ 42D0h
-_ErrD_OP1_0		equ 42D3h
-_FINDSYM_GET_SIZE 	equ 42D6h ;like findsym, but on output hl is the size of the variable
-_STO_STATVAR		equ 42D9h
-_Rcl_StatVar		equ 42DCh
-_CkOP2Real		equ 42DFh
-_GET_X_INDIRECT		equ 42E2h ;whatever this is, it uses the imathptrX locations
-_MemChk			equ 42E5h
-_CMPPRGNAMLEN1		equ 42E8h ;gets variable name length from HL
-_CMPPRGNAMLEN		equ 42EBh ;gets variable name length from OP1
-_FINDPROGSYM		equ 42EEh ;find the program whose name is in op1 (see chkfindsym in SDK)
-_ChkFindSym		equ 42F1h
-_FindSym		equ 42F4h
-_InsertMem		equ 42F7h
-_INSERTMEMA		equ 42FAh ;not sure how this differs from insertmem
-_EnoughMem		equ 42FDh
-_CMPMEMNEED		equ 4300h
-_CREATEPVAR4		equ 4303h
-_CREATEPVAR3		equ 4306h
-_CREATEVAR3		equ 4309h
-_CreateCplx		equ 430Ch
-_CreateReal		equ 430Fh
-_CreateTempRList	equ 4312h
-_CreateRList		equ 4315h
-_CREATETCLIST		equ 4318h
-_CreateCList		equ 431Bh
-_CreateTempRMat		equ 431Eh
-_CreateRMat		equ 4321h
-_CreateTempString	equ 4324h
-_CreateStrng		equ 4327h
-_Create0Equ		equ 432Ah
-_CreateTempEqu		equ 432Dh
-_CreateEqu		equ 4330h
-_CreatePict		equ 4333h
-_CreateGDB		equ 4336h
-_CreateProg		equ 4339h
-_CHKDEL			equ 433Ch
-_CHKDELA		equ 433Fh
-_ADJPARSER		equ 4342h
-_ADJMATH		equ 4345h
-_ADJM7			equ 4348h
-_DELMEMA		equ 434Bh
-_GET_FORM_NUM		equ 434Eh
-_DelVar			equ 4351h
-_DELVARIO		equ 4354h
-_DelMem			equ 4357h
-_DELVAR3D		equ 435Ah
-_DELVAR3C		equ 435Dh
-_DELVAR3DC		equ 4360h ;may be incorrect
-_IsFixedName		equ 4363h
-_DelVarEntry		equ 4366h
-_DataSizeA		equ 4369h
-_DataSize		equ 436Ch
-_POPMCPLXO1		equ 436Fh
-_POPMCPLX		equ 4372h
-_MOVCPLX		equ 4375h
-_popOP5			equ 4378h
-_popOP3			equ 437Bh
-_popOP1			equ 437Eh
-_PopRealO6		equ 4381h
-_PopRealO5		equ 4384h
-_PopRealO4		equ 4387h
-_PopRealO3		equ 438Ah
-_PopRealO2		equ 438Dh
-_PopRealO1		equ 4390h
-_PopReal		equ 4393h
-_FPOPCPLX		equ 4396h
-_FPOPREAL		equ 4399h
-_FPOPFPS		equ 439Ch
-_DeallocFPS		equ 439Fh
-_DeallocFPS1		equ 43A2h
-_AllocFPS		equ 43A5h
-_AllocFPS1		equ 43A8h
-_PushRealO6		equ 43ABh
-_PushRealO5		equ 43AEh
-_PushRealO4		equ 43B1h
-_PushRealO3		equ 43B4h
-_PushRealO2		equ 43B7h
-_PushRealO1		equ 43BAh
-_PushReal		equ 43BDh
-_PushOP5		equ 43C0h
-_PushOP3		equ 43C3h
-_PUSHMCPLXO3		equ 43C6h
-_PushOP1		equ 43C9h
-_PUSHMCPLXO1		equ 43CCh
-_PUSHMCPLX		equ 43CFh
-_ExMCplxO1		equ 43D2h
-_Exch9			equ 43D5h
-_CpyTo1FPS11		equ 43D8h
-_CpyTo2FPS5		equ 43DBh
-_CpyTo1FPS5		equ 43DEh
-_CpyTo2FPS6		equ 43E1h
-_CpyTo1FPS6		equ 43E4h
-_CpyTo2FPS7		equ 43E7h
-_CpyTo1FPS7		equ 43EAh
-_CpyTo1FPS8		equ 43EDh
-_CpyTo2FPS8		equ 43F0h
-_CpyTo1FPS10		equ 43F3h
-_CpyTo1FPS9		equ 43F6h
-_CpyTo2FPS4		equ 43F9h
-_CpyTo6FPS3		equ 43FCh
-_CpyTo6FPS2		equ 43FFh
-_CpyTo2FPS3		equ 4402h
-_CPYCTO1FPS3		equ 4405h
-_CpyTo1FPS3		equ 4408h
-_CPYFPS3		equ 440Bh
-_CpyTo1FPS4		equ 440Eh
-_CpyTo3FPS2		equ 4411h
-_CpyTo5FPST		equ 4414h
-_CpyTo6FPST		equ 4417h
-_CpyTo4FPST		equ 441Ah
-_CpyTo3FPST		equ 441Dh
-_CpyTo2FPST		equ 4420h
-_CpyTo1FPST		equ 4423h
-_CPYFPST		equ 4426h
-_CpyStack		equ 4429h
-_CpyTo3FPS1		equ 442Ch
-_CpyTo2FPS1		equ 442Fh
-_CpyTo1FPS1		equ 4432h
-_CPYFPS1		equ 4435h
-_CpyTo2FPS2		equ 4438h
-_CpyTo1FPS2		equ 443Bh
-_CPYFPS2		equ 443Eh
-_CpyO3ToFPST		equ 4441h
-_CpyO2ToFPST		equ 4444h
-_CpyO6ToFPST		equ 4447h
-_CpyO1ToFPST		equ 444Ah
-_CpyToFPST		equ 444Dh
-_CpyToStack		equ 4450h
-_CpyO3ToFPS1		equ 4453h
-_CpyO5ToFPS1		equ 4456h
-_CpyO2ToFPS1		equ 4459h
-_CpyO1ToFPS1		equ 445Ch
-_CpyToFPS1		equ 445Fh
-_CpyO2ToFPS2		equ 4462h
-_CpyO3ToFPS2		equ 4465h
-_CpyO6ToFPS2		equ 4468h
-_CpyO1ToFPS2		equ 446Bh
-_CpyToFPS2		equ 446Eh
-_CpyO5ToFPS3		equ 4471h
-_CpyO2ToFPS3		equ 4474h
-_CpyO1ToFPS3		equ 4477h
-_CpyToFPS3		equ 447Ah
-_CpyO1ToFPS6		equ 447Dh
-_CpyO1ToFPS7		equ 4480h
-_CpyO1ToFPS5		equ 4483h
-_CpyO2ToFPS4		equ 4486h
-_CpyO1ToFPS4		equ 4489h
-_ErrNotEnoughMem 	equ 448Ch ;only if not HL bytes free
-_FPSMINUS9		equ 448Fh
-_HLMINUS9		equ 4492h
-_ErrOverflow		equ 4495h
-_ErrDivBy0		equ 4498h
-_ErrSingularMat		equ 449Bh
-_ErrDomain		equ 449Eh
-_ErrIncrement		equ 44A1h
-_ErrNon_Real		equ 44A4h
-_ErrSyntax		equ 44A7h
-_ErrDataType		equ 44AAh
-_ErrArgument		equ 44ADh
-_ErrDimMismatch		equ 44B0h
-_ErrDimension		equ 44B3h
-_ErrUndefined		equ 44B6h
-_ErrMemory		equ 44B9h
-_ErrInvalid		equ 44BCh
-_ErrBreak		equ 44BFh
-_ErrStat		equ 44C2h
-_ErrSignChange		equ 44C5h
-_ErrIterations		equ 44C8h
-_ErrBadGuess		equ 44CBh
-_ErrTolTooSmall		equ 44CEh
-_ErrStatPlot		equ 44D1h
-_ErrLinkXmit		equ 44D4h
-_JError			equ 44D7h
-_noErrorEntry		equ 44DAh
-_pushErrorHandleR	equ 44DDh
-_popErrorHandleR	equ 44E0h
-_strcopy		equ 44E3h
-_strCat			equ 44E6h
-_isInSet		equ 44E9h
-_sDone			equ 44ECh
-_serrort		equ 44EFh
-_sNameEq		equ 44F2h
-_sUnderScr		equ 44F5h
-_sFAIL			equ 44F8h
-_sName			equ 44FBh
-_sOK			equ 44FEh
-_PutMap			equ 4501h
-_PutC			equ 4504h
-_DispHL			equ 4507h
-_PutS			equ 450Ah
-_putpsb			equ 450Dh
-_PutPS			equ 4510h
-_wputps			equ 4513h
-_putbuf			equ 4516h
-_putbuf1		equ 4519h
-_wputc			equ 451Ch
-_wputs			equ 451Fh
-_wputsEOL		equ 4522h ;displays string in HL in big font, and uses ... if too long
-_wdispEOL		equ 4525h
-_whomeup		equ 4528h
-_setNumWindow		equ 452Bh ;based on current cursor position, sets winleft and similar (for input prompts)
-_newline		equ 452Eh
-_moveDown		equ 4531h
-_scrollUp		equ 4534h
-_shrinkWindow		equ 4537h
-_moveUp			equ 453Ah
-_scrollDown		equ 453Dh
-_ClrLCDFull		equ 4540h
-_ClrLCD			equ 4543h
-_ClrScrnFull		equ 4546h
-_ClrScrn		equ 4549h
-_ClrTxtShd		equ 454Ch
-_ClrWindow		equ 454Fh
-_EraseEOL		equ 4552h
-_EraseEOW		equ 4555h
-_HomeUp			equ 4558h
-_getcurloc		equ 455Bh
-_VPutMap		equ 455Eh
-_VPutS			equ 4561h
-_VPutSN			equ 4564h
-_vputsnG		equ 4567h
-_vputsnT		equ 456Ah
-_RunIndicOn		equ 456Dh
-_RunIndicOff		equ 4570h
-_saveCmdShadow		equ 4573h
-_saveShadow		equ 4576h
-_rstrShadow		equ 4579h
-_rstrpartial		equ 457Ch
-_rstrCurRow		equ 457Fh
-_rstrUnderMenu		equ 4582h
-_rstrbotrow		equ 4585h
-_saveTR			equ 4588h ;save top right corner of LCD so 2nd arrow can be displayed, indicinuse flag must be set
-_restoreTR		equ 458Bh ;restore top right corner of LCD destroyed by an arrow. indicinuse flag must be set
-_GetKeyPress		equ 458Eh
-_GetTokLen		equ 4591h ;input: hl=pointer to token. output: a=lenght of string, hl=pointer to string on page 1
-_GET_TOK_STRNG		equ 4594h ;input: hl=pointer to token. output: op3=string of the token, a=length of string
-_GETTOKSTRING		equ 4597h ;input: DE=token. output: hl=pointer to the string on page 1
-_PUTBPATBUF2		equ 459Ah
-_PUTBPATBUF		equ 459Dh
-_putbPAT		equ 45A0h
-_putcCheckScrolL	equ 45A3h
-_DispEOL		equ 45A6h
-_fdispEOL		equ 45A9h
-_MAKEROWCMD		equ 45ACh
-_TOTOSTRP		equ 45AFh
-_SETVARNAME		equ 45B2h
-_DispDone		equ 45B5h
-_finishoutput		equ 45B8h
-_curBlink		equ 45BBh
-_CursorOff		equ 45BEh
-_hideCursor		equ 45C1h
-_CursorOn		equ 45C4h
-_showCursor		equ 45C7h
-_KeyToString		equ 45CAh
-_PULLDOWNCHK		equ 45CDh ;something wrong here
-_MenuCatCommon		equ 45D0h
-_ZIfCatalog		equ 45D3h
-_ZIfMatrixMenu		equ 45D6h ;_loadCurCat
-_LoadMenuNum		equ 45D9h
-_LoadMenuNumL		equ 45DCh
-_MenCatRet		equ 45DFh ;restores display as though a menu were just cleared (restores some flags too)
-_MenuSwitchContext	equ 45E2h ;switches to context in A, calls menu hook with A=3, set 5,(iy+16h) for some sort of override to not make switch
-_MenuEdKey		equ 45E5h
-;45E8h
-_notalphnum		equ 45EBh
-_SaveSavedFlags		equ 45EEh
-_SetMenuFlags		equ 45F1h
-_RstrSomeFlags		equ 45F4h
-_RstrOScreen		equ 45F7h ;restores saveSScreen to the display
-_SaveOScreen		equ 45FAh ;stores display in saveSScreen
-_dispListName		equ 45FDh ;_SeeIfErrorCx
-_PrevContext		equ 4600h
-_CompareContext		equ 4603h
-_AdrMRow		equ 4606h
-_AdrMEle		equ 4609h
-_GETMATOP1A		equ 460Ch
-_GETM1TOOP1		equ 460Fh
-_GETM1TOP1A		equ 4612h
-_GetMToOP1		equ 4615h
-_PUTTOM1A		equ 4618h
-_PUTTOMA1		equ 461Bh
-_PutToMat		equ 461Eh
-_MAT_EL_DIV		equ 4621h
-_CMATFUN		equ 4624h
-_ROWECH_POLY		equ 4627h
-_ROWECHELON		equ 462Ah
-_AdrLEle		equ 462Dh
-_GETL1TOOP1		equ 4630h
-_GETL1TOP1A		equ 4633h
-_GetLToOP1		equ 4636h
-_GETL1TOOP2		equ 4639h
-_GETL1TOP2A		equ 463Ch
-_GETL2TOP1A		equ 463Fh
-_PUTTOLA1		equ 4642h
-_PutToL			equ 4645h
-_MAXMINLST		equ 4648h
-_LLOW			equ 464Bh
-_LHIGH			equ 464Eh
-_LSUM			equ 4651h
-CUMSUM			equ 4654h
-_ToFrac			equ 4657h
-_SEQSET			equ 465Ah
-_SEQSOLVE		equ 465Dh
-_CMP_NUM_INIT		equ 4660h
-_BinOPExec		equ 4663h
-_EXMEAN1		equ 4666h
-_SET2MVLPTRS		equ 4669h
-_SETMAT1		equ 466Ch
-_CREATETLIST		equ 466Fh
-_UnOPExec		equ 4672h
-_ThreeExec		equ 4675h
-_RESTOREERRNO		equ 4678h
-_FourExec		equ 467Bh
-_FiveExec		equ 467Eh
-_CPYTO2ES1		equ 4681h
-_CPYTO6ES1		equ 4684h
-_CPYTO1ES1		equ 4687h
-_CPYTO3ES1		equ 468Ah
-_CPYTO3ES2		equ 468Dh
-_CPYTO2ES2		equ 4690h
-_CPYTO1ES2		equ 4693h
-_CPYTO2ES3		equ 4696h
-_CPYTO1ES3		equ 4699h
-_CPYTO3ES4		equ 469Ch
-_CPYTO6ES3		equ 469Fh
-_CPYTO2ES4		equ 46A2h
-_CPYTO1ES4		equ 46A5h
-_CPYTO2ES5		equ 46A8h
-_CPYTO1ES5		equ 46ABh
-_CPYTO4EST		equ 46AEh
-_CPYTO2EST		equ 46B1h
-_CPYTO1EST		equ 46B4h
-_CPYTO2ES6		equ 46B7h
-_CPYTO1ES6		equ 46BAh
-_CPYTO2ES7		equ 46BDh
-_CPYTO1ES7		equ 46C0h
-_CPYTO2ES8		equ 46C3h
-_CPYTO1ES8		equ 46C6h
-_CPYTO1ES9		equ 46C9h
-_CPYTO2ES9		equ 46CCh
-_CPYTO2ES10		equ 46CFh
-_CPYTO1ES10		equ 46D2h
-_CPYTO2ES11		equ 46D5h
-_CPYTO1ES11		equ 46D8h
-_CPYTO2ES12		equ 46DBh
-_CPYTO1ES12		equ 46DEh
-_CPYTO2ES13		equ 46E1h
-_CPYTO1ES13		equ 46E4h
-_CPYTO1ES14		equ 46E7h
-_CPYTO1ES16		equ 46EAh
-_CPYTO1ES17		equ 46EDh
-_CPYTO1ES18		equ 46F0h
-_CPYTO1ES15		equ 46F3h
-_CPYTO2ES15		equ 46F6h
-_CPYO1TOEST		equ 46F9h
-_CPYO1TOES1		equ 46FCh
-_CPYO6TOES1		equ 46FFh
-_CPYO6TOES3		equ 4702h
-_CPYO1TOES2		equ 4705h
-_CPYO2TOES2		equ 4708h
-_CPYO1TOES3		equ 470Bh
-_CPYO1TOES4		equ 470Eh
-_CPYO1TOES5		equ 4711h
-_CPYO1TOES6		equ 4714h
-_CPYO1TOES7		equ 4717h
-_CPYO2TOES4		equ 471Ah
-_CPYO2TOES5		equ 471Dh
-_CPYO2TOES6		equ 4720h
-_CPYO2TOES7		equ 4723h
-_CPYO2TOES8		equ 4726h
-_CPYO2TOES9		equ 4729h
-_CPYO1TOES8		equ 472Ch
-_CPYO1TOES9		equ 472Fh
-_CPYO1TOES10		equ 4732h
-_CPYO1TOES11		equ 4735h
-_CPYO1TOES12		equ 4738h
-_CPYO1TOES13		equ 473Bh
-_CPYO1TOES14		equ 473Eh
-_CPYO1TOES15		equ 4741h
-_EVALF3A		equ 4744h
-_GetK			equ 4747h ;?
-_setTitle               equ 474Ah
-_dispVarVal		equ 474Dh
-_RecallEd		equ 4750h ;_setupBuffer
-_createNumEditBuf	equ 4753h
-_ProcessBufKeys		equ 4756h ;may be default key processing like [CLEAR], etc. especially for an edit buffer.
-_CallCommon		equ 4759h
-_CommonKeys		equ 475Ch
-_Leftmore		equ 475Fh
-_fDel			equ 4762h
-_fClear			equ 4765h
-_finsDisp		equ 4768h ;Michael says _FinsDisp02 equ 4768h (something's not right)
-_FinsDisp02		equ 476Bh ;_setIndicator
-_closeeditbufnor	equ 476Eh
-_releaseBuffer		equ 4771h
-_varnameToOP1hl		equ 4774h
-_nameToOP1		equ 4777h
-_numPPutAway		equ 477Ah
-_numRedisp		equ 477Dh
-_numError02		equ 4780h
-_Load_SFont		equ 4783h
-_SFont_Len		equ 4786h
-_InitNumVec		equ 4789h
-_SetXXOP1		equ 478Ch
-_SetXXOP2		equ 478Fh
-_SetXXXXOP2		equ 4792h
-_UCLineS		equ 4795h
-_CLine			equ 4798h
-_CLineS			equ 479Bh
-_XRootY			equ 479Eh
-_YToX			equ 47A1h
-_ZmStats		equ 47A4h
-_POINT_STAT_HLP		equ 47A7h
-_DRAWSPLOT		equ 47AAh
-_INITNEWTRACEP		equ 47ADh
-_SPLOTCOORD		equ 47B0h
-_SPLOTRIGHT		equ 47B3h
-_SPLOTLEFT		equ 47B6h
-_CMPBOXINFO		equ 47B9h
-_NEXTPLOT		equ 47BCh
-_PREVPLOT		equ 47BFh
-_CLRPREVPLOT		equ 47C2h
-_PUT_INDEX_LST		equ 47C5h
-_GET_INDEX_LST		equ 47C8h
-_HEAP_SORT		equ 47CBh
-_StoGDB2		equ 47CEh
-_RclGDB2		equ 47D1h
-_CircCmd		equ 47D4h
-_GrphCirc		equ 47D7h
-_Mov18B			equ 47DAh
-_DarkLine		equ 47DDh
-_ILine			equ 47E0h
-_IPoint			equ 47E3h
-_XYRNDBOTH		equ 47E6h
-_XYRND			equ 47E9h
-_CheckTOP		equ 47ECh
-_CheckXY		equ 47EFh
-_DarkPnt		equ 47F2h
-_CPointS		equ 47F5h
-_WTOV			equ 47F8h
-_VtoWHLDE		equ 47FBh
-_Xitof			equ 47FEh
-_YftoI			equ 4801h
-_XftoI			equ 4804h
-_TraceOff		equ 4807h
-_GrRedisp		equ 480Ah
-_GDISPTOKEN		equ 480Dh
-_GRDECODA		equ 4810h
-_LABCOOR		equ 4813h
-_COORDISP		equ 4816h ;draws X & Y coordinates (or R and theta if PolarGC)
-_TMPEQUNOSRC		equ 4819h
-_GRLABELS		equ 481Ch
-_YPIXSET		equ 481Fh
-_XPIXSET		equ 4822h
-_COPYRNG		equ 4825h
-_VALCUR			equ 4828h
-_GRPUTAWAY		equ 482Bh
-_RSTGFLAGS		equ 482Eh
-_GRReset		equ 4831h
-_XYCENT			equ 4834h
-_ZOOMXYCMD		equ 4837h
-_CPTDELY		equ 483Ah
-_CPTDELX		equ 483Dh
-_SetFuncM		equ 4840h
-_SetSeqM		equ 4843h
-_SetPolM		equ 4846h
-_SetParM		equ 4849h
-_ZmInt			equ 484Ch
-_ZmDecml		equ 484Fh
-_ZmPrev			equ 4852h
-_ZmUsr			equ 4855h
-_SETUZM			equ 4858h
-_ZmFit			equ 485Bh
-_ZmSquare		equ 485Eh
-_ZmTrig			equ 4861h
-_SetXMinMax		equ 4864h
-_ZooDefault		equ 4867h
-_GrBufCpy		equ 486Ah
-_DRAWSPLITLINE		equ 486Dh
-_RestoreDisp		equ 4870h
-_FNDDB			equ 4873h
-_AllEq			equ 4876h
-_fndallseleq		equ 4879h
-_NEXTEQ			equ 487Ch
-_PREVEQ			equ 487Fh
-_BLINKGCUR		equ 4882h
-_NBCURSOR		equ 4885h
-_STATMARK		equ 4888h
-_CHKTEXTCURS		equ 488Bh
-_Regraph		equ 488Eh
-_DOREFFLAGS02		equ 4891h ;something wrong here
-INITNSEQ		equ 4894h
-_YRES			equ 4897h ;_PLOTPTXY2
-_Ceiling		equ 489Ah ;ceil(OP1)
-_PutXY			equ 489Dh ;draws X & Y coordinates (regardless of PolarGC)
-_PUTEQUNO		equ 48A0h
-_PDspGrph		equ 48A3h
-_HorizCmd		equ 48A6h
-_VertCmd		equ 48A9h
-_LineCmd		equ 48ACh
-_UnLineCmd		equ 48AFh
-_PointCmd		equ 48B2h
-_PixelTest		equ 48B5h
-_PixelCmd  		equ 48B8h
-_TanLnF			equ 48BBh
-_DRAWCMD_INIT		equ 48BEh
-_DrawCmd		equ 48C1h
-_SHADECMD		equ 48C4h
-_InvCmd			equ 48C7h
-_STATSHADE		equ 48CAh
-_dspmattable		equ 48CDh
-_dsplsts		equ 48D0h
-_closeEditBuf		equ 48D3h
-_parseEditBuf		equ 48D6h
-_putsm			equ 48D9h
-_DspCurTbl		equ 48DCh
-_DSPGRTBL		equ 48DFh
-_zeroTemplate		equ 48E2h
-_settblrefs		equ 48E5h
-_dispTblBot		equ 48E8h
-_DispTblTop		equ 48EBh
-_dispTblbody		equ 48EEh
-_VPUTBLANK		equ 48F1h
-_TBLTRACE		equ 48F4h
-_dispListNameY		equ 48F7h
-_CurNameLength		equ 48FAh
-_NameToBuf		equ 48FDh
-_jpromptcursor		equ 4900h
-_BufLeft		equ 4903h
-_BufRight		equ 4906h
-_bufInsert		equ 4909h
-_bufQueueChar		equ 490Ch
-_BufReplace		equ 490Fh
-_BufDelete		equ 4912h
-_BUFPEEK		equ 4915h
-_BUFPEEK1		equ 4918h
-_BUFPEEK2		equ 491Bh
-_BUFPEEK3		equ 491Eh
-_BufToBtm		equ 4921h
-_setupEditEqu		equ 4924h
-_BufToTop		equ 4927h
-_isEditFull		equ 492Ah
-_IsEditEmpty		equ 492Dh
-_IsAtTop		equ 4930h
-_IsAtBtm		equ 4933h
-_BufClear		equ 4936h
-_JcursorFirst		equ 4939h
-_JcursorLast		equ 493Ch
-_CursorLeft		equ 493Fh
-_cursorRight		equ 4942h
-_cursorUp		equ 4945h
-_CursorDown		equ 4948h
-_cursorToOffset		equ 494Bh
-_InsDisp		equ 494Eh
-_FDISPBOL1		equ 4951h
-_FDISPBOL		equ 4954h
-_DispEOW		equ 4957h
-_DispHead		equ 495Ah
-_DispTail		equ 495Dh
-_PutTokString		equ 4960h
-_setupEditCmd		equ 4963h
-_setEmptyEditEqu	equ 4966h
-_SetEmptyEditPtr	equ 4969h
-_CloseEditEqu		equ 496Ch
-_GetPrevTok		equ 496Fh
-_getkey			equ 4972h
-_canIndic		equ 4975h
-_LCD_DRIVERON		equ 4978h 
-_DFMIN2			equ 497Bh
-_formDisp		equ 497Eh
-_formMatrix		equ 4981h
-_wscrollLeft		equ 4984h
-_wscrollUp		equ 4987h
-_wscrollDown		equ 498Ah
-_wscrollRight		equ 498Dh
-_FormEReal		equ 4990h
-_formERealTOK		equ 4993h
-_FormDCplx		equ 4996h
-_FormReal		equ 4999h
-_formScrollUp		equ 499Ch
-_setwinabove		equ 499Fh
-_disarmScroll		equ 49A2h
-_OP1toEdit		equ 49A5h
-_MinToEdit		equ 49A8h
-_rclVarToEdit		equ 49ABh
-_rclVarToEditPtR	equ 49AEh
-_RCLENTRYTOEDIT		equ 49B1h
-_rclToQueue		equ 49B4h ;recalls bytes at OP1 into edit buffer
-_FORMTOTOK		equ 49B7h
-_DISP_INTERVAL		equ 49BAh
-_DisplstName		equ 49BDh
-_dispSLstNameHL		equ 49C0h
-_EditEqu		equ 49C3h
-_closeEquField		equ 49C6h
-_AutoSelect		equ 49C9h
-_DISPYEOS		equ 49CCh
-_dispNumEOS		equ 49CFh
-_setupdispeq		equ 49D2h
-_DispForward		equ 49D5h
-_DispYPrompt2		equ 49D8h
-_stringwidth		equ 49DBh
-_dispErrorScreen	equ 49DEh ;displays top row of error screen (error message)
-_POPCX			equ 49E1h ;moves 14 bytes at cxPrev to cxMain, 15th byte goes to replace appflags
-_loadnoeentry		equ 49E4h
-_SaveScreen		equ 49E7h
-_RETSCREEN		equ 49EAh
-_RetScreenErr		equ 49EDh
-_CheckSplitFlag		equ 49F0h
-_SolveRedisp		equ 49F3h
-_SolveDisp		equ 49F6h
-_itemName		equ 49F9h
-_SetNorm_Vals		equ 49FCh
-_SetYOffset		equ 49FFh ;sets up YOffset and next 4 bytes (possibly specialized for the table editor)
-_ConvKeyToTok		equ 4A02h
-_ConvFCKeyToTok		equ 4A05h
-_ConvFEKeyToTok		equ 4A08h
-_TokToKey		equ 4A0Bh
-_SendSkipExitPacket	equ 4A0Eh
-_GETVARCMD		equ 4A11h
-_SendVarCmd		equ 4A14h
-_SendScreenshot		equ 4A17h
-keyscnlnk		equ 4A1Ah
-_DeselectAllVars	equ 4A1Dh
-_DelRes			equ 4A20h
-_ConvLcToLr		equ 4A23h
-_RedimMat		equ 4A26h
-_IncLstSize		equ 4A29h
-_InsertList		equ 4A2Ch
-_dellistel		equ 4A2Fh
-_EditProg		equ 4A32h
-_CloseProg		equ 4A35h
-_ClrGraphRef		equ 4A38h
-_FixTempCnt		equ 4A3Bh
-_SAVEDATA		equ 4A3Eh
-_RESTOREDATA		equ 4A41h
-_FindAlphaUp		equ 4A44h
-_FindAlphaDn		equ 4A47h
-_CmpSyms		equ 4A4Ah
-_CREATETEMP		equ 4A4Dh
-_CleanAll		equ 4A50h
-_MoveToNextSym		equ 4A53h ;input: hl=pointer to type byte of VAT entry. output: hl = pointer to next entry's type byte
-_ConvLrToLc		equ 4A56h
-_TblScreenDn		equ 4A59h ;something is not right here
-_TblScreenUp		equ 4A5Ch
-_SCREENUP		equ 4A5Fh
-_ScreenUpDown		equ 4A62h
-_ZifRclHandler		equ 4A65h
-_zifrclkapp		equ 4A68h
-_rclkeyRtn		equ 4A6Bh
-_RCLKEY			equ 4A6Bh
-_RCLREGEQ_CALL		equ 4A6Eh
-_RCLREGEQ		equ 4A71h
-_initNamePrompt		equ 4A74h
-_NamePrompt2		equ 4A77h
-_CATALOGCHK		equ 4A7Ah
-_clrTR			equ 4A7Dh
-_QUAD			equ 4A80h
-_GRAPHQUAD		equ 4A83h
-_BC2NOREAL		equ 4A86h
-;4A89h
-_ErrNonReal		equ 4A8Ch ;ERR:DATA TYPE if top B numers from FPS are non-real
-_WRITE_TEXT		equ 4A8Fh
-_FORSEQINIT		equ 4A92h
-_GRPHPARS		equ 4A95h
-_PLOTPARS		equ 4A98h
-_ParseInp		equ 4A9Bh
-_PARSEOFF		equ 4A9Eh
-_PARSESCAN		equ 4AA1h
-_GETPARSE		equ 4AA4h
-_SAVEPARSE		equ 4AA7h
-_InitPFlgs		equ 4AAAh
-_CKENDLINERR		equ 4AADh
-_OP2Set60		equ 4AB0h
-_GETSTATPTR		equ 4AB3h
-_CMP_STATPTR		equ 4AB6h
-_VARSYSADR		equ 4AB9h
-_StoSysTok		equ 4ABCh
-_StoAns			equ 4ABFh
-_StoTheta		equ 4AC2h
-_StoR			equ 4AC5h
-_StoY			equ 4AC8h
-_StoN			equ 4ACBh
-_StoT			equ 4ACEh
-_StoX			equ 4AD1h
-_StoOther		equ 4AD4h
-_RclAns			equ 4AD7h
-_RclY			equ 4ADAh
-_RclN			equ 4ADDh
-_RclX			equ 4AE0h
-_RclVarSym		equ 4AE3h
-_RclSysTok		equ 4AE6h
-_StMatEl		equ 4AE9h
-_STLSTVECEL		equ 4AECh
-_ConvOP1		equ 4AEFh
-_Find_Parse_Formula	equ 4AF2h
-_PARSE_FORMULA		equ 4AF5h
-_FetchQuotedString	equ 4AF8h
-_FetchNumLine		equ 4AFBh
-;4AFEh
-_ParseInpGraph		equ 4B01h ;same as _ParseInp except 3,(iy+1Fh) is graph/split screen override, or something
-_ParseInpGraphReset	equ 4B04h ;_ParseInpGraph except zeroes out iy+6/7, resets 3,(iy+1Ah) & 0,(iy+1Fh), fmtFlags->fmtOverride, parse within ParseInp?
-_ParseInpLastEnt	equ 4B07h ;ParseInp on program 05h,23h,00h
-_ErrOnCertainTypes	equ 4B0Ah ;ERR:DATA TYPE if A is one of a couple of values...subroutine in ParseInp, somehow
-_CreatePair		equ 4B0Dh
-_PUSHNUM		equ 4B10h
-_INCCURPCERREND		equ 4B13h
-_ERREND			equ 4B16h
-_COMMAERRF		equ 4B19h
-_COMMAERR		equ 4B1Ch
-_STEQARG2		equ 4B1Fh
-_STEQARG		equ 4B22h
-_INPARG			equ 4B25h
-_STEQARG3		equ 4B28h
-_NXTFETCH		equ 4B2Bh
-_CKFETCHVAR		equ 4B2Eh
-_FETCHVARA		equ 4B31h
-_FETCHVAR		equ 4B34h
-_CKENDLIN		equ 4B37h ;gets parse byte in A and then _CKENDEXP
-_CKENDEXP		equ 4B3Ah ;checks A for 3Eh or 3Fh
-_CKPARSEND		equ 4B3Dh
-_STOTYPEARG		equ 4B40h
-_ConvDim		equ 4B43h
-_ConvDim00		equ 4B46h
-_AHEADEQUAL		equ 4B49h
-_PARSAHEADS		equ 4B4Ch
-_PARSAHEAD              equ 4B4Fh
-_AnsName		equ 4B52h
-_STOCMPREALS		equ 4B55h
-_GETDEPTR		equ 4B58h
-_PUSH2BOPER		equ 4B5Bh ;push the value in bc onto the operator stack
-_POP2BOPER		equ 4B5Eh ;pop 2 bytes on the operator stack to bc
-_PUSHOPER		equ 4B61h ;push the value in a onto the operator stack
-_POPOPER		equ 4B64h ;pop 1 byte on the operator stack to a
-_FIND_E_UNDEF		equ 4B67h
-_STTMPEQ		equ 4B6Ah
-_FINDEOL		equ 4B6Dh
-_BRKINC			equ 4B70h
-_INCFETCH		equ 4B73h
-_CURFETCH		equ 4B76h
-_Random			equ 4B79h
-_StoRand		equ 4B7Ch
-_RandInit		equ 4B7Fh
-_resetStacks		equ 4B82h ;(onsp)->(errsp), (fpbase)->(fps), (opbase)->(ops)
-_Factorial		equ 4B85h
-_YONOFF			equ 4B88h
-_EQSELUNSEL		equ 4B8Bh
-_ITSOLVER		equ 4B8Eh
-_GRITSOLVER		equ 4B91h
-_ITSOLVERB		equ 4B94h
-_ITSOLVERNB		equ 4B97h
-_ExTest_INT		equ 4B9Ah
-_DIST_FUN		equ 4BADh
-_LogGamma		equ 4BA0h
-_OneVar			equ 4BA3h
-_ONEVARS_0		equ 4BA6h
-_ORDSTAT		equ 4BA9h
-_INITSTATANS2		equ 4BACh
-_ANOVA_SPEC		equ 4BAFh
-_OutputExpr		equ 4BB2h
-_CentCursor		equ 4BB5h
-_TEXT			equ 4BB8h
-_FINISHSPEC		equ 4BBBh
-_TRCYFUNC		equ 4BBEh
-_RCL_SEQ_X		equ 4BC1h
-_RCLSEQ2		equ 4BC4h
-_GRPPutAway		equ 4BC7h
-_CKVALDELX		equ 4BCAh
-_CKVALDELTA		equ 4BCDh
-_GrBufClr		equ 4BD0h
-_GRBUFCPY_V		equ 4BD3h
-_FNDSELEQ		equ 4BD6h
-_CLRGRAPHXY		equ 4BD9h
-_NEDXT_Y_STYLE		equ 4BDCh
-_PLOTPT			equ 4BDFh
-_NEWINDEP		equ 4BE2h
-_Axes			equ 4BE5h
-_setPenX		equ 4BE8h
-_setPenY		equ 4BEBh
-_setPenT		equ 4BEEh
-_TAN_EQU_DISP		equ 4BF1h
-_PutAns			equ 4BF4h
-_DispOP1A		equ 4BF7h
-_MATHTANLN		equ 4BFAh
-_ENDDRAW		equ 4BFDh
-_SetTblGraphDraw	equ 4C00h
-_StartDialog		equ 4C03h
-_DialogInit		equ 4C06h
-_GetDialogNumOP1	equ 4C09h
-_SetDialogNumOP1	equ 4C0Ch
-_GetDialogNumHL		equ 4C0Fh
-_ErrArgumentO123	equ 4C12h ;ERR:ARGUMENT if OP2>OP1 or OP1>OP3
-_SetDialogKeyOverride	equ 4C15h
-_ResDialogKeyOverride	equ 4C18h
-_ForceDialogKeypress	equ 4C1Bh
-_DialogStartGetKey	equ 4C1Eh
-_StartDialog_Override	equ 4C21h
-_CallDialogCallback	equ 4C24h
-_SetDialogCallback	equ 4C27h
-_ResDialogCallback	equ 4C2Ah
-_CopyDialogNum		equ 4C2Dh
-_MemClear		equ 4C30h
-_MemSet			equ 4C33h
-_ReloadAppEntryVecs	equ 4C36h
-_PointOn		equ 4C39h
-_ExecuteNewPrgm		equ 4C3Ch
-_StrLength		equ 4C3Fh
-_VPutMapRec		equ 4C42h
-_getRomPage		equ 4C45h
-_FindAppUp		equ 4C48h
-_FindAppDn		equ 4C4Bh
-_FindApp		equ 4C4Eh
-_ExecuteApp		equ 4C51h
-_MonReset		equ 4C54h
-;4C57h
-;4C5Ah
-_isContextKey		equ 4C5Dh
-_IBounds		equ 4C60h
-_IOffset		equ 4C63h
-_DrawCirc2		equ 4C66h
-_CanAlphIns		equ 4C69h
-cxRedisp		equ 4C6Ch
-_GetBaseVer		equ 4C6Fh
-_OPSet0DE		equ 4C72h ;loads a floating point 0 to location de 
-_AppGetCbl		equ 4C75h
-_AppGetCalc		equ 4C78h
-_SaveDisp		equ 4C7Bh
-_SetIgnoreKey  		equ 4C7Eh ;set 1,(iy+28h) / ret
-_SetSendThisKeyBack	equ 4C81h ;set 2,(iy+28h) / ld (kbdKey),a / ret
-_DisableApd		equ 4C84h
-_EnableApd		equ 4C87h ;set apdable,(iy+apdflags)
-_JForceCmdNoChar2	equ 4C8Ah ;2.41 at least
-_set2IY34		equ 4C8Dh ;set 2,(iy+34) / ret
-_forcecmd		equ 4C90h
-_ApdSetup		equ 4C93h
-_Get_NumKey		equ 4C96h
-_AppSetup		equ 4C99h ;or _AppCleanup, or something
-_HandleLinkKeyActivity	equ 4C9Ch
-_JForceCmdNoChar3	equ 4C9Fh ;2.41 at least
-_ReleaseSedit		equ 4CA2h
-_initsmalleditline	equ 4CA5h
-_startsmalledit		equ 4CA8h
-;4CABh
-_SGetTokString		equ 4CAEh
-_LoadPattern	 	equ 4CB1h
-_SStringLength		equ 4CB4h
-_RestorePenCol		equ 4CB7h
-;4CBAh
-_DoNothing		equ 4CBDh
-_ForceSmallEditReturn	equ 4CC0h
-;4CC3h ;saves context
-;4CC6h
-;4CC9h
-;4CCCh
-_VEraseEOL		equ 4CCFh
-;4CD2h
-;4CD5h
-_GoToErr		equ 4CD8h
-_initsmalleditBox	equ 4CDBh
-;4CDEh
-_EmptyHook		equ 4CE1h
-_ForceSmallEditReturn2	equ 4CE4h
-;4CE7h ;same as 4CC3h
-;4CEAh
-_ClearRow		equ 4CEDh
-;4CF0h
-;4CF3h
-;4CF6h
-;4CF9h
-;4CFCh
-;4CFFh
-;4D02h
-;4D05h
-;4D08h
-;4D0Bh
-;4D0Eh
-;4D11h
-;4D14h
-;4D17h
-;4D1Ah
-;4D1Dh
-;4D20h
-;4D23h
-_AppScreenUpDown	equ 4D26h ;shifts screen up/down, A is LCD row, H is number of lines to shift, (OP1)-(OP1+3) are something
-_AppScreenUpDown1	equ 4D29h ;shifts screen up/down, but really no clue what the inputs are (all registers and (OP1)-(OP1+3))
-;4D2Ch
-_initsmalleditlinevar	equ 4D2Fh
-_initsmalleditlineop1	equ 4D32h
-_initsmalleditboxvar	equ 4D35h
-_initsmalleditboxop1	equ 4D38h
-;4D3Bh
-_RestartDialog		equ 4D3Eh
-_ErrCustom1		equ 4D41h
-_ErrCustom2		equ 4D44h
-_AppStartMouse		equ 4D47h
-_AppStartMouseNoSetup	equ 4D4Ah
-_AppMouseGetKey		equ 4D4Dh
-_AppDispMouse		equ 4D50h
-_AppEraseMouse		equ 4D53h
-_AppSetupMouseMem	equ 4D56h
-_GetDispRowOffset	equ 4D59h ;HL=A*12 (intended for A to be row and HL becomes offset into plotSScreen)
-_ClearRect		equ 4D5Ch
-_InvertRect		equ 4D5Fh
-_FillRect		equ 4D62h
-_AppUpdateMouse		equ 4D65h
-_AppDispPrevMouse	equ 4D68h ;might bring previous keypress's movement to current coordinates with flags to not display
-;4D6Bh ;restores some cursor flags and stuff
-_initcellbox		equ 4D6Eh
-_drawcell		equ 4D71h
-;4D74h
-_invertcell		equ 4D77h
-_setcelloverride	equ 4D7Ah
-_DrawRectBorder		equ 4D7Dh
-_ClearCell		equ 4D80h
-_covercell		equ 4D83h
-_EraseRectBorder	equ 4D86h
-_FillRectPattern	equ 4D89h
-_DrawRectBorderClear	equ 4D8Ch
-;4D8Fh ;mouse subroutine
-;4D92h
-_VerticalLine		equ 4D95h
-_IBoundsFull		equ 4D98h
-_DisplayImage		equ 4D9Bh
-;4D9Eh ;does something dumb with ports 10h/11h
-;4DA1h ;mouse subroutine
-_AppUpdateMouseCoords	equ 4DA4h
-_ShiftBitsLeft		equ 4DA7h ;mouse subroutine, shifts B bits left from DE sprite to HL one
-;4DAAh ;mouse subroutine
-;4DADh ;mouse subroutine
-;4DB0h ;mouse subroutine
-;4DB3h ;mouse subroutine
-;4DB6h ;mouse subroutine
-;4DB9h ;mouse subroutine
-;4DBCh ;mouse subroutine
-_AppUpdateMouseRow	equ 4DBFh
-_AppDrawMouse		equ 4DC2h ;set 2,(iy+2Ch) for AppEraseMouse, reset for AppDispMouse
-_AppDrawMouseDirect	equ 4DC5h ;pretty much _AppDrawMouse, but you pass LCD column in A
-_CPoint			equ 4DC8h
-_DeleteApp		equ 4DCBh
-_AppUpdateMouseXY	equ 4DCEh
-_setmodecellflag	equ 4DD1h
-_resetmodecellflag	equ 4DD4h
-_ismodecellset		equ 4DD7h
-_getmodecellflag	equ 4DDAh
-;4DDDh
-_CellBoxManager		equ 4DE0h
-_startnewcell		equ 4DE3h
-;4DE6h
-_CellCursorHandle	equ 4DE9h
-;4DECh
-;4DEFh
-_ClearCurCell		equ 4DF2h
-_drawcurcell		equ 4DF5h
-_invertcurcell		equ 4DF8h
-_covercurcell		equ 4DFBh
-_BlinkCell		equ 4DFEh
-_BlinkCellNoLookUp	equ 4E01h
-_BlinkCurCell		equ 4E04h
-_BlinkCellToOn		equ 4E07h
-_BlinkCellToOnNoLookUp	equ 4E0Ah
-_BlinkCurCellToOn	equ 4E0Dh
-_BlinkCellToOff		equ 4E10h
-_BlinkCellToOffNoLookUp equ 4E13h
-_BlinkCurCellToOff	equ 4E16h
-_getcurmodecellflag	equ 4E19h
-;4E1Ch
-_startsmalleditreturn	equ 4E1Fh
-;4E22h
-;4E25h
-_CellkHandle		equ 4E28h
-_errchkalphabox		equ 4E2Bh
-;4E2Eh
-;4E31h
-;4E34h
-;4E37h
-_eraseallcells		equ 4E3Ah
-_iscurmodecellset	equ 4E3Dh
-;4E40h
-_initalphabox		equ 4E43h
-;4E46h
-;4E49h
-_drawblnkcell		equ 4E4Ch
-_ClearBlnkCell		equ 4E4Fh
-_invertblnkcell		equ 4E52h
-_AppMouseForceKey	equ 4E55h
-_AppSetupMouseMemCoords	equ 4E58h ;this is _AppSetupMouseMem except you pass starting coordinates in HL
-_AppMoveMouse		equ 4E5Bh ;this is _AppMouseForceKey and then updating coordinates
-_GetStringInput		equ 4E5Eh
-_GetStringInput2	equ 4E61h
-;4E64h
-_HorizontalLine		equ 4E67h
-_CreateAppVar		equ 4E6Ah
-_CreateProtProg		equ 4E6Dh
-_CreateVar		equ 4E70h
-_AsmComp		equ 4E73h
-_GetAsmSize		equ 4E76h
-_SquishPrgm		equ 4E79h
-_ExecutePrgm		equ 4E7Ch
-_ChkFindSymAsm		equ 4E7Fh
-_ParsePrgmName		equ 4E82h
-_CSub			equ 4E85h
-_CAdd			equ 4E88h
-_CSqaure		equ 4E8Bh
-_CMult			equ 4E8Eh
-_CRecip			equ 4E91h
-_CDiv			equ 4E94h
-_CAbs			equ 4E97h
-_AddSquares		equ 4E9Ah
-_CSqRoot		equ 4E9Dh
-_CLN			equ 4EA0h
-_CLog			equ 4EA3h
-_CTenX			equ 4EA6h
-_CEtoX			equ 4EA9h
-_CXrootY		equ 4EACh
-;4EAFh
-_CYtoX			equ 4EB2h
-_InvertNonReal		equ 4EB5h
-_CplxMult		equ 4EB8h
-_CplxDiv		equ 4EBBh
-_CplxTrunc		equ 4EBEh
-_CplxFrac		equ 4EC1h
-_CplxFloor		equ 4EC4h
-_SendHeaderPacket	equ 4EC7h
-_CancelTransmission	equ 4ECAh
-_SendScreenContents	equ 4ECDh
-_SendRAMVarData		equ 4ED0h
-_SendRAMCmd		equ 4ED3h
-_SendPacket		equ 4ED6h
-_ReceiveAck		equ 4ED9h
-_Send4BytePacket	equ 4EDCh
-_SendDataByte		equ 4EDFh
-_Send4Bytes		equ 4EE2h
-_SendAByte		equ 4EE5h
-_SendCByte		equ 4EE8h
-_GetSmallPacket		equ 4EEBh
-_GetDataPacket		equ 4EEEh
-_SendAck		equ 4EF1h
-_Get4Bytes		equ 4EF4h
-_Get3Bytes		equ 4EF7h
-_Rec1stByte		equ 4EFAh
-_Rec1stByteNC		equ 4EFDh
-_ContinueGetByte	equ 4F00h
-_RecAByteIO		equ 4F03h
-_ReceiveVar		equ 4F06h
-_ReceiveVarDataExists	equ 4F09h
-_ReceiveVarData		equ 4F0Ch
-_SrchVLstUp		equ 4F0Fh
-_SrchVLstDn		equ 4F12h
-_SendVariable		equ 4F15h
-_Get4BytesCursor	equ 4F18h
-_Get4BytesNC		equ 4F1Bh
-_Convert85List		equ 4F1Eh
-_SendDirectoryContents	equ 4F21h
-_SendReadyPacket	equ 4F24h
-_Convert85Real		equ 4F27h
-_ret_6			equ 4F2Ah
-_SendCertificate	equ 4F2Dh ;sends certificate in header/data packets, Flash must be unlocked, used with sending an application in LINK menu
-_SendApplication	equ 4F30h
-_SendOSHeader		equ 4F33h
-_SendOSPage		equ 4F36h
-_SendOS			equ 4F39h
-_FlashWriteDisable	equ 4F3Ch
-_SendCmd		equ 4F3Fh
-_SendOSValidationData	equ 4F42h
-_Disp			equ 4F45h
-_SendGetkeyPress	equ 4F48h
-_RejectCommand		equ 4F4Bh
-_CheckLinkLines		equ 4F4Eh
-_GetHookByte		equ 4F51h
-_GetBytePaged		equ 4F54h
-_cursorhook		equ 4F57h
-_call_library_hook	equ 4F5Ah
-_call_rawkey_hook	equ 4F5Dh
-_setCursorHook		equ 4F60h ;enable cursor hook
-_EnableLibraryHook	equ 4F63h
-_SetGetKeyHook		equ 4F66h
-_ClrCursorHook		equ 4F69h
-_DisableLibraryHook	equ 4F6Ch
-_ClrRawKeyHook  	equ 4F6Fh
-_ResetHookBytes		equ 4F72h
-_AdjustAllHooks		equ 4F75h
-_getkeyhook		equ 4F78h
-_SetGetcscHook		equ 4F7Bh
-_ClrGetKeyHook		equ 4F7Eh
-_call_linkactivity_hook	equ 4F81h
-_EnableLinkActivityHook	equ 4F84h
-_DisableLinkHook	equ 4F87h
-_GetSmallPacket2	equ 4F8Ah
-_EnableCatalog2Hook	equ 4F8Dh
-_DisableCatalog2Hook	equ 4F90h
-_EnableLocalizeHook	equ 4F93h
-_DisableLocalizeHook	equ 4F96h
-_SetTokenHook		equ 4F99h
-_ClearTokenHook		equ 4F9Ch
-;4F9Fh ld hl,92c6 / ld a,(92c5) / res 2,a / cp (hl) / ret
-;4FA2h hl=11*(92fc)+92c9 / ld a,(hl) / and Fh / cp 2 / ret
-;4FA5h
-_Bit_VertSplit		equ 4FA8h
-_SetHomescreenHook	equ 4FABh
-_ClrHomeScreenHook	equ 4FAEh
-_SetWindowHook		equ 4FB1h
-_DisableWindowHook	equ 4FB4h
-_SetGraphModeHook	equ 4FB7h
-_DisableGraphHook	equ 4FBAh
-;4FBDh
-;4FC0h
-_JForceWindowSettings	equ 4FC3h
-_DelVarArc		equ 4FC6h
-_DelVarNoArc		equ 4FC9h
-_SetAllPlots		equ 4FCCh
-_SetYeditHook     	equ 4FCFh
-_DisableYEquHook	equ 4FD2h
-_JForceYEqu		equ 4FD5h
-_Arc_Unarc		equ 4FD8h ;checks for low battery
-_ArchiveVar		equ 4FDBh ;set 0,(iy+24h) to check for low battery first
-_UnarchiveVar		equ 4FDEh
-_DialogKeyHook		equ 4FE1h ;rawkey hook used by OS for dialog context
-_SetFontHook		equ 4FE4h
-_ClrFontHook		equ 4FE7h
-_SetRegraphHook		equ 4FEAh
-_DisableRegraphHook	equ 4FEDh
-_RunGraphingHook	equ 4FF0h
-_SetTraceHook		equ 4FF3h
-_DisableTraceHook	equ 4FF6h
-_RunTraceHook		equ 4FF9h
-_NDeriv			equ 4FFCh
-;4FFFh
-_JForceGraphNoKey	equ 5002h
-_JForceGraphKey		equ 5005h
-_PowerOff		equ 5008h
-_GetKeyRetOff		equ 500Bh ;same as getkey, only returns kOff if 2nd+on is pressed 
-_FindGroupSym		equ 500Eh
-_FillBasePageTable	equ 5011h
-_ArcChk			equ 5014h
-_FlashToRam		equ 5017h
-_LoadDEIndPaged		equ 501Ah
-_LoadCIndPaged		equ 501Dh
-_SetupPagedPtr		equ 5020h
-_PagedGet		equ 5023h
-_SetParserHook		equ 5026h
-_ClearParserHook	equ 5029h
-_SetAppChangeHook 	equ 502Ch
-_ClearAppChangeHook	equ 502Fh
-_EnableGraphicsHook	equ 5032h
-_DisableGraphicsHook	equ 5035h
-;5038h
-_ILineNoHook		equ 503Bh
-;503Eh
-_DeleteTempPrograms	equ 5041h
-_EnableCatalog1Hook	equ 5044h
-_DisableCatalog1Hook	equ 5047h
-_EnableHelpHook		equ 504Ah
-_DisableHelpHook	equ 504Dh
-_DispCatalogEnd		equ 5050h
-_GetMenuKeypress	equ 5053h
-_GetCatalogItem		equ 5056h
-_RunCatalog2Hook	equ 5059h
-_RunCatalog1Hook	equ 505Ch
-;505Fh
-;5062h
-_dispMenuTitle		equ 5065h
-;5068h
-_EnablecxRedispHook	equ 506Bh
-_DisablecxRedispHook	equ 506Eh
-_BufCpy			equ 5071h
-_BufClr			equ 5074h
-_UnOPExec2		equ 5077h
-_BinOPExec2		equ 507Ah
-_LoadMenuB		equ 507Dh ;clears screen and loads menu from B, plus a couple flag changes
-_DisplayVarInfo		equ 5080h
-_SetMenuHook		equ 5083h
-_ClearMenuHook		equ 5086h
-_getBCOffsetIX		equ 5089h
-_GetBCOffsetIX2		equ 508Ch
-_ForceFullScreen	equ 508Fh
-_GetVariableData	equ 5092h
-_FindSwapSector		equ 5095h
-_CopyFlashPage		equ 5098h
-_FindAppNumPages	equ 509Bh
-_HLMinus5		equ 509Eh
-_SendArcPacket		equ 50A1h
-_ForceGraphKeypress	equ 50A4h
-_DoNothing3		equ 50A7h
-_FormBase		equ 50AAh
-;50ADh
-_IsFragmented		equ 50B0h
-_Chk_Batt_Low		equ 50B3h
-_Chk_Batt_Low_2		equ 50B6h
-_Arc_Unarc2		equ 50B9h ;identical to _Arc_Unarc, except you can choose to res 0,(iy+24h) to skip low battery check
-_GetAppBasePage		equ 50BCh ;input: a=one of an app's pages. output: a=app's first page
-_SetExSpeed		equ 50BFh
-_RclExit		equ 50C2h
-_GroupAllVars		equ 50C5h
-_UngroupVar		equ 50C8h
-_WriteToFlash		equ 50CBh ;ReceiveApplication or something like that on OSes below 2.40
-_SetSilentLinkHook	equ 50CEh
-_DisableSilentLinkHook	equ 50D1h
-_TwoVarSet		equ 50D4h
-_ExecClass2Token	equ 50D7h
-_ExecClass3Token	equ 50DAh
-_GetSysInfo		equ 50DDh
-_NZIf83Plus		equ 50E0h
-_LinkStatus		equ 50E3h
-_DoNothing2		equ 50E6h ;originally for TI-Navigator
-_KeyboardGetKey		equ 50E9h
-_RunAppLib		equ 50ECh
-_FindSpecialAppHeader	equ 50EFh
-_SendUSBData		equ 50F2h
-_AppGetCBLUSB		equ 50F5h
-_AppGetCalcUSB		equ 50F8h
-_GetVarCmdUSB		equ 50FBh
-;50FEh
-_TenX2			equ 5101h
-;5104h
-;5107h
-_GetVarVersion		equ 510Ah
-;510Dh
-;5110h
-_DeleteTempEditEqu	equ 5113h
-_JcursorFirst2		equ 5116h
-;5119h
-;511Ch
-_wputsEOL2		equ 511Fh ;same except res 0,(iy+0Eh) first
-_InvertTextInsMode	equ 5122h
-;5125h
-_ResetDefaults		equ 5128h
-_ZeroFinanceVars	equ 512Bh
-_DispHeader		equ 512Eh
-_JForceGroup		equ 5131h
-;5134h
-;5137h
-_DispCoords		equ 513Ah
-;513Dh
-;5140h
-;5143h
-;5146h
-;5149h
-;514Ch
-_getDate		equ 514Fh
-;5152h
-_getDtFmt		equ 5155h
-;5158h
-_getTime		equ 515Bh
-;515Eh
-_getTmFmt		equ 5161h
-;5164h
-_SetZeroOne		equ 5167h
-;516Ah
-_IsOneTwoThree		equ 516Dh
-;5170h
-_IsOP112or24		equ 5173h
-_chkTimer0		equ 5176h
-;5179h
-;517Ch
-_ClrWindowAndFlags	equ 517Fh
-_SetMachineID		equ 5182h
-_ResetLists		equ 5185h
-;5188h
-;518Bh
-;518Eh
-_ExecLib		equ 5191h
-;5194h
-_CPOP1OP2Rounded	equ 5197h
-_CPOP1OP2Rounded2	equ 519Ah
-_OpenLib		equ 519Dh
-;51A0h
-;51A3h
-_ResetIOPrompt		equ 51A6h
-;51A9h
-_SetUpEditor		equ 51ACh
-_SortA			equ 51AFh
-_SortD			equ 51B2h
-;51B5h
-_IsOP1ResID		equ 51B8h
-;51BBh
-;51BEh
-;51C1h
-_ForceModeKeypress	equ 51C4h ;forces a keypress (and calls help hook) on any of several mode-setting contexts
-_DispAboutScreen	equ 51C7h
-_ChkHelpHookVer		equ 51CAh
-_Disp32			equ 51CDh
-;51D0h
-;51D3h
-;51D6h
-;51D9h
-_DrawTableEditor	equ 51DCh ;draws table editor lines
-;51DFh
-;51E2h
-;51E5h
-;51E8h
-;51EBh
-;51EEh
-_MatrixName		equ 51F1h
-;51F4h
-;51F7h
-;51FAh
-;51FDh
-;5200h
-;5203h
-;5206h
-;5209h
-;520Ch
-;520Fh
-_SetupEmptyEditTempEqu	equ 5212h
-;5215h
-;5218h
-;521Bh
-;521Eh
-_Chk_Batt_Level		equ 5221h
-;5224h
-;5227h
-;522Ah
-;522Dh
-;5230h
-_GoToLastRow		equ 5233h
-_RectBorder		equ 5236h
-;5239h
-;523Ch
-;523Fh
-_LoadA5			equ 5242h
-;5245h
-_NamedListToOP1		equ 5248h
-;524Bh
-;524Eh
-;5251h
-_InitUSBDeviceCallback	equ 5254h
-_KillUSBDevice		equ 5257h
-_SetUSBConfiguration	equ 525Ah
-_RequestUSBData		equ 525Dh
-_StopReceivingUSBData	equ 5260h
-_FindAppHeaderByPage	equ 5263h
-_FindNextHeaderByPage	equ 5266h
-_IsMatchingLaunchApp	equ 5269h
-_InitTimer		equ 526Ch
-_KillTimer		equ 526Fh
-_StartTimer		equ 5272h
-_RestartTimer		equ 5275h
-_StopTimer		equ 5278h
-_WaitTimer		equ 527Bh
-_CheckTimer		equ 527Eh
-_CheckTimerRestart	equ 5281h
-_SetVertGraphActive	equ 5284h
-_ClearVertGraphActive	equ 5287h
-_EnableUSBHook		equ 528Ah
-_DisableUSBHook		equ 528Dh
-_InitUSBDevice		equ 5290h
-_KillUSBPeripheral	equ 5293h
-;5296h
-;5299h
-_GraphLine		equ 529Ch
-;529Fh
-;52A2h
-;52A5h
-;52A8h
-;52ABh
-;52AEh
-_ZifTableEditor		equ 52B1h
-;52B4h
-;52B7h
-;52BAh
-_FindAppName		equ 52BDh
-;52C0h
-;52C3h
-;52C6h
-_GrBufCpyCustom		equ 52C9h
-;52CCh
-;52CFh
-;52D2h
-_VDispRealOP1		equ 52D5h
-_DispXEqualsNum		equ 52D8h
-_ResetGraphSettings	equ 52DBh
-_InitializeVariables	equ 52DEh
-;52E1h ;bit 4,(9C75h) (this is DEFINITELY returning the status of something when acting as a TI-SmartView Input Pad...this bit is bit 1 of the data byte from a PC HID Set Report request)
-_DelVarSym		equ 52E4h
-_FindAppUpNoCase	equ 52E7h
-_FindAppDnNoCase	equ 52EAh
-_DeleteInvalidApps	equ 52EDh
-_DeleteApp_Link		equ 52F0h
-_CmpSymsNoCase		equ 52F3h
-_SetAppRestrictions	equ 52F6h
-_RemoveAppRestrictions	equ 52F9h
-_QueryAppRestrictions	equ 52FCh
-_DispAppRestrictions	equ 52FFh
-_SetupHome		equ 5302h
-_GRPUTAWAYFull		equ 5305h ;same as _GRPUTAWAY except it assumes no split screen
-_SendSmartPadKeypress	equ 5308h ;B and A are the inputs
-_ToggleUSBSmartPadInput	equ 530Bh ;A is input, 0 or 1 to enable/disable
-_IsUSBDeviceConnected	equ 530Eh ;bit 4,(81h) \ ret, this is just a guess on its purpose but it seems to work
-_ClearUSBCallback2	equ 5311h ;identical to 5257h
-_PolarEquToOP1		equ 5314h
-_ParamXEquToOP1		equ 5317h
-_ParamYEquToOP1		equ 531Ah
-_GetRestrictionsOptions	equ 531Dh
-_DispResetComplete	equ 5320h
-_PTTReset		equ 5323h
-_FindAppCustom		equ 5326h
-_ClearGraphStyles	equ 5329h
+#define _jerrorno	$4000
+#define _fonthook	$4003
+#define _call_character_hook	$4006 ;calls character(localize) hook
+#define _ldhlind	$4009 ;l=a=(hl),h=(hl+1)
+#define _cphlde	$400c
+#define _divhlby10	$400f
+#define _divhlbya	$4012
+#define _kdbscan	$4015
+#define _getcsc	$4018 ;key board scan codes
+#define _coormon	$401b ;
+#define _mon	$401e ;system monitor, customized through the context vectors
+#define _monforcekey	$4021 ;
+#define _sendkpress	$4024
+#define _jforcecmdnochar	$4027
+#define _jforcecmd	$402a ;
+#define _syserrhandler	$402d ;loads error context? sp=(onsp)
+#define _newcontext	$4030 ;(kbdkey)=0, loads context, restores page in $4000-$7fff
+#define _newcontext0	$4033 ;loads context
+#define _cxputaway	$4036 ;
+#define _cxputaway2	$4039 ;same but also does a b_call canalphins
+#define _cxpputaway	$403c
+#define _cxsizewind	$403f
+#define _cxerrep	$4042
+#define _cxmain	$4045
+#define _monerrhand	$4048 ;installs errorhandler to start of rom call, loads error context, jumps to mon
+#define _appinit	$404b ;loads vector data at hl to cxmain and the rest of the vectors
+#define _resetram	$404e
+#define _lcd_busy	$4051 ;wait till bit 1 of port 2 is set
+#define _min	$4054 ;op1 = lowest number between op1 and op2
+#define _max	$4057 ;op1 = highest number between op1 and op2
+#define _trunc	$4060
+#define _invsub	$4063
+#define _times2	$4066
+#define _plus1	$4069 ;op1=op1+1
+#define _minus1	$406c
+#define _fpsub	$406f
+#define _fpadd	$4072
+#define _dtor	$4075
+#define _rtod	$4078
+#define _cube	$407b
+#define _timespt5	$407e
+#define _fpsquare	$4081
+#define _fpmult	$4084 ;op1=op1*op2
+#define _ljrnd	$4087 ;adjusts op1 if 0s precede the actual number... rounding? when
+#define _invop1sc	$408a
+#define _invop1s	$408d
+#define _invop2s	$4090
+#define _frac	$4093
+#define _fprecip	$4096
+#define _fpdiv	$4099
+#define _sqroot	$409c
+#define _rndguard	$409f
+#define _rnfx	$40a2
+#define _int	$40a5
+#define _round	$40a8
+#define _lnx	$40ab
+#define _logx	$40ae
+#define _ljnornd	$40b1 ;like _ljrnd but no rounding
+#define _etox	$40b4
+#define _tenx	$40b7
+#define _sincosrad	$40ba
+#define _sin	$40bd
+#define _cos	$40c0
+#define _tan	$40c3
+#define _sinhcosh	$40c6
+#define _tanh	$40c9
+#define _cosh	$40cc
+#define _sinh	$40cf
+#define _acosrad	$40d2
+#define _atanrad	$40d5
+#define _atan2rad	$40d8
+#define _asinrad	$40db
+#define _acos	$40de
+#define _atan	$40e1
+#define _asin	$40e4
+#define _atan2	$40e7
+#define _atanh	$40ea
+#define _asinh	$40ed
+#define _acosh	$40f0
+#define _ptor	$40f3
+#define _rtop	$40f6
+#define _hltimes9	$40f9
+#define _ckop1cplx	$40fc
+#define _ckop1real	$40ff
+#define _angle	$4102
+#define _cop1set0	$4105
+#define _cpop4op3	$4108
+#define _mov9op2cp	$410b
+#define _abso1o2cp	$410e
+#define _cpop1op2	$4111
+#define _op3toop4	$4114
+#define _op1toop4	$4117
+#define _op2toop4	$411a
+#define _op4toop2	$411d
+#define _op1toop3	$4123
+#define _op5toop2	$4126
+#define _op5toop6	$4129
+#define _op5toop4	$412c
+#define _op1toop2	$412f
+#define _op6toop2	$4132
+#define _op6toop1	$4135
+#define _op4toop1	$4138
+#define _op5toop1	$413b
+#define _op3toop1	$413e
+#define _op6toop5	$4141
+#define _op4toop5	$4144
+#define _op3toop5	$4147
+#define _op2toop5	$414a
+#define _op2toop6	$414d
+#define _op1toop6	$4150
+#define _op1toop5	$4153
+#define _op2toop1	$4156
+#define _mov11b	$4159
+#define _mov10b	$415c
+#define _mov9b	$415f
+#define _mov9b2	$4162 ;points to _mov9b
+#define _mov8b	$4165
+#define _mov7b	$4168
+#define _mov7b2	$416b ;same pointer as _mov7b
+#define _op2toop3	$416e
+#define _op4toop3	$4171
+#define _op5toop3	$4174
+#define _op4toop6	$4177
+#define _mov9toop1	$417a
+#define _mov9op1op2	$417d
+#define _mov9toop2	$4180
+#define _movfrop1	$4183
+#define _op4set1	$4186
+#define _op3set1	$4189
+#define _op2set8	$418c
+#define _op2set5	$418f
+#define _op2seta	$4192
+#define _op2set4	$4195
+#define _op2set3	$4198
+#define _op1set1	$419b
+#define _op1set4	$419e
+#define _op1set3	$41a1
+#define _op3set2	$41a4
+#define _op1set2	$41a7
+#define _op2set2	$41aa
+#define _op2set1	$41ad
+#define _zero16d	$41b0
+#define _op5set0	$41b3
+#define _op4set0	$41b6
+#define _op3set0	$41b9
+#define _op2set0	$41bc
+#define _op1set0	$41bf
+#define _opset0	$41c2 ;hl = location to write floating point 0
+#define _zeroop1	$41c5
+#define _zeroop2	$41c8
+#define _zeroop3	$41cb
+#define _zeroop	$41ce
+#define _clrlp	$41d1
+#define _shracc	$41d4 ;move high nibble in a to low nibble
+#define _shlacc	$41d7 ;move low nibble in a to high nibble
+#define _shr18	$41da ;insert a 0 nibble at high nibble of (hl), shift 9 bytes 1 nibble to right
+#define _shr18a	$41dd ;insert low nibble in a at high nibble of (hl), shift 9 bytes 1 nibble to right
+#define _shr16	$41e0 ;insert a 0 nibble at highnibble of (hl), shift 8 bytes 1 nibble to right
+#define _shr14	$41e3 ;insert low nibble in a at high nibble of (hl), shift 7 bytes 1 nibble to right
+#define _shl16	$41e6 ;insert nibble of 0 in low nibble of (hl), shift 8 bytes (before and including (hl)) to the left 1 nibble
+#define _shl14	$41e9 ;insert low nibble of a in low nibble of (hl), shift 7 bytes (before and including (hl)) to the left 1 nibble
+#define _srdo1	$41ec
+#define _shrdrnd	$41ef
+#define _mantpa	$41f2 ;adds the value of a to hl which points to the end of the bcd 7 bytes long
+#define _addprop	$41f5 ;adds the value of a to hl which points to the end of the bcd (b bytes long)
+#define _addproplp	$41f8 ;adds the value of a and carry to hl which points to the end of the bcd (b bytes long)
+#define _add16d 	$41fb ;adds the bcd numbers at (hl-7) and (de-7)
+#define _add14d	$41fe ;adds the bcd numbers at (hl-6) and (de-6)
+#define _sub16d	$4201 ;subtracts bcd numbers at (hl-7) and (de-7)
+#define _sub14d	$4204 ;subtracts bcd numbers at (hl-6) and (de-6)
+#define _op2exop6	$4207
+#define _op5exop6	$420a
+#define _op1exop5	$420d
+#define _op1exop6	$4210
+#define _op2exop4	$4213
+#define _op2exop5	$4216
+#define _op1exop3	$4219
+#define _op1exop4	$421c
+#define _op1exop2	$421f
+#define _exlp	$4222
+#define _ckop1c0	$4225
+#define _ckop1fp0	$4228
+#define _ckop2fp0	$422b
+#define _posno0int	$422e
+#define _ckposint	$4231
+#define _ckint	$4234
+#define _ckodd	$4237
+#define _ckop1m	$423a
+#define _getconop1	$423d	;a=0 opx=57.29577951308232 (1 radian in degrees)
+#define _getconop2	$4240	;a=1 opx=1.570796326794897 (90 deg = pi/2)
+							;a=2 opx=.7853981633974483 (45 deg = pi/4)
+							;a=3 opx=.4342944819032518 (log e)
+							;a=4 opx=3.141592653589800 (pi)
+							;a=5 opx=.0174532925199433 (pi/180 = 1 degree in radians)
+							;a=6 opx=2.302585092994046 (ln 10)
+#define _pidiv2	$4243 ;not code, but a pointer to:	.db 80,15,70,79,63,26,79,48,97
+#define _pidiv4	$4246 ;								.db 7f,78,53,98,16,33,97,44,83
+#define _pitimes2	$4249 ;not code, but a pointer to a 2*pi in non-op format (no exponent byte)
+#define _pi	$424c ;not code, but a pointer to a pi in non-op format (no exponent byte)
+#define _exptohex	$424f
+#define _op1exptodec	$4252
+#define _ckop2pos	$4255
+#define _ckop1pos	$4258
+#define _clrop2s	$425b
+#define _clrop1s	$425e
+#define _fdiv100	$4261 ;op1=op1/100
+#define _fdiv10	$4264 ;op1=op1/10
+#define _deco1exp	$4267 ;decrease exponent by 1, this can go from $00 to $ff
+#define _inco1exp	$426a ;op1=op1*10
+#define _incexp	$426d ;hl points to the floating point's exponent to be multiplied by 10
+#define _ckvalidnum	$4270
+#define _getexp	$4273 ;a=op1's exponent, carry set if negative exponent, z if e0
+#define _htimesl	$4276
+#define _eop1notreal	$4279
+#define _thetaname	$427c
+#define _rname	$427f
+#define _regeqname	$4282
+#define _recurnname	$4285
+#define _xname	$4288
+#define _yname	$428b
+#define _tname	$428e
+#define _realname	$4291
+#define _setestofps	$4294 ;moves the word at fps to es
+#define _marktabledirty	$4297 ;looks up table variable and marks vat entry as "dirty" or selected
+#define _op1mop2exp	$429a ;op1's exponent = op1's expoent - op2's exponent
+#define _op1expminuse	$429d ;a=(op1+1)-e
+#define _chkerrbreak	$42a0
+#define _isa2bytetok	$42a3
+#define _getlastentry	$42a6
+#define _getlastentryptr	$42a9
+#define _regclrchng	$42ac
+#define _resetwintop	$42af ;takes into account grfsplitoverride and grfsplit flags
+#define _setyup	$42b2 ;loads 7 to port 10... what does this do?
+#define _setxup	$42b5 ;loads 5 to port 10...
+#define _iso1nontlstorprog	$42b8 ;checks if op1 contains a list, program, group, or appvar obj name
+#define _iso1nontemplst	$42bb ;checks if op1 contains a list (why would op1+1 contain 01, or 0d for a var name?)
+#define _is_a_lstorclst	$42be ;checks if a = 1 or 0d
+#define _chk_hl_999	$42c1 ;returns nc if less than 999, throws invalid dim error if greater than or equal to 999
+#define _equ_or_newequ	$42c4
+#define _errd_op1notpos	$42c7
+#define _errd_op1not_r	$42ca
+#define _errd_op1notposint 	$42cd
+#define _errd_op1_le_0	$42d0
+#define _errd_op1_0	$42d3
+#define _findsym_get_size 	$42d6 ;like findsym, but on output hl is the size of the variable
+#define _sto_statvar	$42d9
+#define _rcl_statvar	$42dc
+#define _ckop2real	$42df
+#define _get_x_indirect	$42e2 ;whatever this is, it uses the imathptrx locations
+#define _memchk	$42e5
+#define _cmpprgnamlen1	$42e8 ;gets variable name length from hl
+#define _cmpprgnamlen	$42eb ;gets variable name length from op1
+#define _findprogsym	$42ee ;find the program whose name is in op1 (see chkfindsym in sdk)
+#define _chkfindsym	$42f1
+#define _findsym	$42f4
+#define _insertmem	$42f7
+#define _insertmema	$42fa ;not sure how this differs from insertmem
+#define _enoughmem	$42fd
+#define _cmpmemneed	$4300
+#define _createpvar4	$4303
+#define _createpvar3	$4306
+#define _createvar3	$4309
+#define _createcplx	$430c
+#define _createreal	$430f
+#define _createtemprlist	$4312
+#define _createrlist	$4315
+#define _createtclist	$4318
+#define _createclist	$431b
+#define _createtemprmat	$431e
+#define _creatermat	$4321
+#define _createtempstring	$4324
+#define _createstrng	$4327
+#define _create0equ	$432a
+#define _createtempequ	$432d
+#define _createequ	$4330
+#define _createpict	$4333
+#define _creategdb	$4336
+#define _createprog	$4339
+#define _chkdel	$433c
+#define _chkdela	$433f
+#define _adjparser	$4342
+#define _adjmath	$4345
+#define _adjm7	$4348
+#define _delmema	$434b
+#define _get_form_num	$434e
+#define _delvar	$4351
+#define _delvario	$4354
+#define _delmem	$4357
+#define _delvar3d	$435a
+#define _delvar3c	$435d
+#define _delvar3dc	$4360 ;may be incorrect
+#define _isfixedname	$4363
+#define _delvarentry	$4366
+#define _datasizea	$4369
+#define _datasize	$436c
+#define _popmcplxo1	$436f
+#define _popmcplx	$4372
+#define _movcplx	$4375
+#define _popop5	$4378
+#define _popop3	$437b
+#define _popop1	$437e
+#define _poprealo6	$4381
+#define _poprealo5	$4384
+#define _poprealo4	$4387
+#define _poprealo3	$438a
+#define _poprealo2	$438d
+#define _poprealo1	$4390
+#define _popreal	$4393
+#define _fpopcplx	$4396
+#define _fpopreal	$4399
+#define _fpopfps	$439c
+#define _deallocfps	$439f
+#define _deallocfps1	$43a2
+#define _allocfps	$43a5
+#define _allocfps1	$43a8
+#define _pushrealo6	$43ab
+#define _pushrealo5	$43ae
+#define _pushrealo4	$43b1
+#define _pushrealo3	$43b4
+#define _pushrealo2	$43b7
+#define _pushrealo1	$43ba
+#define _pushreal	$43bd
+#define _pushop5	$43c0
+#define _pushop3	$43c3
+#define _pushmcplxo3	$43c6
+#define _pushop1	$43c9
+#define _pushmcplxo1	$43cc
+#define _pushmcplx	$43cf
+#define _exmcplxo1	$43d2
+#define _exch9	$43d5
+#define _cpyto1fps11	$43d8
+#define _cpyto2fps5	$43db
+#define _cpyto1fps5	$43de
+#define _cpyto2fps6	$43e1
+#define _cpyto1fps6	$43e4
+#define _cpyto2fps7	$43e7
+#define _cpyto1fps7	$43ea
+#define _cpyto1fps8	$43ed
+#define _cpyto2fps8	$43f0
+#define _cpyto1fps10	$43f3
+#define _cpyto1fps9	$43f6
+#define _cpyto2fps4	$43f9
+#define _cpyto6fps3	$43fc
+#define _cpyto6fps2	$43ff
+#define _cpyto2fps3	$4402
+#define _cpycto1fps3	$4405
+#define _cpyto1fps3	$4408
+#define _cpyfps3	$440b
+#define _cpyto1fps4	$440e
+#define _cpyto3fps2	$4411
+#define _cpyto5fpst	$4414
+#define _cpyto6fpst	$4417
+#define _cpyto4fpst	$441a
+#define _cpyto3fpst	$441d
+#define _cpyto2fpst	$4420
+#define _cpyto1fpst	$4423
+#define _cpyfpst	$4426
+#define _cpystack	$4429
+#define _cpyto3fps1	$442c
+#define _cpyto2fps1	$442f
+#define _cpyto1fps1	$4432
+#define _cpyfps1	$4435
+#define _cpyto2fps2	$4438
+#define _cpyto1fps2	$443b
+#define _cpyfps2	$443e
+#define _cpyo3tofpst	$4441
+#define _cpyo2tofpst	$4444
+#define _cpyo6tofpst	$4447
+#define _cpyo1tofpst	$444a
+#define _cpytofpst	$444d
+#define _cpytostack	$4450
+#define _cpyo3tofps1	$4453
+#define _cpyo5tofps1	$4456
+#define _cpyo2tofps1	$4459
+#define _cpyo1tofps1	$445c
+#define _cpytofps1	$445f
+#define _cpyo2tofps2	$4462
+#define _cpyo3tofps2	$4465
+#define _cpyo6tofps2	$4468
+#define _cpyo1tofps2	$446b
+#define _cpytofps2	$446e
+#define _cpyo5tofps3	$4471
+#define _cpyo2tofps3	$4474
+#define _cpyo1tofps3	$4477
+#define _cpytofps3	$447a
+#define _cpyo1tofps6	$447d
+#define _cpyo1tofps7	$4480
+#define _cpyo1tofps5	$4483
+#define _cpyo2tofps4	$4486
+#define _cpyo1tofps4	$4489
+#define _errnotenoughmem 	$448c ;only if not hl bytes free
+#define _fpsminus9	$448f
+#define _hlminus9	$4492
+#define _erroverflow	$4495
+#define _errdivby0	$4498
+#define _errsingularmat	$449b
+#define _errdomain	$449e
+#define _errincrement	$44a1
+#define _errnon_real	$44a4
+#define _errsyntax	$44a7
+#define _errdatatype	$44aa
+#define _errargument	$44ad
+#define _errdimmismatch	$44b0
+#define _errdimension	$44b3
+#define _errundefined	$44b6
+#define _errmemory	$44b9
+#define _errinvalid	$44bc
+#define _errbreak	$44bf
+#define _errstat	$44c2
+#define _errsignchange	$44c5
+#define _erriterations	$44c8
+#define _errbadguess	$44cb
+#define _errtoltoosmall	$44ce
+#define _errstatplot	$44d1
+#define _errlinkxmit	$44d4
+#define _jerror	$44d7
+#define _noerrorentry	$44da
+#define _pusherrorhandler	$44dd
+#define _poperrorhandler	$44e0
+#define _strcopy	$44e3
+#define _strcat	$44e6
+#define _isinset	$44e9
+#define _sdone	$44ec
+#define _serrort	$44ef
+#define _snameeq	$44f2
+#define _sunderscr	$44f5
+#define _sfail	$44f8
+#define _sname	$44fb
+#define _sok	$44fe
+#define _putmap	$4501
+#define _putc	$4504
+#define _disphl	$4507
+#define _puts	$450a
+#define _putpsb	$450d
+#define _putps	$4510
+#define _wputps	$4513
+#define _putbuf	$4516
+#define _putbuf1	$4519
+#define _wputc	$451c
+#define _wputs	$451f
+#define _wputseol	$4522 ;displays string in hl in big font, and uses ... if too long
+#define _wdispeol	$4525
+#define _whomeup	$4528
+#define _setnumwindow	$452b ;based on current cursor position, sets winleft and similar (for input prompts)
+#define _newline	$452e
+#define _movedown	$4531
+#define _scrollup	$4534
+#define _shrinkwindow	$4537
+#define _moveup	$453a
+#define _scrolldown	$453d
+#define _clrlcdfull	$4540
+#define _clrlcd	$4543
+#define _clrscrnfull	$4546
+#define _clrscrn	$4549
+#define _clrtxtshd	$454c
+#define _clrwindow	$454f
+#define _eraseeol	$4552
+#define _eraseeow	$4555
+#define _homeup	$4558
+#define _getcurloc	$455b
+#define _vputmap	$455e
+#define _vputs	$4561
+#define _vputsn	$4564
+#define _vputsng	$4567
+#define _vputsnt	$456a
+#define _runindicon	$456d
+#define _runindicoff	$4570
+#define _savecmdshadow	$4573
+#define _saveshadow	$4576
+#define _rstrshadow	$4579
+#define _rstrpartial	$457c
+#define _rstrcurrow	$457f
+#define _rstrundermenu	$4582
+#define _rstrbotrow	$4585
+#define _savetr	$4588 ;save top right corner of lcd so 2nd arrow can be displayed, indicinuse flag must be set
+#define _restoretr	$458b ;restore top right corner of lcd destroyed by an arrow. indicinuse flag must be set
+#define _getkeypress	$458e
+#define _gettoklen	$4591 ;input: hl=pointer to token. output: a=lenght of string, hl=pointer to string on page 1
+#define _get_tok_strng	$4594 ;input: hl=pointer to token. output: op3=string of the token, a=length of string
+#define _gettokstring	$4597 ;input: de=token. output: hl=pointer to the string on page 1
+#define _putbpatbuf2	$459a
+#define _putbpatbuf	$459d
+#define _putbpat	$45a0
+#define _putccheckscroll	$45a3
+#define _dispeol	$45a6
+#define _fdispeol	$45a9
+#define _makerowcmd	$45ac
+#define _totostrp	$45af
+#define _setvarname	$45b2
+#define _dispdone	$45b5
+#define _finishoutput	$45b8
+#define _curblink	$45bb
+#define _cursoroff	$45be
+#define _hidecursor	$45c1
+#define _cursoron	$45c4
+#define _showcursor	$45c7
+#define _keytostring	$45ca
+#define _pulldownchk	$45cd ;something wrong here
+#define _menucatcommon	$45d0
+#define _zifcatalog	$45d3
+#define _zifmatrixmenu	$45d6 ;_loadcurcat
+#define _loadmenunum	$45d9
+#define _loadmenunuml	$45dc
+#define _mencatret	$45df ;restores display as though a menu were just cleared (restores some flags too)
+#define _menuswitchcontext	$45e2 ;switches to context in a, calls menu hook with a=3, set 5,(iy+$16) for some sort of override to not make switc
+#define _menuedkey	$45e5
+;$45e8
+#define _notalphnum	$45eb
+#define _savesavedflags	$45ee
+#define _setmenuflags	$45f1
+#define _rstrsomeflags	$45f4
+#define _rstroscreen	$45f7 ;restores savesscreen to the display
+#define _saveoscreen	$45fa ;stores display in savesscreen
+#define _displistname	$45fd ;_seeiferrorcx
+#define _prevcontext	$4600
+#define _comparecontext	$4603
+#define _adrmrow	$4606
+#define _adrmele	$4609
+#define _getmatop1a	$460c
+#define _getm1toop1	$460f
+#define _getm1top1a	$4612
+#define _getmtoop1	$4615
+#define _puttom1a	$4618
+#define _puttoma1	$461b
+#define _puttomat	$461e
+#define _mat_el_div	$4621
+#define _cmatfun	$4624
+#define _rowech_poly	$4627
+#define _rowechelon	$462a
+#define _adrlele	$462d
+#define _getl1toop1	$4630
+#define _getl1top1a	$4633
+#define _getltoop1	$4636
+#define _getl1toop2	$4639
+#define _getl1top2a	$463c
+#define _getl2top1a	$463f
+#define _puttola1	$4642
+#define _puttol	$4645
+#define _maxminlst	$4648
+#define _llow	$464b
+#define _lhigh	$464e
+#define _lsum	$4651
+#define cumsum	$4654
+#define _tofrac	$4657
+#define _seqset	$465a
+#define _seqsolve	$465d
+#define _cmp_num_init	$4660
+#define _binopexec	$4663
+#define _exmean1	$4666
+#define _set2mvlptrs	$4669
+#define _setmat1	$466c
+#define _createtlist	$466f
+#define _unopexec	$4672
+#define _threeexec	$4675
+#define _restoreerrno	$4678
+#define _fourexec	$467b
+#define _fiveexec	$467e
+#define _cpyto2es1	$4681
+#define _cpyto6es1	$4684
+#define _cpyto1es1	$4687
+#define _cpyto3es1	$468a
+#define _cpyto3es2	$468d
+#define _cpyto2es2	$4690
+#define _cpyto1es2	$4693
+#define _cpyto2es3	$4696
+#define _cpyto1es3	$4699
+#define _cpyto3es4	$469c
+#define _cpyto6es3	$469f
+#define _cpyto2es4	$46a2
+#define _cpyto1es4	$46a5
+#define _cpyto2es5	$46a8
+#define _cpyto1es5	$46ab
+#define _cpyto4est	$46ae
+#define _cpyto2est	$46b1
+#define _cpyto1est	$46b4
+#define _cpyto2es6	$46b7
+#define _cpyto1es6	$46ba
+#define _cpyto2es7	$46bd
+#define _cpyto1es7	$46c0
+#define _cpyto2es8	$46c3
+#define _cpyto1es8	$46c6
+#define _cpyto1es9	$46c9
+#define _cpyto2es9	$46cc
+#define _cpyto2es10	$46cf
+#define _cpyto1es10	$46d2
+#define _cpyto2es11	$46d5
+#define _cpyto1es11	$46d8
+#define _cpyto2es12	$46db
+#define _cpyto1es12	$46de
+#define _cpyto2es13	$46e1
+#define _cpyto1es13	$46e4
+#define _cpyto1es14	$46e7
+#define _cpyto1es16	$46ea
+#define _cpyto1es17	$46ed
+#define _cpyto1es18	$46f0
+#define _cpyto1es15	$46f3
+#define _cpyto2es15	$46f6
+#define _cpyo1toest	$46f9
+#define _cpyo1toes1	$46fc
+#define _cpyo6toes1	$46ff
+#define _cpyo6toes3	$4702
+#define _cpyo1toes2	$4705
+#define _cpyo2toes2	$4708
+#define _cpyo1toes3	$470b
+#define _cpyo1toes4	$470e
+#define _cpyo1toes5	$4711
+#define _cpyo1toes6	$4714
+#define _cpyo1toes7	$4717
+#define _cpyo2toes4	$471a
+#define _cpyo2toes5	$471d
+#define _cpyo2toes6	$4720
+#define _cpyo2toes7	$4723
+#define _cpyo2toes8	$4726
+#define _cpyo2toes9	$4729
+#define _cpyo1toes8	$472c
+#define _cpyo1toes9	$472f
+#define _cpyo1toes10	$4732
+#define _cpyo1toes11	$4735
+#define _cpyo1toes12	$4738
+#define _cpyo1toes13	$473b
+#define _cpyo1toes14	$473e
+#define _cpyo1toes15	$4741
+#define _evalf3a	$4744
+#define _getk	$4747 ;?
+#define _settitle	$474a
+#define _dispvarval	$474d
+#define _recalled	$4750 ;_setupbuffer
+#define _createnumeditbuf	$4753
+#define _processbufkeys	$4756 ;may be default key processing like [clear], etc. especially for an edit buffer.
+#define _callcommon	$4759
+#define _commonkeys	$475c
+#define _leftmore	$475f
+#define _fdel	$4762
+#define _fclear	$4765
+#define _finsdisp	$4768 ;michael says #define _finsdisp02	$4768 (something's not right)
+#define _finsdisp02	$476b ;_setindicator
+#define _closeeditbufnor	$476e
+#define _releasebuffer	$4771
+#define _varnametoop1l	$4774
+#define _nametoop1	$4777
+#define _numpputaway	$477a
+#define _numredisp	$477d
+#define _numerror02	$4780
+#define _load_sfont	$4783
+#define _sfont_len	$4786
+#define _initnumvec	$4789
+#define _setxxop1	$478c
+#define _setxxop2	$478f
+#define _setxxxxop2	$4792
+#define _uclines	$4795
+#define _cline	$4798
+#define _clines	$479b
+#define _xrooty	$479e
+#define _ytox	$47a1
+#define _zmstats	$47a4
+#define _point_stat_hlp	$47a7
+#define _drawsplot	$47aa
+#define _initnewtracep	$47ad
+#define _splotcoord	$47b0
+#define _splotright	$47b3
+#define _splotleft	$47b6
+#define _cmpboxinfo	$47b9
+#define _nextplot	$47bc
+#define _prevplot	$47bf
+#define _clrprevplot	$47c2
+#define _put_index_lst	$47c5
+#define _get_index_lst	$47c8
+#define _heap_sort	$47cb
+#define _stogdb2	$47ce
+#define _rclgdb2	$47d1
+#define _circcmd	$47d4
+#define _grphcirc	$47d7
+#define _mov18b	$47da
+#define _darkline	$47dd
+#define _iline	$47e0
+#define _ipoint	$47e3
+#define _xyrndboth	$47e6
+#define _xyrnd	$47e9
+#define _checktop	$47ec
+#define _checkxy	$47ef
+#define _darkpnt	$47f2
+#define _cpoints	$47f5
+#define _wtov	$47f8
+#define _vtowhlde	$47fb
+#define _xitof	$47fe
+#define _yftoi	$4801
+#define _xftoi	$4804
+#define _traceoff	$4807
+#define _grredisp	$480a
+#define _gdisptoken	$480d
+#define _grdecoda	$4810
+#define _labcoor	$4813
+#define _coordisp	$4816 ;draws x & y coordinates (or r and theta if polargc)
+#define _tmpequnosrc	$4819
+#define _grlabels	$481c
+#define _ypixset	$481f
+#define _xpixset	$4822
+#define _copyrng	$4825
+#define _valcur	$4828
+#define _grputaway	$482b
+#define _rstgflags	$482e
+#define _grreset	$4831
+#define _xycent	$4834
+#define _zoomxycmd	$4837
+#define _cptdely	$483a
+#define _cptdelx	$483d
+#define _setfuncm	$4840
+#define _setseqm	$4843
+#define _setpolm	$4846
+#define _setparm	$4849
+#define _zmint	$484c
+#define _zmdecml	$484f
+#define _zmprev	$4852
+#define _zmusr	$4855
+#define _setuzm	$4858
+#define _zmfit	$485b
+#define _zmsquare	$485e
+#define _zmtrig	$4861
+#define _setxminmax	$4864
+#define _zoodefault	$4867
+#define _grbufcpy	$486a
+#define _drawsplitline	$486d
+#define _restoredisp	$4870
+#define _fnddb	$4873
+#define _alleq	$4876
+#define _fndallseleq	$4879
+#define _nexteq	$487c
+#define _preveq	$487f
+#define _blinkgcur	$4882
+#define _nbcursor	$4885
+#define _statmark	$4888
+#define _chktextcurs	$488b
+#define _regraph	$488e
+#define _dorefflags02	$4891 ;something wrong here
+#define initnseq	$4894
+#define _yres	$4897 ;_plotptxy2
+#define _ceiling	$489a ;ceil(op1)
+#define _putxy	$489d ;draws x & y coordinates (regardless of polargc)
+#define _putequno	$48a0
+#define _pdspgrph	$48a3
+#define _horizcmd	$48a6
+#define _vertcmd	$48a9
+#define _linecmd	$48ac
+#define _unlinecmd	$48af
+#define _pointcmd	$48b2
+#define _pixeltest	$48b5
+#define _pixelcmd  	$48b8
+#define _tanlnf	$48bb
+#define _drawcmd_init	$48be
+#define _drawcmd	$48c1
+#define _shadecmd	$48c4
+#define _invcmd	$48c7
+#define _statshade	$48ca
+#define _dspmattable	$48cd
+#define _dsplsts	$48d0
+#define _closeeditbuf	$48d3
+#define _parseeditbuf	$48d6
+#define _putsm	$48d9
+#define _dspcurtbl	$48dc
+#define _dspgrtbl	$48df
+#define _zerotemplate	$48e2
+#define _settblrefs	$48e5
+#define _disptblbot	$48e8
+#define _disptbltop	$48eb
+#define _disptblbody	$48ee
+#define _vputblank	$48f1
+#define _tbltrace	$48f4
+#define _displistnamey	$48f7
+#define _curnamelength	$48fa
+#define _nametobuf	$48fd
+#define _jpromptcursor	$4900
+#define _bufleft	$4903
+#define _bufright	$4906
+#define _bufinsert	$4909
+#define _bufqueuechar	$490c
+#define _bufreplace	$490f
+#define _bufdelete	$4912
+#define _bufpeek	$4915
+#define _bufpeek1	$4918
+#define _bufpeek2	$491b
+#define _bufpeek3	$491e
+#define _buftobtm	$4921
+#define _setupeditequ	$4924
+#define _buftotop	$4927
+#define _iseditfull	$492a
+#define _iseditempty	$492d
+#define _isattop	$4930
+#define _isatbtm	$4933
+#define _bufclear	$4936
+#define _jcursorfirst	$4939
+#define _jcursorlast	$493c
+#define _cursorleft	$493f
+#define _cursorright	$4942
+#define _cursorup	$4945
+#define _cursordown	$4948
+#define _cursortooffset	$494b
+#define _insdisp	$494e
+#define _fdispbol1	$4951
+#define _fdispbol	$4954
+#define _dispeow	$4957
+#define _disphead	$495a
+#define _disptail	$495d
+#define _puttokstring	$4960
+#define _setupeditcmd	$4963
+#define _setemptyeditequ	$4966
+#define _setemptyeditptr	$4969
+#define _closeeditequ	$496c
+#define _getprevtok	$496f
+#define _getkey	$4972
+#define _canindic	$4975
+#define _lcd_driveron	$4978
+#define _dfmin2	$497b
+#define _formdisp	$497e
+#define _formmatrix	$4981
+#define _wscrollleft	$4984
+#define _wscrollup	$4987
+#define _wscrolldown	$498a
+#define _wscrollright	$498d
+#define _formereal	$4990
+#define _formerealtok	$4993
+#define _formdcplx	$4996
+#define _formreal	$4999
+#define _formscrollup	$499c
+#define _setwinabove	$499f
+#define _disarmscroll	$49a2
+#define _op1toedit	$49a5
+#define _mintoedit	$49a8
+#define _rclvartoedit	$49ab
+#define _rclvartoeditptr	$49ae
+#define _rclentrytoedit	$49b1
+#define _rcltoqueue	$49b4 ;recalls bytes at op1 into edit buffer
+#define _formtotok	$49b7
+#define _disp_interval	$49ba
+#define _displstname	$49bd
+#define _dispslstnamehl	$49c0
+#define _editequ	$49c3
+#define _closeequfield	$49c6
+#define _autoselect	$49c9
+#define _dispyeos	$49cc
+#define _dispnumeos	$49cf
+#define _setupdispeq	$49d2
+#define _dispforward	$49d5
+#define _dispyprompt2	$49d8
+#define _stringwidth	$49db
+#define _disperrorscreen	$49de ;displays top row of error screen (error message)
+#define _popcx	$49e1 ;moves 14 bytes at cxprev to cxmain, 15th byte goes to replace appflags
+#define _loadnoeentry	$49e4
+#define _savescreen	$49e7
+#define _retscreen	$49ea
+#define _retscreenerr	$49ed
+#define _checksplitflag	$49f0
+#define _solveredisp	$49f3
+#define _solvedisp	$49f6
+#define _itemname	$49f9
+#define _setnorm_vals	$49fc
+#define _setyoffset	$49ff ;sets up yoffset and next 4 bytes (possibly specialized for the table editor)
+#define _convkeytotok	$4a02
+#define _convfckeytotok	$4a05
+#define _convfekeytotok	$4a08
+#define _toktokey	$4a0b
+#define _sendskipexitpacket	$4a0e
+#define _getvarcmd	$4a11
+#define _sendvarcmd	$4a14
+#define _sendscreenshot	$4a17
+#define keyscnlnk	$4a1a
+#define _deselectallvars	$4a1d
+#define _delres	$4a20
+#define _convlctolr	$4a23
+#define _redimmat	$4a26
+#define _inclstsize	$4a29
+#define _insertlist	$4a2c
+#define _dellistel	$4a2f
+#define _editprog	$4a32
+#define _closeprog	$4a35
+#define _clrgraphref	$4a38
+#define _fixtempcnt	$4a3b
+#define _savedata	$4a3e
+#define _restoredata	$4a41
+#define _findalphaup	$4a44
+#define _findalphadn	$4a47
+#define _cmpsyms	$4a4a
+#define _createtemp	$4a4d
+#define _cleanall	$4a50
+#define _movetonextsym	$4a53 ;input: hl=pointer to type byte of vat entry. output: hl = pointer to next entry's type byte
+#define _convlrtolc	$4a56
+#define _tblscreendn	$4a59 ;something is not right here
+#define _tblscreenup	$4a5c
+#define _screenup	$4a5f
+#define _screenupdown	$4a62
+#define _zifrclhandler	$4a65
+#define _zifrclkapp	$4a68
+#define _rclkeyrtn	$4a6b
+#define _rclkey	$4a6b
+#define _rclregeq_call	$4a6e
+#define _rclregeq	$4a71
+#define _initnameprompt	$4a74
+#define _nameprompt2	$4a77
+#define _catalogchk	$4a7a
+#define _clrtr	$4a7d
+#define _quad	$4a80
+#define _graphquad	$4a83
+#define _bc2noreal	$4a86
+;$4a89
+#define _errnonreal	$4a8c ;err:data type if top b numers from fps are non-real
+#define _write_text	$4a8f
+#define _forseqinit	$4a92
+#define _grphpars	$4a95
+#define _plotpars	$4a98
+#define _parseinp	$4a9b
+#define _parseoff	$4a9e
+#define _parsescan	$4aa1
+#define _getparse	$4aa4
+#define _saveparse	$4aa7
+#define _initpflgs	$4aaa
+#define _ckendlinerr	$4aad
+#define _op2set60	$4ab0
+#define _getstatptr	$4ab3
+#define _cmp_statptr	$4ab6
+#define _varsysadr	$4ab9
+#define _stosystok	$4abc
+#define _stoans	$4abf
+#define _stotheta	$4ac2
+#define _stor	$4ac5
+#define _stoy	$4ac8
+#define _ston	$4acb
+#define _stot	$4ace
+#define _stox	$4ad1
+#define _stoother	$4ad4
+#define _rclans	$4ad7
+#define _rcly	$4ada
+#define _rcln	$4add
+#define _rclx	$4ae0
+#define _rclvarsym	$4ae3
+#define _rclsystok	$4ae6
+#define _stmatel	$4ae9
+#define _stlstvecel	$4aec
+#define _convop1	$4aef
+#define _find_parse_formula	$4af2
+#define _parse_formula	$4af5
+#define _fetchquotedstring	$4af8
+#define _fetchnumline	$4afb
+;$4afe
+#define _parseinpgraph	$4b01 ;same as _parseinp except 3,(iy+$1f) is graph/split screen override, or something
+#define _parseinpgraphreset	$4b04 ;_parseinpgraph except zeroes out iy+6/7, resets 3,(iy+$1a) & 0,(iy+$1f), fmtflags->fmtoverride, parse within parseinp?
+#define _parseinplastent	$4b07 ;parseinp on program $05,$23,$00
+#define _erroncertaintypes	$4b0a ;err:data type if a is one of a couple of values...subroutine in parseinp, somehow
+#define _createpair	$4b0d
+#define _pushnum	$4b10
+#define _inccurpcerrend	$4b13
+#define _errend	$4b16
+#define _commaerrf	$4b19
+#define _commaerr	$4b1c
+#define _steqarg2	$4b1f
+#define _steqarg	$4b22
+#define _inparg	$4b25
+#define _steqarg3	$4b28
+#define _nxtfetch	$4b2b
+#define _ckfetchvar	$4b2e
+#define _fetchvara	$4b31
+#define _fetchvar	$4b34
+#define _ckendlin	$4b37 ;gets parse byte in a and then _ckendexp
+#define _ckendexp	$4b3a ;checks a for $3e or $3f
+#define _ckparsend	$4b3d
+#define _stotypearg	$4b40
+#define _convdim	$4b43
+#define _convdim00	$4b46
+#define _aheadequal	$4b49
+#define _parsaheads	$4b4c
+#define _parsahead         	$4b4f
+#define _ansname	$4b52
+#define _stocmpreals	$4b55
+#define _getdeptr	$4b58
+#define _push2boper	$4b5b ;push the value in bc onto the operator stack
+#define _pop2boper	$4b5e ;pop 2 bytes on the operator stack to bc
+#define _pushoper	$4b61 ;push the value in a onto the operator stack
+#define _popoper	$4b64 ;pop 1 byte on the operator stack to a
+#define _find_e_undef	$4b67
+#define _sttmpeq	$4b6a
+#define _findeol	$4b6d
+#define _brkinc	$4b70
+#define _incfetch	$4b73
+#define _curfetch	$4b76
+#define _random	$4b79
+#define _storand	$4b7c
+#define _randinit	$4b7f
+#define _resetstacks	$4b82 ;(onsp)->(errsp), (fpbase)->(fps), (opbase)->(ops)
+#define _factorial	$4b85
+#define _yonoff	$4b88
+#define _eqselunsel	$4b8b
+#define _itsolver	$4b8e
+#define _gritsolver	$4b91
+#define _itsolverb	$4b94
+#define _itsolvernb	$4b97
+#define _extest_int	$4b9a
+#define _dist_fun	$4bad
+#define _loggamma	$4ba0
+#define _onevar	$4ba3
+#define _onevars_0	$4ba6
+#define _ordstat	$4ba9
+#define _initstatans2	$4bac
+#define _anova_spec	$4baf
+#define _outputexpr	$4bb2
+#define _centcursor	$4bb5
+#define _text	$4bb8
+#define _finishspec	$4bbb
+#define _trcyfunc	$4bbe
+#define _rcl_seq_x	$4bc1
+#define _rclseq2	$4bc4
+#define _grpputaway	$4bc7
+#define _ckvaldelx	$4bca
+#define _ckvaldelta	$4bcd
+#define _grbufclr	$4bd0
+#define _grbufcpy_v	$4bd3
+#define _fndseleq	$4bd6
+#define _clrgraphxy	$4bd9
+#define _nedxt_y_style	$4bdc
+#define _plotpt	$4bdf
+#define _newindep	$4be2
+#define _axes	$4be5
+#define _setpenx	$4be8
+#define _setpeny	$4beb
+#define _setpent	$4bee
+#define _tan_equ_disp	$4bf1
+#define _putans	$4bf4
+#define _dispop1a	$4bf7
+#define _mathtanln	$4bfa
+#define _enddraw	$4bfd
+#define _settblgraphdraw	$4c00
+#define _startdialog	$4c03
+#define _dialoginit	$4c06
+#define _getdialognumop1	$4c09
+#define _setdialognumop1	$4c0c
+#define _getdialognumhl	$4c0f
+#define _errargumento123	$4c12 ;err:argument if op2>op1 or op1>op3
+#define _setdialogkeyoverride	$4c15
+#define _resdialogkeyoverride	$4c18
+#define _forcedialogkeypress	$4c1b
+#define _dialogstartgetkey	$4c1e
+#define _startdialog_override	$4c21
+#define _calldialogcallback	$4c24
+#define _setdialogcallback	$4c27
+#define _resdialogcallback	$4c2a
+#define _copydialognum	$4c2d
+#define _memclear	$4c30
+#define _memset	$4c33
+#define _reloadappentryvecs	$4c36
+#define _pointon	$4c39
+#define _executenewprgm	$4c3c
+#define _strlength	$4c3f
+#define _vputmaprec	$4c42
+#define _getrompage	$4c45
+#define _findappup	$4c48
+#define _findappdn	$4c4b
+#define _findapp	$4c4e
+#define _executeapp	$4c51
+#define _monreset	$4c54
+;$4c57
+;$4c5a
+#define _iscontextkey	$4c5d
+#define _ibounds	$4c60
+#define _ioffset	$4c63
+#define _drawcirc2	$4c66
+#define _canalphins	$4c69
+#define cxredisp	$4c6c
+#define _getbasever	$4c6f
+#define _opset0de	$4c72 ;loads a floating point 0 to location de
+#define _appgetcbl	$4c75
+#define _appgetcalc	$4c78
+#define _savedisp	$4c7b
+#define _setignorekey  	$4c7e ;set 1,(iy+$28) / ret
+#define _setsendthiskeyback	$4c81 ;set 2,(iy+$28) / ld (kbdkey),a / ret
+#define _disableapd	$4c84
+#define _enableapd	$4c87 ;set apdable,(iy+apdflags)
+#define _jforcecmdnochar2	$4c8a ;$2.41 at least
+#define _set2iy34	$4c8d ;set 2,(iy+$34) / ret
+#define _forcecmd	$4c90
+#define _apdsetup	$4c93
+#define _get_numkey	$4c96
+#define _appsetup	$4c99 ;or _appcleanup, or something
+#define _handlelinkkeyactivity	$4c9c
+#define _jforcecmdnochar3	$4c9f ;2.41 at least
+#define _releasesedit	$4ca2
+#define _initsmalleditline	$4ca5
+#define _startsmalledit	$4ca8
+;$4cab
+#define _sgettokstring	$4cae
+#define _loadpattern	$ 	$4cb1
+#define _sstringlength	$4cb4
+#define _restorepencol	$4cb7
+;$4cba
+#define _donothing	$4cbd
+#define _forcesmalleditreturn	$4cc0
+;$4cc3 ;saves context
+;$4cc6
+;$4cc9
+;$4ccc
+#define _veraseeol	$4ccf
+;$4cd2
+;$4cd5
+#define _gotoerr	$4cd8
+#define _initsmalleditbox	$4cdb
+;$4cde
+#define _emptyhook	$4ce1
+#define _forcesmalleditreturn2	$4ce4
+;$4ce7 ;same as $4cc3
+;$4cea
+#define _clearrow	$4ced
+;$4cf0
+;$4cf3
+;$4cf6
+;$4cf9
+;$4cfc
+;$4cff
+;$4d02
+;$4d05
+;$4d08
+;$4d0b
+;$4d0e
+;$4d11
+;$4d14
+;$4d17
+;$4d1a
+;$4d1d
+;$4d20
+;$4d23
+#define _appscreenupdown	$4d26 ;shifts screen up/down, a is lcd row, h is number of lines to shift, (op1)-(op1+3) are something
+#define _appscreenupdown1	$4d29 ;shifts screen up/down, but really no clue what the inputs are (all registers and (op1)-(op1+3))
+;$4d2c
+#define _initsmalleditlinevar	$4d2f
+#define _initsmalleditlineop1	$4d32
+#define _initsmalleditboxvar	$4d35
+#define _initsmalleditboxop1	$4d38
+;$4d3b
+#define _restartdialog	$4d3e
+#define _errcustom1	$4d41
+#define _errcustom2	$4d44
+#define _appstartmouse	$4d47
+#define _appstartmousenosetup	$4d4a
+#define _appmousegetkey	$4d4d
+#define _appdispmouse	$4d50
+#define _apperasemouse	$4d53
+#define _appsetupmousemem	$4d56
+#define _getdisprowoffset	$4d59 ;hl=a*12 (intended for a to be row and hl becomes offset into plotsscreen)
+#define _clearrect	$4d5c
+#define _invertrect	$4d5f
+#define _fillrect	$4d62
+#define _appupdatemouse	$4d65
+#define _appdispprevmouse	$4d68 ;might bring previous keypress's movement to current coordinates with flags to not display
+;$4d6b ;restores some cursor flags and stuff
+#define _initcellbox	$4d6e
+#define _drawcell	$4d71
+;$4d74
+#define _invertcell	$4d77
+#define _setcelloverride	$4d7a
+#define _drawrectborder	$4d7d
+#define _clearcell	$4d80
+#define _covercell	$4d83
+#define _eraserectborder	$4d86
+#define _fillrectpattern	$4d89
+#define _drawrectborderclear	$4d8c
+;$4d8f ;mouse subroutine
+;$4d92
+#define _verticalline	$4d95
+#define _iboundsfull	$4d98
+#define _displayimage	$4d9b
+;$4d9e ;does something dumb with ports 10/11
+;$4da1 ;mouse subroutine
+#define _appupdatemousecoords	$4da4
+#define _shiftbitsleft	$4da7 ;mouse subroutine, shifts b bits left from de sprite to hl one
+;$4daa ;mouse subroutine
+;$4dad ;mouse subroutine
+;$4db0 ;mouse subroutine
+;$4db3 ;mouse subroutine
+;$4db6 ;mouse subroutine
+;$4db9 ;mouse subroutine
+;$4dbc ;mouse subroutine
+#define _appupdatemouserow	$4dbf
+#define _appdrawmouse	$4dc2 ;set 2,(iy+$2c) for apperasemouse, reset for appdispmouse
+#define _appdrawmousedirect	$4dc5 ;pretty much _appdrawmouse, but you pass lcd column in a
+#define _cpoint	$4dc8
+#define _deleteapp	$4dcb
+#define _appupdatemousexy	$4dce
+#define _setmodecellflag	$4dd1
+#define _resetmodecellflag	$4dd4
+#define _ismodecellset	$4dd7
+#define _getmodecellflag	$4dda
+;$4ddd
+#define _cellboxmanager	$4de0
+#define _startnewcell	$4de3
+;$4de6
+#define _cellcursorhandle	$4de9
+;$4dec
+;$4def
+#define _clearcurcell	$4df2
+#define _drawcurcell	$4df5
+#define _invertcurcell	$4df8
+#define _covercurcell	$4dfb
+#define _blinkcell	$4dfe
+#define _blinkcellnolookup	$4e01
+#define _blinkcurcell	$4e04
+#define _blinkcelltoon	$4e07
+#define _blinkcelltoonnolookup	$4e0a
+#define _blinkcurcelltoon	$4e0d
+#define _blinkcelltooff	$4e10
+#define _blinkcelltooffnolookup	$4e13
+#define _blinkcurcelltooff	$4e16
+#define _getcurmodecellflag	$4e19
+;$4e1c
+#define _startsmalleditreturn	$4e1f
+;$4e22
+;$4e25
+#define _cellkhandle	$4e28
+#define _errchkalphabox	$4e2b
+;$4e2e
+;$4e31
+;$4e34
+;$4e37
+#define _eraseallcells	$4e3a
+#define _iscurmodecellset	$4e3d
+;$4e40
+#define _initalphabox	$4e43
+;$4e46
+;$4e49
+#define _drawblnkcell	$4e4c
+#define _clearblnkcell	$4e4f
+#define _invertblnkcell	$4e52
+#define _appmouseforcekey	$4e55
+#define _appsetupmousememcoords	$4e58 ;this is _appsetupmousemem except you pass starting coordinates in hl
+#define _appmovemouse	$4e5b ;this is _appmouseforcekey and then updating coordinates
+#define _getstringinput	$4e5e
+#define _getstringinput2	$4e61
+;$4e64
+#define _horizontalline	$4e67
+#define _createappvar	$4e6a
+#define _createprotprog	$4e6d
+#define _createvar	$4e70
+#define _asmcomp	$4e73
+#define _getasmsize	$4e76
+#define _squishprgm	$4e79
+#define _executeprgm	$4e7c
+#define _chkfindsymasm	$4e7f
+#define _parseprgmname	$4e82
+#define _csub	$4e85
+#define _cadd	$4e88
+#define _csqaure	$4e8b
+#define _cmult	$4e8e
+#define _crecip	$4e91
+#define _cdiv	$4e94
+#define _cabs	$4e97
+#define _addsquares	$4e9a
+#define _csqroot	$4e9d
+#define _cln	$4ea0
+#define _clog	$4ea3
+#define _ctenx	$4ea6
+#define _cetox	$4ea9
+#define _cxrooty	$4eac
+;$4eaf
+#define _cytox	$4eb2
+#define _invertnonreal	$4eb5
+#define _cplxmult	$4eb8
+#define _cplxdiv	$4ebb
+#define _cplxtrunc	$4ebe
+#define _cplxfrac	$4ec1
+#define _cplxfloor	$4ec4
+#define _sendheaderpacket	$4ec7
+#define _canceltransmission	$4eca
+#define _sendscreencontents	$4ecd
+#define _sendramvardata	$4ed0
+#define _sendramcmd	$4ed3
+#define _sendpacket	$4ed6
+#define _receiveack	$4ed9
+#define _send4bytepacket	$4edc
+#define _senddatabyte	$4edf
+#define _send4bytes	$4ee2
+#define _sendabyte	$4ee5
+#define _sendcbyte	$4ee8
+#define _getsmallpacket	$4eeb
+#define _getdatapacket	$4eee
+#define _sendack	$4ef1
+#define _get4bytes	$4ef4
+#define _get3bytes	$4ef7
+#define _rec1stbyte	$4efa
+#define _rec1stbytenc	$4efd
+#define _continuegetbyte	$4f00
+#define _recabyteio	$4f03
+#define _receivevar	$4f06
+#define _receivevardataexists	$4f09
+#define _receivevardata	$4f0c
+#define _srchvlstup	$4f0f
+#define _srchvlstdn	$4f12
+#define _sendvariable	$4f15
+#define _get4bytescursor	$4f18
+#define _get4bytesnc	$4f1b
+#define _convert85list	$4f1e
+#define _senddirectorycontents	$4f21
+#define _sendreadypacket	$4f24
+#define _convert85real	$4f27
+#define _ret_6	$4f2a
+#define _sendcertificate	$4f2d ;sends certificate in header/data packets, flash must be unlocked, used with sending an application in link menu
+#define _sendapplication	$4f30
+#define _sendosheader	$4f33
+#define _sendospage	$4f36
+#define _sendos	$4f39
+#define _flashwritedisable	$4f3c
+#define _sendcmd	$4f3f
+#define _sendosvalidationdata	$4f42
+#define _disp	$4f45
+#define _sendgetkeypress	$4f48
+#define _rejectcommand	$4f4b
+#define _checklinklines	$4f4e
+#define _gethookbyte	$4f51
+#define _getbytepaged	$4f54
+#define _cursorhook	$4f57
+#define _call_library_hook	$4f5a
+#define _call_rawkey_hook	$4f5d
+#define _setcursorhook	$4f60 ;enable cursor hook
+#define _enablelibraryhook	$4f63
+#define _setgetkeyhook	$4f66
+#define _clrcursorhook	$4f69
+#define _disablelibraryhook	$4f6c
+#define _clrrawkeyhook  	$4f6f
+#define _resethookbytes	$4f72
+#define _adjustallhooks	$4f75
+#define _getkeyhook	$4f78
+#define _setgetcschook	$4f7b
+#define _clrgetkeyhook	$4f7e
+#define _call_linkactivity_hook	$4f81
+#define _enablelinkactivityhook	$4f84
+#define _disablelinkhook	$4f87
+#define _getsmallpacket2	$4f8a
+#define _enablecatalog2ook	$4f8d
+#define _disablecatalog2ook	$4f90
+#define _enablelocalizehook	$4f93
+#define _disablelocalizehook	$4f96
+#define _settokenhook	$4f99
+#define _cleartokenhook	$4f9c
+;$4f9f ld hl,$92c6 / ld a,($92c5) / res 2,a / cp (hl) / ret
+;$4fa2 hl=11*($92fc)+$92c9 / ld a,(hl) / and f / cp 2 / ret
+;$4fa5
+#define _bit_vertsplit	$4fa8
+#define _sethomescreenhook	$4fab
+#define _clrhomescreenhook	$4fae
+#define _setwindowhook	$4fb1
+#define _disablewindowhook	$4fb4
+#define _setgraphmodehook	$4fb7
+#define _disablegraphhook	$4fba
+;$4fbd
+;$4fc0
+#define _jforcewindowsettings	$4fc3
+#define _delvararc	$4fc6
+#define _delvarnoarc	$4fc9
+#define _setallplots	$4fcc
+#define _setyedithook 	$4fcf
+#define _disableyequhook	$4fd2
+#define _jforceyequ	$4fd5
+#define _arc_unarc	$4fd8 ;checks for low battery
+#define _archivevar	$4fdb ;set 0,(iy+$24) to check for low battery first
+#define _unarchivevar	$4fde
+#define _dialogkeyhook	$4fe1 ;rawkey hook used by os for dialog context
+#define _setfonthook	$4fe4
+#define _clrfonthook	$4fe7
+#define _setregraphhook	$4fea
+#define _disableregraphhook	$4fed
+#define _rungraphinghook	$4ff0
+#define _settracehook	$4ff3
+#define _disabletracehook	$4ff6
+#define _runtracehook	$4ff9
+#define _nderiv	$4ffc
+;$4fff
+#define _jforcegraphnokey	$5002
+#define _jforcegraphkey	$5005
+#define _poweroff	$5008
+#define _getkeyretoff	$500b ;same as getkey, only returns koff if 2nd+on is pressed
+#define _findgroupsym	$500e
+#define _fillbasepagetable	$5011
+#define _arcchk	$5014
+#define _flashtoram	$5017
+#define _loaddeindpaged	$501a
+#define _loadcindpaged	$501d
+#define _setuppagedptr	$5020
+#define _pagedget	$5023
+#define _setparserhook	$5026
+#define _clearparserhook	$5029
+#define _setappchangehook 	$502c
+#define _clearappchangehook	$502f
+#define _enablegraphicshook	$5032
+#define _disablegraphicshook	$5035
+;$5038
+#define _ilinenohook	$503b
+;$503e
+#define _deletetempprograms	$5041
+#define _enablecatalog1ook	$5044
+#define _disablecatalog1ook	$5047
+#define _enablehelphook	$504a
+#define _disablehelphook	$504d
+#define _dispcatalogend	$5050
+#define _getmenukeypress	$5053
+#define _getcatalogitem	$5056
+#define _runcatalog2ook	$5059
+#define _runcatalog1ook	$505c
+;$505f
+;$5062
+#define _dispmenutitle	$5065
+;$5068
+#define _enablecxredisphook	$506b
+#define _disablecxredisphook	$506e
+#define _bufcpy	$5071
+#define _bufclr	$5074
+#define _unopexec2	$5077
+#define _binopexec2	$507a
+#define _loadmenub	$507d ;clears screen and loads menu from b, plus a couple flag changes
+#define _displayvarinfo	$5080
+#define _setmenuhook	$5083
+#define _clearmenuhook	$5086
+#define _getbcoffsetix	$5089
+#define _getbcoffsetix2	$508c
+#define _forcefullscreen	$508f
+#define _getvariabledata	$5092
+#define _findswapsector	$5095
+#define _copyflashpage	$5098
+#define _findappnumpages	$509b
+#define _hlminus5	$509e
+#define _sendarcpacket	$50a1
+#define _forcegraphkeypress	$50a4
+#define _donothing3	$50a7
+#define _formbase	$50aa
+;$50ad
+#define _isfragmented	$50b0
+#define _chk_batt_low	$50b3
+#define _chk_batt_low_2	$50b6
+#define _arc_unarc2	$50b9 ;identical to _arc_unarc, except you can choose to res 0,(iy+$24) to skip low battery check
+#define _getappbasepage	$50bc ;input: a=one of an app's pages. output: a=app's first page
+#define _setexspeed	$50bf
+#define _rclexit	$50c2
+#define _groupallvars	$50c5
+#define _ungroupvar	$50c8
+#define _writetoflash	$50cb ;receiveapplication or something like that on oses below 2.40
+#define _setsilentlinkhook	$50ce
+#define _disablesilentlinkhook	$50d1
+#define _twovarset	$50d4
+#define _execclass2token	$50d7
+#define _execclass3token	$50da
+#define _getsysinfo	$50dd
+#define _nzif83plus	$50e0
+#define _linkstatus	$50e3
+#define _donothing2	$50e6 ;originally for ti-navigator
+#define _keyboardgetkey	$50e9
+#define _runapplib	$50ec
+#define _findspecialappheader	$50ef
+#define _sendusbdata	$50f2
+#define _appgetcblusb	$50f5
+#define _appgetcalcusb	$50f8
+#define _getvarcmdusb	$50fb
+;$50fe
+#define _tenx2	$5101
+;$5104
+;$5107
+#define _getvarversion	$510a
+;$510d
+;$5110
+#define _deletetempeditequ	$5113
+#define _jcursorfirst2	$5116
+;$5119
+;$511c
+#define _wputseol2	$511f ;same except res 0,(iy+$0e) first
+#define _inverttextinsmode	$5122
+;$5125
+#define _resetdefaults	$5128
+#define _zerofinancevars	$512b
+#define _dispheader	$512e
+#define _jforcegroup	$5131
+;$5134
+;$5137
+#define _dispcoords	$513a
+;$513d
+;$5140
+;$5143
+;$5146
+;$5149
+;$514c
+#define _getdate	$514f
+;$5152
+#define _getdtfmt	$5155
+;$5158
+#define _gettime	$515b
+;$515e
+#define _gettmfmt	$5161
+;$5164
+#define _setzeroone	$5167
+;$516a
+#define _isonetwothree	$516d
+;$5170
+#define _isop112or24	$5173
+#define _chktimer0	$5176
+;$5179
+;$517c
+#define _clrwindowandflags	$517f
+#define _setmachineid	$5182
+#define _resetlists	$5185
+;$5188
+;$518b
+;$518e
+#define _execlib	$5191
+;$5194
+#define _cpop1op2rounded	$5197
+#define _cpop1op2rounded2	$519a
+#define _openlib	$519d
+;$51a0
+;$51a3
+#define _resetioprompt	$51a6
+;$51a9
+#define _setupeditor	$51ac
+#define _sorta	$51af
+#define _sortd	$51b2
+;$51b5
+#define _isop1resid	$51b8
+;$51bb
+;$51be
+;$51c1
+#define _forcemodekeypress	$51c4 ;forces a keypress (and calls help hook) on any of several mode-setting contexts
+#define _dispaboutscreen	$51c7
+#define _chkhelphookver	$51ca
+#define _disp32	$51cd
+;$51d0
+;$51d3
+;$51d6
+;$51d9
+#define _drawtableeditor	$51dc ;draws table editor lines
+;$51df
+;$51e2
+;$51e5
+;$51e8
+;$51eb
+;$51ee
+#define _matrixname	$51f1
+;$51f4
+;$51f7
+;$51fa
+;$51fd
+;$5200
+;$5203
+;$5206
+;$5209
+;$520c
+;$520f
+#define _setupemptyedittempequ	$5212
+;$5215
+;$5218
+;$521b
+;$521e
+#define _chk_batt_level	$5221
+;$5224
+;$5227
+;$522a
+;$522d
+;$5230
+#define _gotolastrow	$5233
+#define _rectborder	$5236
+;$5239
+;$523c
+;$523f
+#define _loada5	$5242
+;$5245
+#define _namedlisttoop1	$5248
+;$524b
+;$524e
+;$5251
+#define _initusbdevicecallback	$5254
+#define _killusbdevice	$5257
+#define _setusbconfiguration	$525a
+#define _requestusbdata	$525d
+#define _stopreceivingusbdata	$5260
+#define _findappheaderbypage	$5263
+#define _findnextheaderbypage	$5266
+#define _ismatchinglaunchapp	$5269
+#define _inittimer	$526c
+#define _killtimer	$526f
+#define _starttimer	$5272
+#define _restarttimer	$5275
+#define _stoptimer	$5278
+#define _waittimer	$527b
+#define _checktimer	$527e
+#define _checktimerrestart	$5281
+#define _setvertgraphactive	$5284
+#define _clearvertgraphactive	$5287
+#define _enableusbhook	$528a
+#define _disableusbhook	$528d
+#define _initusbdevice	$5290
+#define _killusbperipheral	$5293
+;$5296
+;$5299
+#define _graphline	$529c
+;$529f
+;$52a2
+;$52a5
+;$52a8
+;$52ab
+;$52ae
+#define _ziftableeditor	$52b1
+;$52b4
+;$52b7
+;$52ba
+#define _findappname	$52bd
+;$52c0
+;$52c3
+;$52c6
+#define _grbufcpycustom	$52c9
+;$52cc
+;$52cf
+;$52d2
+#define _vdisprealop1	$52d5
+#define _dispxequalsnum	$52d8
+#define _resetgraphsettings	$52db
+#define _initializevariables	$52de
+;$52e1 ;bit 4,($9c75) (this is definitely returning the status of something when acting as a ti-smartview input pad...this bit is bit 1 of the data byte from a pc hid set report request)
+#define _delvarsym	$52e4
+#define _findappupnocase	$52e7
+#define _findappdnnocase	$52ea
+#define _deleteinvalidapps	$52ed
+#define _deleteapp_link	$52f0
+#define _cmpsymsnocase	$52f3
+#define _setapprestrictions	$52f6
+#define _removeapprestrictions	$52f9
+#define _queryapprestrictions	$52fc
+#define _dispapprestrictions	$52ff
+#define _setuphome	$5302
+#define _grputawayfull	$5305 ;same as _grputaway except it assumes no split screen
+#define _sendsmartpadkeypress	$5308 ;b and a are the inputs
+#define _toggleusbsmartpadinput	$530b ;a is input, 0 or 1 to enable/disable
+#define _isusbdeviceconnected	$530e ;bit 4,($81) \ ret, this is just a guess on its purpose but it seems to work
+#define _clearusbcallback2	$5311 ;identical to $5257
+#define _polarequtoop1	$5314
+#define _paramxequtoop1	$5317
+#define _paramyequtoop1	$531a
+#define _getrestrictionsoptions	$531d
+#define _dispresetcomplete	$5320
+#define _pttreset	$5323
+#define _findappcustom	$5326
+#define _cleargraphstyles	$5329
 
-;Page 1Fh ROM Calls
+;page $1f rom calls
 ;--------------------------------
-bootbtf				equ 8000h
-;400Fh may point to version string ("1.02 ",0)
-_MD5Final			equ 8018h
-_RSAValidate			equ 801Bh
-_cmpStr				equ 801Eh ;BigNumCompare
-_WriteAByte			equ 8021h
-_EraseFlash			equ 8024h
-_FindFirstCertField		equ 8027h
-_ZeroToCertificate		equ 802Ah
-_GetCertificateEnd		equ 802Dh
-_FindGroupedField		equ 8030h
-_ret_1				equ 8033h
-_ret_2				equ 8036h
-_ret_3				equ 8039h
-_ret_4				equ 803Ch
-_ret_5				equ 803Fh
-_Mult8By8			equ 8042h
-_Mult16By8			equ 8045h
-_Div16By8			equ 8048h
-_Div16By16			equ 804Bh
-;804Eh ;scary certificate reading and writing, something about calc ID and fields 0A10/0A20
-_LoadAIndPaged			equ 8051h
-_FlashToRam2			equ 8054h
-_GetCertificateStart		equ 8057h
-_GetFieldSize			equ 805Ah
-_FindSubField			equ 805Dh
-_EraseCertificateSector		equ 8060h
-_CheckHeaderKey			equ 8063h
-;8066h ;just returns Z if specified data in field 0310h, subfield 0610h exists, DE points to data of that field you want to find
-;8069h ;just returns number of 0810h/0710h fields that exist in certificate or something, in IX
-_Load_LFontV2			equ 806Ch
-_Load_LFontV			equ 806Fh
-_ReceiveOS			equ 8072h
-_FindOSHeaderSubField		equ 8075h
-_FindNextCertField		equ 8078h
-_GetByteOrBoot			equ 807Bh
-_getSerial			equ 807Eh ;GetCalcSerial
-_ReceiveCalcID			equ 8081h ;receives certificate replacement (including calculator ID, fails if already exists) and writes it, requires Flash unlocked
-_EraseFlashPage			equ 8084h
-_WriteFlashUnsafe		equ 8087h
-_dispBootVer			equ 808Ah
-_MD5Init			equ 808Dh
-_MD5Update			equ 8090h
-_MarkOSInvalid			equ 8093h
-_FindProgramLicense		equ 8096h ;copies 8010h field to appID and other insane stuff that makes zero sense
-_MarkOSValid			equ 8099h
-_CheckOSValidated		equ 809Ch
-_SetupAppPubKey			equ 809Fh
-_SigModR			equ 80A2h
-_TransformHash			equ 80A5h
-_IsAppFreeware			equ 80A8h
-_FindAppHeaderSubField		equ 80ABh
-_WriteValidationNumber		equ 80AEh ;generates two-byte validation number from calc ID and stores to certificate
-_Div32By16			equ 80B1h
-_FindGroup			equ 80B4h ;searches until field of DE-like group is found (DE=0A00h, it stops when it finds 0Ax0h)
-_getBootVer			equ 80B7h
-_getHardwareVersion		equ 80BAh
-_xorA				equ 80BDh ;xor a
-_bignumpowermod17		equ 80C0h
-_ProdNrPart1			equ 80C3h
-_WriteAByteSafe			equ 80C6h
-_WriteFlash			equ 80C9h
-_SetupDateStampPubKey		equ 80CCh
-_SetFlashLowerBound		equ 80CFh
-_LowBatteryBoot			equ 80D2h
-;TI-84 Plus/Silver Edition Only Entry Points
-_AttemptUSBOSReceive		equ 80E4h ;Z to wait for USB cable insert & get OS, NZ and A= contents of port 4Dh or 56h, ON to cancel & clear RAM
-_DisplayBootMessage		equ 80E7h
-_NewLine2			equ 80EAh
-_DisplayBootError10		equ 80EDh
-_Chk_Batt_Low_B			equ 80F0h
-_Chk_Batt_Low_B2		equ 80F3h
-_ReceiveOS_USB			equ 80F6h
-_DisplayOSProgress		equ 80F9h
-_ResetCalc			equ 80FCh
-_SetupOSPubKey			equ 80FFh
-_CheckHeaderKeyHL		equ 8102h ;same as _CheckHeaderKey, only you pass the address of header in HL, not at appData
-_USBErrorCleanup		equ 8105h ;kills some USB stuff (doesn't completely kill periph communication), error handler in boot code
-_InitUSB			equ 8108h ;initializes USB hardware as peripheral, sets 5,(iy+1Bh), C set if problems
-;810Bh set 1,(81h) and wait (has something to do with USB peripheral kill, but it doesn't actually kill it)
-_KillUSB			equ 810Eh ;identical to 8105h, except in the middle of the outputs, it sends zero to port 4Ch
-_DisplayBootError1		equ 8111h
-_DisplayBootError2		equ 8114h
-_DisplayBootError3		equ 8117h
-_DisplayBootError4		equ 811Ah
-_DisplayBootError5		equ 811Dh
-_DisplayBootError6		equ 8120h
-_DisplayBootError7		equ 8123h
-_DisplayBootError8		equ 8126h
-_DisplayBootError9		equ 8129h
+#define bootbtf	$8000
+;$400f may point to version string ("1.02 ",0)
+#define _md5final	$8018
+#define _rsavalidate	$801b
+#define _cmpstr	$801e ;bignumcompare
+#define _writeabyte	$8021
+#define _eraseflash	$8024
+#define _findfirstcertfield	$8027
+#define _zerotocertificate	$802a
+#define _getcertificateend	$802d
+#define _findgroupedfield	$8030
+#define _ret_1	$8033
+#define _ret_2	$8036
+#define _ret_3	$8039
+#define _ret_4	$803c
+#define _ret_5	$803f
+#define _mult8by8	$8042
+#define _mult16by8	$8045
+#define _div16by8	$8048
+#define _div16by16	$804b
+;$804e ;scary certificate reading and writing, something about calc id and fields $0a10/$0a20
+#define _loadaindpaged	$8051
+#define _flashtoram2	$8054
+#define _getcertificatestart	$8057
+#define _getfieldsize	$805a
+#define _findsubfield	$805d
+#define _erasecertificatesector	$8060
+#define _checkheaderkey	$8063
+;$8066 ;just returns z if specified data in field $0310, subfield $0610 exists, de points to data of that field you want to find
+;$8069 ;just returns number of $0810/$0710 fields that exist in certificate or something, in ix
+#define _load_lfontv2	$806c
+#define _load_lfontv	$806f
+#define _receiveos	$8072
+#define _findosheadersubfield	$8075
+#define _findnextcertfield	$8078
+#define _getbyteorboot	$807b
+#define _getserial	$807e ;getcalcserial
+#define _receivecalcid	$8081 ;receives certificate replacement (including calculator id, fails if already exists) and writes it, requires flash unlocked
+#define _eraseflashpage	$8084
+#define _writeflashunsafe	$8087
+#define _dispbootver	$808a
+#define _md5init	$808d
+#define _md5update	$8090
+#define _markosinvalid	$8093
+#define _findprogramlicense	$8096 ;copies $8010 field to appid and other insane stuff that makes zero sense
+#define _markosvalid	$8099
+#define _checkosvalidated	$809c
+#define _setupapppubkey	$809f
+#define _sigmodr	$80a2
+#define _transformhash	$80a5
+#define _isappfreeware	$80a8
+#define _findappheadersubfield	$80ab
+#define _writevalidationnumber	$80ae ;generates two-byte validation number from calc id and stores to certificate
+#define _div32by16	$80b1
+#define _findgroup	$80b4 ;searches until field of de-like group is found (de=$0a00, it stops when it finds $0ax0)
+#define _getbootver	$80b7
+#define _gethardwareversion	$80ba
+#define _xora	$80bd ;xor a
+#define _bignumpowermod17	$80c0
+#define _prodnrpart1	$80c3
+#define _writeabytesafe	$80c6
+#define _writeflash	$80c9
+#define _setupdatestamppubkey	$80cc
+#define _setflashlowerbound	$80cf
+#define _lowbatteryboot	$80d2
+;ti-84 plus/silver edition only entry points
+#define _attemptusbosreceive	$80e4 ;z to wait for usb cable insert & get os, nz and a= contents of port $4d or $56, on to cancel & clear ram
+#define _displaybootmessage	$80e7
+#define _newline2	$80ea
+#define _displaybooterror10	$80ed
+#define _chk_batt_low_b	$80f0
+#define _chk_batt_low_b2	$80f3
+#define _receiveos_usb	$80f6
+#define _displayosprogress	$80f9
+#define _resetcalc	$80fc
+#define _setupospubkey	$80ff
+#define _checkheaderkeyhl	$8102 ;same as _checkheaderkey, only you pass the address of header in hl, not at appdata
+#define _usberrorcleanup	$8105 ;kills some usb stuff (doesn't completely kill periph communication), error handler in boot code
+#define _initusb	$8108 ;initializes usb hardware as peripheral, sets 5,(iy+$1b), c set if problems
+;$810b set 1,($81) and wait (has something to do with usb peripheral kill, but it doesn't actually kill it)
+#define _killusb	$810e ;identical to $8105, except in the middle of the outputs, it sends zero to port $4c
+#define _displaybooterror1	$8111
+#define _displaybooterror2	$8114
+#define _displaybooterror3	$8117
+#define _displaybooterror4	$811a
+#define _displaybooterror5	$811d
+#define _displaybooterror6	$8120
+#define _displaybooterror7	$8123
+#define _displaybooterror8	$8126
+#define _displaybooterror9	$8129
 
-;RAM Equates
+;ram equates
 ;--------------------------------
-ramStart		equ 8000h
-appData			equ 8000h
-ramCode			equ 8100h
-SmallEditColumnLeft	equ 8177h
-SmallEditRow		equ 8178h
-SmallEditColumnRight	equ 8179h
-;penCol left edge?	equ 817Bh
-bigInteger1		equ 8182h
-SmallEditCancelParse	equ 8194h
-SmallEditRowCount	equ 81B7h
-bigInteger2		equ 81C3h
-SmallEditPromptString	equ 81CCh
-ramCodeEnd		equ 822Fh
-baseAppBrTab		equ 8230h ;table of base pages for apps on page < 20h (starts with eight zeroes because they're OS pages)
-clockFlag		equ 8230h ;bit 2 set for 24-hour mode and don't display "AM/PM"
-clockIDs		equ 8231h ;five bytes, numbers 0-4 in memory, that when present, stops displaying clock numbers in time setting context?
-bootTemp		equ 8251h
-MD5Temp			equ 8259h
-MD5Length		equ 8269h
-MD5Hash			equ 8292h
-appSearchPage		equ 82A3h
-tempSwapArea		equ 82A5h
-;something		equ 837Bh ;18 bytes, probably indicates something about Flash app pages, start out as 0FFh
-appID			equ 838Dh
-arcPageEnd		equ 8392h
-arcPtrEnd		equ 8393h
-;839Fh something...field size bytes?
-MD5Buffer		equ 83A5h
-Abackup			equ 83EBh
-ramReturnData		equ 83EDh
-arcInfo			equ 83EEh
-savedArcInfo		equ 8406h
-appInfo			equ 8432h
-appBank_jump		equ 843Ch
-appPage			equ 843Eh
-kbdScanCode		equ 843Fh
-kbdKey			equ 8444h
-kbdGetKy		equ 8445h
-keyExtend		equ 8446h
-EXTECHO			equ keyExtend
-contrast		equ 8447h
-apdSubTimer		equ 8448h
-apdTimer		equ 8449h
-curTime			equ 844Ah
-curRow			equ 844Bh
-curCol			equ 844Ch
-curOffset		equ 844Dh
-curUnder		equ 844Eh
-curY			equ 844Fh
-curType			equ 8450h
-curXRow			equ 8451h
-prevDData		equ 8452h
-lFont_record		equ 845Ah
-sFont_record		equ 8462h
-tokVarPtr		equ 846Ah
-tokLen			equ 846Ch
-indicMem		equ 846Eh ;eight bytes used by _saveTR and _restoreTR to store image in top right corner
-indicCounter		equ 8476h
-indicBusy		equ 8477h
-OP1			equ 8478h
-OP1M			equ 847Ah
-OP2			equ 8483h
-OP2M			equ 8485h
-OP2EXT			equ 848Ch
-OP3			equ 848Eh
-OP3M			equ 8490h
-OP4			equ 8499h
-OP4M			equ 849Bh
-OP5			equ 84A4h
-OP5M			equ 84A6h
-OP6			equ 84AFh
-OP6M			equ 84B1h
-OP6EXT			equ 84B8h
-progToEdit		equ 84BFh
-nameBuff		equ 84C7h
-equ_edit_save		equ 84D2h
-iMathPtr1		equ 84D3h
-iMathPtr2		equ 84D5h
-iMathPtr3		equ 84D7h
-iMathPtr4		equ 84D9h
-iMathPtr5		equ 84DBh
-chkDelPtr1		equ 84DDh
-chkDelPtr2		equ 84DFh
-insDelPtr		equ 84E1h
-upDownPtr		equ 84E3h
-fOutDat			equ 84E5h
-asm_data_ptr1		equ 84EBh
-asm_data_ptr2		equ 84EDh
-asm_sym_ptr1		equ 84EFh
-asm_sym_ptr2		equ 84F1h
-asm_ram			equ 84F3h
-asm_ind_call		equ 8507h
-textShadow		equ 8508h
-textShadCur		equ 8588h
-textShadTop		equ 858Ah
-textShadAlph		equ 858Bh
-textShadIns		equ 858Ch
-cxMain			equ 858Dh
-cxPPutAway		equ 858Fh
-cxPutAway		equ 8591h
-cxErrorEP		equ 8595h
-cxSizeWind		equ 8597h
-cxPage			equ 8599h
-cxCurApp		equ 859Ah
-cxPrev			equ 859Bh ;12 bytes are shadows of cxMain through cxCurApp and appFlags
-monQH			equ 85AAh
-monQT			equ 85ABh
-monQueue		equ 85ACh
-onSP			equ 85BCh
-promptRow		equ 85C0h
-promptCol		equ 85C1h
-promptIns		equ 85C2h
-promptShift		equ 85C3h
-promptRet		equ 85C4h
-promptValid		equ 85C6h
-promptTop		equ 85C8h
-promptCursor		equ 85CAh
-promptTail		equ 85CCh
-promptBtm		equ 85CEh
-varType			equ 85D0h
-varCurrent		equ 85D1h
-varClass		equ 85D9h
-CatalogCurrent		equ 85DAh ;word at this location starting with 6007h corresponds to what is highlighted in catalog
-menuActive		equ 85DCh
-menuAppDepth		equ 85DDh
-MenuCurrent		equ 85DEh
-;			equ 85DFh ;holds current submenu index
-;			equ 85E0h ;holds currently selected item in current submenu
-;			equ 85E1h ;holds number of submenus for this menu
-;			equ 85E2h ;holds number of items in this submenu
-;			equ 85E3h ;iy+appFlags backup for menu stuff
-;			equ 85E4h ;iy+0Ch backup for menu stuff
-;			equ 85E5h ;curGStyle backup for menu stuff
-;			equ 85E6h ;iy+graphFlags backup for menu stuff
-ProgCurrent		equ 85E8h
-;something, OP1 backup?	equ 85F2h ;type and name of topmost variable on menu with names
-;something		equ 85FDh
-userMenuSA		equ 85FEh
-ioPrompt		equ 865Fh
-dImageWidth		equ 8660h
-ioFlag			equ 8670h
-sndRecState		equ 8672h
-ioErrState		equ 8673h
-header			equ 8674h
-ioData			equ 867Dh
-ioNewData		equ 8689h
-bakHeader		equ 868Bh
-;something		equ 8697h ;app bitmap for selecting stuff from menus
-;something		equ 86B7h ;used in 47h and 74h link packets
-penCol			equ 86D7h
-penRow			equ 86D8h
-rclQueue		equ 86D9h
-rclQueueEnd		equ 86DBh
-errNo			equ 86DDh
-errSP			equ 86DEh
-errOffset		equ 86E0h
-saveSScreen		equ 86ECh
-asm_prgm_size		equ 89ECh
-bstCounter		equ 89EEh
-flags			equ 89F0h
-appFlagsAddr		equ 89FDh
-;something		equ 8A36h ;stats-related? This gets stored to (varCurrent) for some reason
-statVars		equ 8A3Ah
-anovaf_vars		equ 8C17h
-infVars			equ 8C4Dh
-infVar1			equ 8C56h
-infVar2			equ 8C5Fh
-infVar3			equ 8C68h
-infVar4			equ 8C71h
-infVar5			equ 8C7Ah
-infVar6			equ 8C83h
-infVar7			equ 8C8Ch
-infVar8			equ 8C95h
-infVar9			equ 8C9Eh
-infVar10		equ 8CA7h
-infVar11		equ 8CB0h
-infVar12		equ 8CB9h
-infVar13		equ 8CC2h
-infVar14		equ 8CCBh
-infVar15		equ 8CD4h
-infVar16		equ 8CDDh
-infVar17		equ 8CE6h
-infVar18		equ 8CEFh
-infVar19		equ 8CF8h
-infVar20		equ 8D01h
-;something		equ 8D0Bh
-;list-related stat vars	equ 8D0Dh
-curGStyle		equ 8D17h
-curGY			equ 8D18h
-curGX			equ 8D19h
-curGY2			equ 8D1Ah
-curGX2			equ 8D1Bh ;currently selected equation while graphing
-freeSaveY		equ 8D1Ch
-freeSaveX		equ 8D1Dh
-;100 bytes		equ 8D2Ah
-XOffset			equ 8DA1h
-YOffset			equ 8DA2h
-lcdTallP		equ 8DA3h
-pixWideP		equ 8DA4h
-pixWide_m_1		equ 8DA5h
-pixWide_m_2		equ 8DA6h
-lastEntryPTR		equ 8DA7h ;pointer to the next available byte in the entry stack
-lastEntryStk		equ 8DA9h ;the start of entry stack (note last entry is not in the stack, it is in the program '#'.)  This is a stack of strings.  first 2 bytes are length, followed by string. 2nd from last entry is first in this stack.
-numLastEntries		equ 8E29h ;number of entries you can back-track through minus one
-currLastEntry		equ 8E2Ah ;counter used by OS to keep track of which entry was just displayed by pressing 2nd+enter
-;something		equ 8E65h
-;something		equ 8E66h
-curInc			equ 8E67h
-uXmin			equ 8E7Eh
-uXmax			equ 8E87h
-uXscl			equ 8E90h
-uYmin			equ 8E99h
-uYmax			equ 8EA2h
-uYscl			equ 8EABh
-uThetMin		equ 8EB4h
-uThetMax		equ 8EBDh
-uThetStep		equ 8EC6h
-uTmin			equ 8ECFh
-uTmax			equ 8ED8h
-uTStep			equ 8EE1h
-uPlotStart		equ 8EEAh
-unMax			equ 8EF3h
-uu0			equ 8EFCh
-uv0			equ 8F05h
-unMin			equ 8F0Eh
-uu02			equ 8F17h
-uv02			equ 8F20h
-uw0			equ 8F29h
-uPlotStep		equ 8F32h
-uXres			equ 8F3Bh
-uw02			equ 8F44h
-Xmin			equ 8F50h
-Xmax			equ 8F59h
-Xscl			equ 8F62h
-Ymin			equ 8F6Bh
-Ymax			equ 8F74h
-Yscl			equ 8F7Dh
-ThetaMin		equ 8F86h
-ThetaMax		equ 8F8Fh
-ThetaStep		equ 8F98h
-TminPar			equ 8FA1h
-TmaxPar			equ 8FAAh
-Tstep			equ 8FB3h
-PlotStart		equ 8FBCh
-nMax			equ 8FC5h
-u0			equ 8FCEh
-v0			equ 8FD7h
-nMin			equ 8FE0h
-u02			equ 8FE9h
-v02			equ 8FF2h
-w0			equ 8FFBh
-PlotStep		equ 9004h
-XresO			equ 900Dh
-w02			equ 9016h
-un1			equ 901Fh
-un2			equ 9028h
-vn1			equ 9031h
-vn2			equ 903Ah
-wn1			equ 9043h
-wn2			equ 904Ch
-fin_N			equ 9055h
-fin_I			equ 905Eh
-fin_PV			equ 9067h
-fin_PMT			equ 9070h
-fin_FV			equ 9079h
-fin_PY			equ 9082h
-fin_CY			equ 908Bh
-cal_N			equ 9094h
-cal_I			equ 909Dh
-cal_PV			equ 90A6h
-cal_PMT			equ 90AFh
-cal_FV			equ 90B8h
-cal_PY			equ 90C1h
-smallEditRAM		equ 90D3h
-XFact			equ 913Fh
-YFact			equ 9148h
-Xres_int		equ 9151h
-deltaX			equ 9152h
-deltaY			equ 915Bh
-shortX			equ 9164h
-shortY			equ 916Dh
-lower			equ 9176h
-upper			equ 917Fh
-XOutSym			equ 918Ch
-XOutDat			equ 918Eh
-YOutSym			equ 9190h
-YOutDat			equ 9192h
-inputSym		equ 9194h
-inputDat		equ 9196h
-prevData		equ 9198h
-;something		equ 91D9h
-;something		equ 91DAh
-CurTableRow		equ 91DCh
-CurTableCol		equ 91DDh
-TblMin			equ 92B3h
-TblStep			equ 92BCh
-;something		equ 92C5h
-;something		equ 92C6h
-;somePlotThing1		equ 92D9h
-;somePlotThing2		equ 92EAh
-;somePlotThing3		equ 92FBh
-ES			equ 9302h ;bottom of the es
-EST			equ 9305h ;current height of the es
-;something		equ 9311h ;this is the pointer to a table of stuff for a BASIC menu
-plotSScreen		equ 9340h
-seed1			equ 9640h
-seed2			equ 9649h
-basic_prog		equ 9652h
-basic_start		equ 965Bh
-nextParseByte		equ 965Dh ;basic_pc
-basic_end		equ 965Fh
-numArguments		equ 9661h
-;something		equ 9665h ;parser-related word
-;something		equ 966Ch
-;something		equ 966Dh
-cmdShadow		equ 966Eh
-cmdShadCur		equ 96EEh
-cmdShadAlph		equ 96F0h
-cmdShadIns		equ 96F1h
-cmdCursor		equ 96F2h
-editTop			equ 96F4h
-editCursor		equ 96F6h
-editTail		equ 96F8h
-editBtm			equ 96FAh
-;something		equ 9700h
-editSym			equ 9706h ;pointer to symbol table entry of variable being edited
-editDat			equ 9708h ;pointer to data of variable being edited
-;something		equ 970Eh ;stats/list editor related, usually 1
-;something		equ 970Fh ;stats/list editor related, usually 0
-;something		equ 9710h ;stats/list editor related, usually 0
-listName1		equ 9711h
-listName2		equ 9716h
-listName3		equ 971Bh
-listName4		equ 9720h
-listName5		equ 9725h
-listName6		equ 972Ah
-listName7		equ 972Fh
-listName8		equ 9734h
-listName9		equ 9739h
-listName10		equ 973Eh
-listName11		equ 9743h
-listName12		equ 9748h
-listName13		equ 974Dh
-listName14		equ 9752h
-listName15		equ 9757h
-listName16		equ 975Ch
-listName17		equ 9761h
-listName18		equ 9766h
-listName19		equ 976Bh
-listName20		equ 9770h
-;something		equ 9775h
-y1LineType		equ 9776h ;these bytes define the line type for functions which are graphed
-y2LineType		equ 9777h
-y3LineType		equ 9778h
-y4LineType		equ 9779h
-y5LineType		equ 977Ah
-y6LineType		equ 977Bh
-y7LineType		equ 977Ch
-y8LineType		equ 977Dh
-y9LineType		equ 977Eh
-y0LineType		equ 977Fh
-para1LineType		equ 9780h
-para2LineType		equ 9781h
-para3LineType		equ 9782h
-para4LineType		equ 9783h
-para5LineType		equ 9784h
-para6LineType		equ 9785h
-polar1LineType		equ 9786h
-polar2LineType		equ 9787h
-polar3LineType		equ 9788h
-polar4LineType		equ 9789h
-polar5LineType		equ 978Ah
-polar6LineType		equ 978Bh
-secULineType		equ 978Ch
-secVLineType		equ 978Dh
-secWLineType		equ 978Eh
-;something		equ 979Fh
-;something		equ 97A1h
-winTop			equ 97A5h
-winBtm			equ 97A6h
-winLeftEdge		equ 97A7h
-winLeft			equ 97A8h
-winAbove		equ 97AAh
-winRow			equ 97ACh
-winCol			equ 97AEh
-fmtDigits		equ 97B0h
-fmtString		equ 97B1h
-fmtConv			equ 97F2h
-fmtLeft			equ 9804h
-fmtIndex		equ 9806h
-fmtMatSym		equ 9808h
-fmtMatMem		equ 980Ah
-EQS			equ 980Ch
-;something		equ 980Eh
-;something		equ 9810h
-freeRAM			equ 9815h ;pretty sure this is the amount of RAM free, valid in Mem Mgmt/Del anyway
-;something		equ 9817h
-tSymPtr1		equ 9818h
-tSymPtr2		equ 981Ah
-chkDelPtr3		equ 981Ch
-chkDelPtr4		equ 981Eh
-tempMem			equ 9820h
-fpBase			equ 9822h
-FPS			equ 9824h
-OPBase			equ 9826h
-OPS			equ 9828h
-pTempCnt		equ 982Ah
-cleanTmp		equ 982Ch
-pTemp                   equ 982Eh ;end of symbol table
-progPtr			equ 9830h
-newDataPtr		equ 9832h
-pagedCount		equ 9834h
-pagedPN			equ 9835h
-pagedGetPtr		equ 9836h
-pagedPutPtr		equ 9838h
-pagedBuf		equ 983Ah
-;something		equ 984Ah ;this is the top LCD row for a menu (usually 1)
-appErr1			equ 984Dh
-appErr2			equ 985Ah
-flashByte1		equ 9867h
-flashByte2		equ 9868h
-freeArcBlock		equ 9869h
-arcPage			equ 986Bh
-arcPtr			equ 986Ch
-appRawKeyHandle		equ 9870h
-appBackUpScreen		equ 9872h
-customHeight		equ 9B72h
-localLanguage		equ 9B73h
-hookExecTemp		equ 9B75h
-linkActivityHook	equ 9B78h
-cursorHookPtr		equ 9B7Ch
-libraryHookPtr		equ 9B80h
-rawKeyHookPtr		equ 9B84h
-getKeyHookPtr		equ 9B88h
-homescreenHookPtr	equ 9B8Ch
-windowHookPtr		equ 9B90h
-graphHookPtr		equ 9B94h
-yEqualsHookPtr		equ 9B98h
-fontHookPtr		equ 9B9Ch
-regraphHookPtr		equ 9BA0h
-graphicsHook		equ 9BA4h
-traceHookPtr		equ 9BA8h
-parserHookPtr		equ 9BACh
-appChangeHookPtr	equ 9BB0h
-catalog1HookPtr		equ 9BB4h
-helpHookPtr		equ 9BB8h
-cxRedispHookPtr		equ 9BBCh
-menuHookPtr		equ 9BC0h
-catalog2HookPtr		equ 9BC4h
-tokenHookPtr		equ 9BC8h
-localizeHookPtr		equ 9BCCh
-silentLinkHookPtr	equ 9BD0h ;restartClr?
-USBActivityHookPtr	equ 9BD4h
-baseAppBrTab2		equ 9C06h ;table of base pages for apps on page >= 20h; first 20h bytes are zeroes.
-USBcallbackPage		equ 9C13h
-USBcallbackPtr		equ 9C14h
-vendorID		equ 9C16h
-productID		equ 9C18h
-devReleaseNumber	equ 9C1Ah
-oldSESpeed		equ 9C21h
-calcPeripheralState	equ 9C26h
-usb_dataWaitingCount	equ 9C27h
-basePageTable2End	equ 9C6Fh ;this is the last page
-port91hTemp		equ 9C79h
-usb_dataExpectCount	equ 9C80h
-offPageCallPage		equ 9C83h ;temporarily stores off-page page and address
-offPageCallAddress	equ 9C84h
-;something		equ 9C86h ;used with SE link activity, values of 00h, 0FAh, 0FFh probably mean something
-;something		equ 9C87h ;zero this to force the APPS menu to recache itself (this is always either 0, 1, or last app page, for some reason)
-;something		equ 9C88h ;don't know, but it's 14 bytes and has to do with selecting stuff (if 9C87h is non-zero, this is zeroed out)
-;something		equ 9C9Eh ;funky, this actually gets written to the certificate on non-83+ (11 bytes)
-SEspeed			equ 9CAEh
-;something, table index	equ 9CAFh
-;something		equ 9CB0h
-;something		equ 9CB1h ;table
-;something		equ 9CCDh
-localTokStr		equ 9D65h
-keyForStr		equ 9D76h
-keyToStrRam		equ 9D77h
-sedMonSp		equ 9D88h
-bpSave			equ 9D8Ah
-userMem			equ 9D95h
-symTable		equ 0FE66h
+#define ramstart	$8000
+#define appdata	$8000
+#define ramcode	$8100
+#define smalleditcolumnleft	$8177
+#define smalleditrow	$8178
+#define smalleditcolumnright	$8179
+;pencol left edge?	$817b
+#define biginteger1	$8182
+#define smalleditcancelparse	$8194
+#define smalleditrowcount	$81b7
+#define biginteger2	$81c3
+#define smalleditpromptstring	$81cc
+#define ramcodeend	$822f
+#define baseappbrtab	$8230 ;table of base pages for apps on page < 20 (starts with eight zeroes because they're os pages)
+#define clockflag	$8230 ;bit 2 set for 24-hour mode and don't display "am/pm"
+#define clockids	$8231 ;five bytes, numbers 0-4 in memory, that when present, stops displaying clock numbers in time setting context?
+#define boottemp	$8251
+#define md5temp	$8259
+#define md5length	$8269
+#define md5ash	$8292
+#define appsearchpage	$82a3
+#define tempswaparea	$82a5
+;something	$837 ;18 bytes, probably indicates something about flash app pages, start out as $ff
+#define appid	$838d
+#define arcpageend	$8392
+#define arcptrend	$8393
+;$839f something...field size bytes?
+#define md5buffer	$83a5
+#define abackup	$83eb
+#define ramreturndata	$83ed
+#define arcinfo	$83ee
+#define savedarcinfo	$8406
+#define appinfo	$8432
+#define appbank_jump	$843c
+#define apppage	$843e
+#define kbdscancode	$843f
+#define kbdkey	$8444
+#define kbdgetky	$8445
+#define keyextend	$8446
+#define extecho	$keyextend
+#define contrast	$8447
+#define apdsubtimer	$8448
+#define apdtimer	$8449
+#define curtime	$844a
+#define currow	$844b
+#define curcol	$844c
+#define curoffset	$844d
+#define curunder	$844e
+#define cury	$844f
+#define curtype	$8450
+#define curxrow	$8451
+#define prevddata	$8452
+#define lfont_record	$845a
+#define sfont_record	$8462
+#define tokvarptr	$846a
+#define toklen	$846c
+#define indicmem	$846e ;eight bytes used by _savetr and _restoretr to store image in top right corner
+#define indiccounter	$8476
+#define indicbusy	$8477
+#define op1	$8478
+#define op1m	$847a
+#define op2	$8483
+#define op2m	$8485
+#define op2ext	$848c
+#define op3	$848e
+#define op3m	$8490
+#define op4	$8499
+#define op4m	$849b
+#define op5	$84a4
+#define op5m	$84a6
+#define op6	$84af
+#define op6m	$84b1
+#define op6ext	$84b8
+#define progtoedit	$84bf
+#define namebuff	$84c7
+#define equ_edit_save	$84d2
+#define imathptr1	$84d3
+#define imathptr2	$84d5
+#define imathptr3	$84d7
+#define imathptr4	$84d9
+#define imathptr5	$84db
+#define chkdelptr1	$84dd
+#define chkdelptr2	$84df
+#define insdelptr	$84e1
+#define updownptr	$84e3
+#define foutdat	$84e5
+#define asm_data_ptr1	$84eb
+#define asm_data_ptr2	$84ed
+#define asm_sym_ptr1	$84ef
+#define asm_sym_ptr2	$84f1
+#define asm_ram	$84f3
+#define asm_ind_call	$8507
+#define textshadow	$8508
+#define textshadcur	$8588
+#define textshadtop	$858a
+#define textshadalph	$858b
+#define textshadins	$858c
+#define cxmain	$858d
+#define cxpputaway	$858f
+#define cxputaway	$8591
+#define cxerrorep	$8595
+#define cxsizewind	$8597
+#define cxpage	$8599
+#define cxcurapp	$859a
+#define cxprev	$859b ;12 bytes are shadows of cxmain through cxcurapp and appflags
+#define monqh	$85aa
+#define monqt	$85ab
+#define monqueue	$85ac
+#define onsp	$85bc
+#define promptrow	$85c0
+#define promptcol	$85c1
+#define promptins	$85c2
+#define promptshift	$85c3
+#define promptret	$85c4
+#define promptvalid	$85c6
+#define prompttop	$85c8
+#define promptcursor	$85ca
+#define prompttail	$85cc
+#define promptbtm	$85ce
+#define vartype	$85d0
+#define varcurrent	$85d1
+#define varclass	$85d9
+#define catalogcurrent	$85da ;word at this location starting with $6007 corresponds to what is highlighted in catalog
+#define menuactive	$85dc
+#define menuappdepth	$85dd
+#define menucurrent	$85de
+;$85df ;holds current submenu index
+;$85e0 ;holds currently selected item in current submenu
+;$85e1 ;holds number of submenus for this menu
+;$85e2 ;holds number of items in this submenu
+;$85e3 ;iy+appflags backup for menu stuff
+;$85e4 ;iy+$0c backup for menu stuff
+;$85e5 ;curgstyle backup for menu stuff
+;$85e6 ;iy+graphflags backup for menu stuff
+#define progcurrent	$85e8
+;something, op1 backup?	$85f2 ;type and name of topmost variable on menu with names
+;something	$85fd
+#define usermenusa	$85fe
+#define ioprompt	$865f
+#define dimagewidth	$8660
+#define ioflag	$8670
+#define sndrecstate	$8672
+#define ioerrstate	$8673
+#define header	$8674
+#define iodata	$867d
+#define ionewdata	$8689
+#define bakheader	$868b
+;something	$8697 ;app bitmap for selecting stuff from menus
+;something	$86b7 ;used in $47 and $74 link packets
+#define pencol	$86d7
+#define penrow	$86d8
+#define rclqueue	$86d9
+#define rclqueueend	$86db
+#define errno	$86dd
+#define errsp	$86de
+#define erroffset	$86e0
+#define savesscreen	$86ec
+#define asm_prgm_size	$89ec
+#define bstcounter	$89ee
+#define flags	$89f0
+#define appflagsaddr	$89fd
+;something	$8a36 ;stats-related? this gets stored to (varcurrent) for some reason
+#define statvars	$8a3a
+#define anovaf_vars	$8c17
+#define infvars	$8c4d
+#define infvar1	$8c56
+#define infvar2	$8c5f
+#define infvar3	$8c68
+#define infvar4	$8c71
+#define infvar5	$8c7a
+#define infvar6	$8c83
+#define infvar7	$8c8c
+#define infvar8	$8c95
+#define infvar9	$8c9e
+#define infvar10	$8ca7
+#define infvar11	$8cb0
+#define infvar12	$8cb9
+#define infvar13	$8cc2
+#define infvar14	$8ccb
+#define infvar15	$8cd4
+#define infvar16	$8cdd
+#define infvar17	$8ce6
+#define infvar18	$8cef
+#define infvar19	$8cf8
+#define infvar20	$8d01
+;something	$8d0b
+;list-related stat vars	$8d0d
+#define curgstyle	$8d17
+#define curgy	$8d18
+#define curgx	$8d19
+#define curgy2	$8d1a
+#define curgx2	$8d1b ;currently selected equation while graphing
+#define freesavey	$8d1c
+#define freesavex	$8d1d
+;100 bytes	$8d2a
+#define xoffset	$8da1
+#define yoffset	$8da2
+#define lcdtallp	$8da3
+#define pixwidep	$8da4
+#define pixwide_m_1	$8da5
+#define pixwide_m_2	$8da6
+#define lastentryptr	$8da7 ;pointer to the next available byte in the entry stack
+#define lastentrystk	$8da9 ;the start of entry stack (note last entry is not in the stack, it is in the program '#'.)  this is a stack of strings.  first 2 bytes are length, followed by string. 2nd from last entry is first in this stack.
+#define numlastentries	$8e29 ;number of entries you can back-track through minus one
+#define currlastentry	$8e2a ;counter used by os to keep track of which entry was just displayed by pressing 2nd+enter
+;something	$8e65
+;something	$8e66
+#define curinc	$8e67
+#define uxmin	$8e7e
+#define uxmax	$8e87
+#define uxscl	$8e90
+#define uymin	$8e99
+#define uymax	$8ea2
+#define uyscl	$8eab
+#define uthetmin	$8eb4
+#define uthetmax	$8ebd
+#define uthetstep	$8ec6
+#define utmin	$8ecf
+#define utmax	$8ed8
+#define utstep	$8ee1
+#define uplotstart	$8eea
+#define unmax	$8ef3
+#define uu0	$8efc
+#define uv0	$8f05
+#define unmin	$8f0e
+#define uu02	$8f17
+#define uv02	$8f20
+#define uw0	$8f29
+#define uplotstep	$8f32
+#define uxres	$8f3b
+#define uw02	$8f44
+#define xmin	$8f50
+#define xmax	$8f59
+#define xscl	$8f62
+#define ymin	$8f6b
+#define ymax	$8f74
+#define yscl	$8f7d
+#define thetamin	$8f86
+#define thetamax	$8f8f
+#define thetastep	$8f98
+#define tminpar	$8fa1
+#define tmaxpar	$8faa
+#define tstep	$8fb3
+#define plotstart	$8fbc
+#define nmax	$8fc5
+#define u0	$8fce
+#define v0	$8fd7
+#define nmin	$8fe0
+#define u02	$8fe9
+#define v02	$8ff2
+#define w0	$8ffb
+#define plotstep	$9004
+#define xreso	$900d
+#define w02	$9016
+#define un1	$901f
+#define un2	$9028
+#define vn1	$9031
+#define vn2	$903a
+#define wn1	$9043
+#define wn2	$904c
+#define fin_n	$9055
+#define fin_i	$905e
+#define fin_pv	$9067
+#define fin_pmt	$9070
+#define fin_fv	$9079
+#define fin_py	$9082
+#define fin_cy	$908b
+#define cal_n	$9094
+#define cal_i	$909d
+#define cal_pv	$90a6
+#define cal_pmt	$90af
+#define cal_fv	$90b8
+#define cal_py	$90c1
+#define smalleditram	$90d3
+#define xfact	$913f
+#define yfact	$9148
+#define xres_int	$9151
+#define deltax	$9152
+#define deltay	$915b
+#define shortx	$9164
+#define shorty	$916d
+#define lower	$9176
+#define upper	$917f
+#define xoutsym	$918c
+#define xoutdat	$918e
+#define youtsym	$9190
+#define youtdat	$9192
+#define inputsym	$9194
+#define inputdat	$9196
+#define prevdata	$9198
+;something	$91d9
+;something	$91da
+#define curtablerow	$91dc
+#define curtablecol	$91dd
+#define tblmin	$92b3
+#define tblstep	$92bc
+;something	$92c5
+;something	$92c6
+;someplotthing1	$92d9
+;someplotthing2	$92ea
+;someplotthing3	$92fb
+#define es	$9302 ;bottom of the es
+#define est	$9305 ;current height of the es
+;something	$9311 ;this is the pointer to a table of stuff for a basic menu
+#define plotsscreen	$9340
+#define seed1	$9640
+#define seed2	$9649
+#define basic_prog	$9652
+#define basic_start	$965b
+#define nextparsebyte	$965d ;basic_pc
+#define basic_end	$965f
+#define numarguments	$9661
+;something	$9665 ;parser-related word
+;something	$966c
+;something	$966d
+#define cmdshadow	$966e
+#define cmdshadcur	$96ee
+#define cmdshadalph	$96f0
+#define cmdshadins	$96f1
+#define cmdcursor	$96f2
+#define edittop	$96f4
+#define editcursor	$96f6
+#define edittail	$96f8
+#define editbtm	$96fa
+;something	$9700
+#define editsym	$9706 ;pointer to symbol table entry of variable being edited
+#define editdat	$9708 ;pointer to data of variable being edited
+;something	$970e ;stats/list editor related, usually 1
+;something	$970f ;stats/list editor related, usually 0
+;something	$9710 ;stats/list editor related, usually 0
+#define listname1	$9711
+#define listname2	$9716
+#define listname3	$971b
+#define listname4	$9720
+#define listname5	$9725
+#define listname6	$972a
+#define listname7	$972f
+#define listname8	$9734
+#define listname9	$9739
+#define listname10	$973e
+#define listname11	$9743
+#define listname12	$9748
+#define listname13	$974d
+#define listname14	$9752
+#define listname15	$9757
+#define listname16	$975c
+#define listname17	$9761
+#define listname18	$9766
+#define listname19	$976b
+#define listname20	$9770
+;something	$9775
+#define y1linetype	$9776 ;these bytes define the line type for functions which are graphed
+#define y2linetype	$9777
+#define y3linetype	$9778
+#define y4linetype	$9779
+#define y5linetype	$977a
+#define y6linetype	$977b
+#define y7linetype	$977c
+#define y8linetype	$977d
+#define y9linetype	$977e
+#define y0linetype	$977f
+#define para1linetype	$9780
+#define para2linetype	$9781
+#define para3linetype	$9782
+#define para4linetype	$9783
+#define para5linetype	$9784
+#define para6linetype	$9785
+#define polar1linetype	$9786
+#define polar2linetype	$9787
+#define polar3linetype	$9788
+#define polar4linetype	$9789
+#define polar5linetype	$978a
+#define polar6linetype	$978b
+#define seculinetype	$978c
+#define secvlinetype	$978d
+#define secwlinetype	$978e
+;something	$979f
+;something	$97a1
+#define wintop	$97a5
+#define winbtm	$97a6
+#define winleftedge	$97a7
+#define winleft	$97a8
+#define winabove	$97aa
+#define winrow	$97ac
+#define wincol	$97ae
+#define fmtdigits	$97b0
+#define fmtstring	$97b1
+#define fmtconv	$97f2
+#define fmtleft	$9804
+#define fmtindex	$9806
+#define fmtmatsym	$9808
+#define fmtmatmem	$980a
+#define eqs	$980c
+;something	$980e
+;something	$9810
+#define freeram	$9815 ;pretty sure this is the amount of ram free, valid in mem mgmt/del anyway
+;something	$9817
+#define tsymptr1	$9818
+#define tsymptr2	$981a
+#define chkdelptr3	$981c
+#define chkdelptr4	$981e
+#define tempmem	$9820
+#define fpbase	$9822
+#define fps	$9824
+#define opbase	$9826
+#define ops	$9828
+#define ptempcnt	$982a
+#define cleantmp	$982c
+#define ptemp	$982e ;end of symbol table
+#define progptr	$9830
+#define newdataptr	$9832
+#define pagedcount	$9834
+#define pagedpn	$9835
+#define pagedgetptr	$9836
+#define pagedputptr	$9838
+#define pagedbuf	$983a
+;something	$984a ;this is the top lcd row for a menu (usually 1)
+#define apperr1	$984d
+#define apperr2	$985a
+#define flashbyte1	$9867
+#define flashbyte2	$9868
+#define freearcblock	$9869
+#define arcpage	$986b
+#define arcptr	$986c
+#define apprawkeyhandle	$9870
+#define appbackupscreen	$9872
+#define customheight	$9b72
+#define locallanguage	$9b73
+#define hookexectemp	$9b75
+#define linkactivityhook	$9b78
+#define cursorhookptr	$9b7c
+#define libraryhookptr	$9b80
+#define rawkeyhookptr	$9b84
+#define getkeyhookptr	$9b88
+#define homescreenhookptr	$9b8c
+#define windowhookptr	$9b90
+#define graphhookptr	$9b94
+#define yequalshookptr	$9b98
+#define fonthookptr	$9b9c
+#define regraphhookptr	$9ba0
+#define graphicshook	$9ba4
+#define tracehookptr	$9ba8
+#define parserhookptr	$9bac
+#define appchangehookptr	$9bb0
+#define catalog1ookptr	$9bb4
+#define helphookptr	$9bb8
+#define cxredisphookptr	$9bbc
+#define menuhookptr	$9bc0
+#define catalog2ookptr	$9bc4
+#define tokenhookptr	$9bc8
+#define localizehookptr	$9bcc
+#define silentlinkhookptr	$9bd0 ;restartclr?
+#define usbactivityhookptr	$9bd4
+#define baseappbrtab2	$9c06 ;table of base pages for apps on page >= 20; first 20 bytes are zeroes.
+#define usbcallbackpage	$9c13
+#define usbcallbackptr	$9c14
+#define vendorid	$9c16
+#define productid	$9c18
+#define devreleasenumber	$9c1a
+#define oldsespeed	$9c21
+#define calcperipheralstate	$9c26
+#define usb_datawaitingcount	$9c27
+#define basepagetable2end	$9c6f ;this is the last page
+#define port91temp	$9c79
+#define usb_dataexpectcount	$9c80
+#define offpagecallpage	$9c83 ;temporarily stores off-page page and address
+#define offpagecalladdress	$9c84
+;something	$9c86 ;used with se link activity, values of $00, $0fa, $0ff probably mean something
+;something	$9c87 ;zero this to force the apps menu to recache itself (this is always either 0, 1, or last app page, for some reason)
+;something	$9c88 ;don't know, but it's 14 bytes and has to do with selecting stuff (if $9c87 is non-zero, this is zeroed out)
+;something	$9c9e ;funky, this actually gets written to the certificate on non-83+ (11 bytes)
+#define sespeed	$9cae
+;something, table index	$9caf
+;something	$9cb0
+;something	$9cb1 ;table
+;something	$9ccd
+#define localtokstr	$9d65
+#define keyforstr	$9d76
+#define keytostrram	$9d77
+#define sedmonsp	$9d88
+#define bpsave	$9d8a
+#define usermem	$9d95
+#define symtable	$0fe66
 
-;System Flags
+;system flags
 ;----------------------------------------------------------------------
-ioDelFlag		equ 0h
-inDelete		equ 0		;1 = DELETE SCREEN 
+#define iodelflag	0
+#define indelete	0	;1 = delete screen
 
-trigFlags		equ 0h	;Trigonometry mode settings
-trigDeg			equ 2		;1=degrees, 0=radians
+#define trigflags	0	;trigonometry mode settings
+#define trigdeg	2	;1=degrees, 0=radians
 
-kbdFlags		equ 0h	;Keyboard scan
-kbdSCR			equ 3		;1=scan code ready
-kbdKeyPress		equ 4		;1=key has been pressed
+#define kbdflags	0	;keyboard scan
+#define kbdscr	3	;1=scan code ready
+#define kbdkeypress	4	;1=key has been pressed
 
-doneFlags		equ 0h	;display "Done"
-donePrgm		equ 5		;1=display "Done" after prgm
+#define doneflags	0	;display "done"
+#define doneprgm	5	;1=display "done" after prgm
 ;----------------------------------------------------------------------
-editFlags		equ 1h
-editOpen		equ 2		;1=edit buffer is open
+#define editflags	1
+#define editopen	2	;1=edit buffer is open
 
-ansFlags		equ 1
-AnsScroll		equ 3		;1=answer can scroll, seems must be reset in order to move about edit buffer
+#define ansflags	1
+#define ansscroll	3	;1=answer can scroll, seems must be reset in order to move about edit buffer
 
-monFlags		equ 1h	 ;monitor flags
-monAbandon		equ 4		;1=don't start any long process in put away (#715)
+#define monflags	1	 ;monitor flags
+#define monabandon	4	;1=don't start any long process in put away (#715)
 ;----------------------------------------------------------------------
-plotFlags		equ 2h	;plot generation flags
-plotLoc 		equ 1		;0=bkup & display, 1=display only
-plotDisp		equ 2		;1=plot is in display, 0=text in display
+#define plotflags	2	;plot generation flags
+#define plotloc 	1	;0=bkup & display, 1=display only
+#define plotdisp	2	;1=plot is in display, 0=text in display
 
-grfModeFlags		equ 2h	;graph mode settings
-grfFuncM		equ 4		;1=function graph
-grfPolarM		equ 5		;1=polar graph
-grfParamM		equ 6		;1=parametric graph
-grfRecurM		equ 7		;1=RECURSION graph
+#define grfmodeflags	2	;graph mode settings
+#define grffuncm	4	;1=function grap
+#define grfpolarm	5	;1=polar grap
+#define grfparamm	6	;1=parametric grap
+#define grfrecurm	7	;1=recursion grap
 ;----------------------------------------------------------------------
-graphFlags		equ 3h
-graphDraw		equ 0		;0=graph is valid, 1=redraw graph(dirty)
-graphCursor		equ 2
+#define graphflags	3
+#define graphdraw	0	;0=graph is valid, 1=redraw graph(dirty)
+#define graphcursor	2
 ;----------------------------------------------------------------------
-grfDBFlags		equ 4h
-grfDot			equ 0		;0=line, 1=dot
-grfSimul		equ 1		;0=sequential, 1=simultaneous
-grfGrid 		equ 2		;0=no grid, 1=grid
-grfPolar		equ 3		;0=rectangular, 1=polar coordinates
-grfNoCoord		equ 4		;0=display coordinates, 1=off
-grfNoAxis		equ 5		;0=axis, 1=no axis
-grfLabel		equ 6		;0=off, 1=axis label
+#define grfdbflags	4
+#define grfdot	0	;0=line, 1=dot
+#define grfsimul	1	;0=sequential, 1=simultaneous
+#define grfgrid 	2	;0=no grid, 1=grid
+#define grfpolar	3	;0=rectangular, 1=polar coordinates
+#define grfnocoord	4	;0=display coordinates, 1=off
+#define grfnoaxis	5	;0=axis, 1=no axis
+#define grflabel	6	;0=off, 1=axis label
 ;----------------------------------------------------------------------
-textFlags		equ 5h	;Text output flags
-textEraseBelow		equ 1		;1=erase line below small char
-textScrolled		equ 2		;1=screen scrolled
-textInverse		equ 3		;1=display inverse bit-map
-textInsMode		equ 4		;0=overstrike, 1=insert mode
+#define textflags	5	;text output flags
+#define texterasebelow	1	;1=erase line below small char
+#define textscrolled	2	;1=screen scrolled
+#define textinverse	3	;1=display inverse bit-map
+#define textinsmode	4	;0=overstrike, 1=insert mode
 ;----------------------------------------------------------------------
-ParsFlag		equ 6h	;PARSER flags
+#define parsflag	6	;parser flags
 ;----------------------------------------------------------------------
-ParsFlag2		equ 7h	;PARSER flags
-numOP1			equ 0		;1=RESULT IN OP1, 0=NO RESULT
+#define parsflag2	7	;parser flags
+#define numop1	0	;1=result in op1, 0=no result
 ;----------------------------------------------------------------------
-newDispF		equ 8h	;Derivative mode flags
-preClrForMode		equ 0		;1=HELP BLINK ON MODE SCREEN
-allowProgTokens		equ 1		;1=allow programming tokens to be parsed in BASIC programs
+#define newdispf	8	;derivative mode flags
+#define preclrformode	0	;1=help blink on mode screen
+#define allowprogtokens	1	;1=allow programming tokens to be parsed in basic programs
 
-apdFlags		equ 8h	;Automatic power-down
-apdAble 		equ 2		;1=APD enabled
-apdRunning		equ 3		;1=APD clock running
+#define apdflags	8	;automatic power-down
+#define apdable 	2	;1=apd enabled
+#define apdrunning	3	;1=apd clock running
 ;----------------------------------------------------------------------
-web_err_mask		equ 60h
+#define web_err_mask	$60
 ;----------------------------------------------------------------------
-onFlags 		equ 9h	;on key flags
-parseInput		equ 1		;1=parse input when done
-onRunning		equ 3		;1=calculator is running
-onInterrupt		equ 4		;1=on key interrupt request
+#define onflags 	9	;on key flags
+#define parseinput	1	;1=parse input when done
+#define onrunning	3	;1=calculator is running
+#define oninterrupt	4	;1=on key interrupt request
 
-statFlags		equ 9h	;statistics flags
-;unknown		equ 5		;unknown
-statsValid		equ 6		;1=stats are valid
+#define statflags	9	;statistics flags
+;unknown	5	;unknown
+#define statsvalid	6	;1=stats are valid
 ;----------------------------------------------------------------------
-fmtFlags		equ 0Ah	;numeric format flags
-fmtExponent		equ 0	 	;1=show exponent, 0=no exponent
-fmtEng			equ 1	 	;1=engineering notion, 0=scientific
-fmtHex			equ 2	 	;1=hexadecimal
-fmtOct			equ 3	 	;1=octal
-fmtBin			equ 4	 	;1=binary
+#define fmtflags	$0a	;numeric format flags
+#define fmtexponent	0	 	;1=show exponent, 0=no exponent
+#define fmteng	1	 	;1=engineering notion, 0=scientific
+#define fmthex	2	 	;1=hexadecimal
+#define fmtoct	3	 	;1=octal
+#define fmtbin	4	 	;1=binary
 
-numMode			equ 0Ah
-fmtReal			equ 5
-fmtRect			equ 6
-fmtPolar		equ 7
+#define nummode	$0a
+#define fmtreal	5
+#define fmtrect	6
+#define fmtpolar	7
 
-realMode		equ 5
-rectMode		equ 6
-polarMode		equ 7
-;					;if Hex and Oct both = 1
-;					; then Bin=0 means >Frac
-;					; Bin=1 means >DMS
-fmtBaseMask		equ  00011100b	; mask to base flags
-fmtBaseShift		equ  2		; offset to base flags
+#define realmode	5
+#define rectmode	6
+#define polarmode	7
+;			;if hex and oct both = 1
+;			; then bin=0 means >frac
+;			; bin=1 means >dms
+#define fmtbasemask	 %00011100	; mask to base flags
+#define fmtbaseshift	 2	; offset to base flags
 ;
-;       CHECK IF THESE ARE USED BY NUMFORM,
+;       check if these are used by numform,
 ;
-;               	equ  6
-;               	equ  7
+;           	 6
+;           	 7
 ;----------------------------------------------------------------------
-fmtOverride		equ 0Bh	;copy of fmtFlags with conversion override
+#define fmtoverride	$0b	;copy of fmtflags with conversion override
 ;----------------------------------------------------------------------
-fmtEditFlags		equ 0Ch	;numeric editing flags
-fmtEdit			equ 0		;1=format number for editing
+#define fmteditflags	$0c	;numeric editing flags
+#define fmtedit	0	;1=format number for editing
 
-curFlags		equ 0Ch	;Cursor
-curAble 		equ 2		;1=cursor flash is enabled
-curOn			equ 3		;1=cursor is showing
-curLock 		equ 4		;1=cursor is locked off
+#define curflags	$0c	;cursor
+#define curable 	2	;1=cursor flash is enabled
+#define curon	3	;1=cursor is showing
+#define curlock 	4	;1=cursor is locked off
 
-cmdFlags		equ 0Ch	;command editor flags
-cmdVirgin		equ 5		;1=nothing has been typed in cmd bfr
+#define cmdflags	$0c	;command editor flags
+#define cmdvirgin	5	;1=nothing has been typed in cmd bfr
 ;----------------------------------------------------------------------
-appFlags		equ 0Dh	;application flags
-appWantIntrpt		equ 0		;1=want ON key interrupts
-appTextSave		equ 1		;1=save characters in textShadow
-appAutoScroll		equ 2		;1=auto-scroll text on last line
-appMenus		equ 3		;1=process keys that bring up menus, 0=check Lock menu flag
-appLockMenus		equ 4		;1=ignore menu keys, 0=switch to home screen and bring up menu
-appCurGraphic		equ 5		;1=graphic cursor
-appCurWord		equ 6		;1=text cursor covers entire word
-appExit 		equ 7		;1=application handles [EXIT] key itself
+#define appflags	$0d	;application flags
+#define appwantintrpt	0	;1=want on key interrupts
+#define apptextsave	1	;1=save characters in textshadow
+#define appautoscroll	2	;1=auto-scroll text on last line
+#define appmenus	3	;1=process keys that bring up menus, 0=check lock menu flag
+#define applockmenus	4	;1=ignore menu keys, 0=switch to home screen and bring up menu
+#define appcurgraphic	5	;1=graphic cursor
+#define appcurword	6	;1=text cursor covers entire word
+#define appexit 	7	;1=application handles [exit] key itself
 
-appWantIntrptF		equ 1<<appWantIntrpt
-appTextSaveF		equ 1<<appTextSave
-appAutoScrollF		equ 1<<appAutoScroll
-appMenusF		equ 1<<appMenus
-appLockMenusF		equ 1<<appLockMenus
-appCurGraphicF		equ 1<<appCurGraphic
-appCurWordF		equ 1<<appCurWord
-appExitF		equ 1<<appExit
+#define appwantintrptf	1<<appwantintrpt
+#define apptextsavef	1<<apptextsave
+#define appautoscrollf	1<<appautoscroll
+#define appmenusf	1<<appmenus
+#define applockmenusf	1<<applockmenus
+#define appcurgraphicf	1<<appcurgraphic
+#define appcurwordf	1<<appcurword
+#define appexitf	1<<appexit
 ;----------------------------------------------------------------------
-rclFlag			equ 0Eh	;OS recall queue flags
-enableQueue		equ 7		;1 = enable recall queue
+#define rclflag	$0e	;os recall queue flags
+#define enablequeue	7	;1 = enable recall queue
 ;----------------------------------------------------------------------
-seqFlags		equ 0Fh	;Sequential Graph flags
-webMode			equ 0		;0 = NORMAL SEQ MODE, 1 = WEB MODE
-webVert			equ 1
-sequv			equ 2		;U vs V
-seqvw			equ 3		;V vs W
-sequw			equ 4		;U vs W
+#define seqflags	$0f	;sequential graph flags
+#define webmode	0	;0 = normal seq mode, 1 = web mode
+#define webvert	1
+#define sequv	2	;u vs v
+#define seqvw	3	;v vs w
+#define sequw	4	;u vs w
 ;----------------------------------------------------------------------
-promptFlags		equ 11h	;prompt line flags
-promptEdit		equ 0		;1=editing in prompt buffer
+#define promptflags	$11	;prompt line flags
+#define promptedit	0	;1=editing in prompt buffer
 ;----------------------------------------------------------------------
-indicFlags		equ 12h	;Indicator flags
-indicRun		equ 0		;1=run indicator ON
-indicInUse		equ 1		;indicator save area in use=1, free=0 ;resetting will disable 2nd while in _getkey
-indicOnly		equ 2		;interrupt handler only checks run indicator
+#define indicflags	$12	;indicator flags
+#define indicrun	0	;1=run indicator on
+#define indicinuse	1	;indicator save area in use=1, free=0 ;resetting will disable 2nd while in _getkey
+#define indiconly	2	;interrupt handler only checks run indicator
 
-shiftFlags		equ 12h	;[2nd] and [ALPHA] flags
-shift2nd		equ 3		;1=[2nd] has been pressed
-shiftAlpha		equ 4		;1=[ALPHA] has been pressed
-shiftLwrAlph		equ 5		;1=lower case, 0=upper case
-shiftALock		equ 6		;1=alpha lock has been pressed
-shiftKeepAlph		equ 7		;1=cannot cancel alpha shift
+#define shiftflags	$12	;[2nd] and [alpha] flags
+#define shift2nd	3	;1=[2nd] has been pressed
+#define shiftalpha	4	;1=[alpha] has been pressed
+#define shiftlwralph	5	;1=lower case, 0=upper case
+#define shiftalock	6	;1=alpha lock has been pressed
+#define shiftkeepalph	7	;1=cannot cancel alpha shift
 ;----------------------------------------------------------------------
-tblFlags		equ 13h	;table flags.
-autoFill		equ 4		;1=prompt, 0=fillAuto
-autoCalc		equ 5		;1=prompt, 0=CalcAuto
-reTable			equ 6		;0=table is okay, 1=must recompute table.
+#define tblflags	$13	;table flags.
+#define autofill	4	;1=prompt, 0=fillauto
+#define autocalc	5	;1=prompt, 0=calcauto
+#define retable	6	;0=table is okay, 1=must recompute table.
 ;----------------------------------------------------------------------
-sGrFlags		equ 14h
-grfSplit		equ 0		;1=Split Graph, 0=Normal
-vertSplit		equ 1		;1=Vertical (left-right) Split
-grfSChanged		equ 2		;1=Graph just changed Split <-> normal
-grfSplitOverride	equ 3		;1 = ignore graph split flag if set
-write_on_graph		equ 4		;1 = TEXT OR EQU WRITING TO GRAPH SCREEN
-g_style_active		equ 5		;1 = GRAPH STYLES ARE ENABLED, USE THEM
-cmp_mod_box		equ 6		;1 = DOING MOD BOX PLOT COMPUTATION
-textWrite		equ 7
+#define sgrflags	$14
+#define grfsplit	0	;1=split graph, 0=normal
+#define vertsplit	1	;1=vertical (left-right) split
+#define grfschanged	2	;1=graph just changed split <-> normal
+#define grfsplitoverride	3	;1 = ignore graph split flag if set
+#define write_on_graph	4	;1 = text or	writing to graph screen
+#define g_style_active	5	;1 = graph styles are enabled, use them
+#define cmp_mod_box	6	;1 = doing mod box plot computation
+#define textwrite	7
 ;----------------------------------------------------------------------
-newIndicFlags		equ 15h
-extraIndic		equ 0
-saIndic			equ 1
+#define newindicflags	$15
+#define extraindic	0
+#define saindic	1
 ;----------------------------------------------------------------------
-batteryFlags		equ 16h
-batteriesGood		equ 2		;1 = batteries good
+#define batteryflags	$16
+#define batteriesgood	2	;1 = batteries good
 ;----------------------------------------------------------------------
-smartFlags		equ 17h
-smarter_mask		equ 3
-smarter_test		equ 1
-smartGraph		equ 0
-smartGraph_inv		equ 1
+#define smartflags	$17
+#define smarter_mask	3
+#define smarter_test	1
+#define smartgraph	0
+#define smartgraph_inv	1
 ;----------------------------------------------------------------------
-traceFlags		equ 18h
-grfExpr			equ 0		;set to hide expression while tracing
+#define traceflags	$18
+#define grfexpr	0	;set to hide expression while tracing
 ;----------------------------------------------------------------------
-statFlags2		equ 1Ah
-statDiagnosticsOn	equ 0		;1 = stat diagnostics on
+#define statflags2	$1a
+#define statdiagnosticson	0	;1 = stat diagnostics on
 ;----------------------------------------------------------------------
-linkFlags		equ 1Bh
-IDis95h			equ 1		;link routines use machine ID 95h (CBL)
-IDis82h			equ 2		;link routines use machine ID 82h (TI-82)
-IDis83h			equ 3		;link routines use machine ID 83h (TI-83)
-IDis03h			equ 4		;link routines use machine ID 03h (PC to TI-83)
-USBenabled		equ 5		;use USB port first, or at least try to
+#define linkflags	$1b
+#define idis95	1	;link routines use machine id 95 (cbl)
+#define idis82	2	;link routines use machine id 82 (ti-82)
+#define idis83	3	;link routines use machine id 83 (ti-83)
+#define idis03	4	;link routines use machine id 03 (pc to ti-83)
+#define usbenabled	5	;use usb port first, or at least try to
 ;----------------------------------------------------------------------
-;There is a flag 1Ch (stats-related).
+;there is a flag $1c (stats-related).
 ;----------------------------------------------------------------------
-;There is a flag 1Eh.
+;there is a flag $1e.
 ;----------------------------------------------------------------------
-varTypeMask		equ 1Fh	;is this a flag byte? yes
-varGraphRef		equ 6
+#define vartypemask	$1f	;is this a flag byte? yes
+#define vargraphref	6
 ;----------------------------------------------------------------------
-graphFlags2		equ 1Fh
-splitOverride		equ 3		;0 = force full screen with ParseInp, or something
+#define graphflags2	$1f
+#define splitoverride	3	;0 = force full screen with parseinp, or something
 ;----------------------------------------------------------------------
-asm_Flag1		equ 21h	;ASM CODING
-asm_Flag2		equ 22h	;ASM CODING
-asm_Flag3		equ 23h	;ASM CODING
+#define asm_flag1	$21	;asm coding
+#define asm_flag2	$22	;asm coding
+#define asm_flag3	$23	;asm coding
 ;----------------------------------------------------------------------
-arcFlag			equ 24h
-checkBatteryLevelFirst	equ 0		;1 = check battery levels in Arc_Unarc first and throw error if low
+#define arcflag	$24
+#define checkbatterylevelfirst	0	;1 = check battery levels in arc_unarc first and throw error if low
 
-getSendFlg		equ 24h
-comFailed		equ 1		;1 = Get/Send Communication Failed
+#define getsendflg	$24
+#define comfailed	1	;1 = get/send communication failed
 
-selfTestFlag		equ 24h
-resetOnPowerOn		equ 2		;1 = Force RAM reset when APD disabled on next power on
+#define selftestflag	$24
+#define resetonpoweron	2	;1 = force ram reset when apd disabled on next power on
 
-appLwrCaseFlag		equ 24h
-lwrCaseActive		equ 3
+#define applwrcaseflag	$24
+#define lwrcaseactive	3
 ;----------------------------------------------------------------------
-contextFlags		equ 25h
-nocxPutAway		equ 5		;1 = do not call cxPutAway routine
+#define contextflags	$25
+#define nocxputaway	5	;1 = do not call cxputaway routine
 ;----------------------------------------------------------------------
-groupFlags		equ 26h ;used temporarily in Arc_Unarc
-inGroup			equ 1		;1 = IN GROUP CONTEXT
-noCompletionByte	equ 2		;1 = do not write 0FCh when calling Arc_Unarc, leave as 0FEh
-noDataWrite		equ 3		;1 = do not write data when calling Arc_Unarc, nor size bytes
-writeSizeBytesOnly	equ 5		;1 = only write size bytes when calling Arc_Unarc
+#define groupflags	$26 ;used temporarily in arc_unarc
+#define ingroup	1	;1 = in group context
+#define nocompletionbyte	2	;1 = do not write 0fch when calling arc_unarc, leave as 0fe
+#define nodatawrite	3	;1 = do not write data when calling arc_unarc, nor size bytes
+#define writesizebytesonly	5	;1 = only write size bytes when calling arc_unarc
 ;----------------------------------------------------------------------
-APIFlg			equ 28h
-appAllowContext		equ 0           ;App wants context changes to happen
+#define apiflg	$28
+#define appallowcontext	0           ;app wants context changes to happen
 ;1 set to ignore a key after returning from rawkeyhook
 ;2 set to send this key back?
 ;3
-appRunning		equ 4		;app is currently running
+#define apprunning	4	;app is currently running
 ;5
 ;6
-appRetKeyOff		equ 7		;1 = GetKey returns kOff when [2nd]+[ON] pressed
+#define appretkeyoff	7	;1 = getkey returns koff when [2nd]+[on] pressed
 ;----------------------------------------------------------------------
-apiFlg2			equ 29h
+#define apiflg2	$29
 ;----------------------------------------------------------------------
-apiFlg3			equ 2Ah
+#define apiflg3	$2a
 ;1 set means using small font?
 ;----------------------------------------------------------------------
-apiFlg4			equ 2Bh
-cellOverride		equ 1		;use cell override
-fullScrnDraw		equ 2		;DRAW INTO LAST ROW/COL OF SCREEN
+#define apiflg4	$2b
+#define celloverride	1	;use cell override
+#define fullscrndraw	2	;draw into last row/col of screen
 ;----------------------------------------------------------------------
-mouseFlag1		equ 2Ch
+#define mouseflag1	$2c
 ;----------------------------------------------------------------------
-mouseFlag2		equ 2Dh ;might want to keep this always reset.
+#define mouseflag2	$2d ;might want to keep this always reset.
 ;----------------------------------------------------------------------
-xapFlag0		equ 2Eh	;external app flags
-xapFlag1		equ 2Fh
-xapFlag2		equ 30h
-xapFlag3		equ 31h
+#define xapflag0	$2e	;external app flags
+#define xapflag1	$2f
+#define xapflag2	$30
+#define xapflag3	$31
 ;----------------------------------------------------------------------
-fontFlags		equ 32h
-fracDrawLFont		equ 2
-fracTallLFont		equ 3
-customFont		equ 7
+#define fontflags	$32
+#define fracdrawlfont	2
+#define fractalllfont	3
+#define customfont	7
 ;----------------------------------------------------------------------
-hookflags1		equ 33h ;also scriptFlag, rclFlag2, backGroundLink
-alt_On			equ 0		;run ONSCRPT at startup
-alt_Off			equ 1		;run OFFSCRPT at shutdown
-useRclQueueEnd		equ 2		;1 = external mode
-ignoreBPLink		equ 3		;1 = override flag for link activity hook
-bPLinkOn		equ 4		;1 = link activity hook active
-noTempDelete		equ 6		;1 = do not delete temporary programs at homescreen
+#define hookflags1	$33 ;also scriptflag, rclflag2, backgroundlink
+#define alt_on	0	;run onscrpt at startup
+#define alt_off	1	;run offscrpt at shutdown
+#define userclqueueend	2	;1 = external mode
+#define ignorebplink	3	;1 = override flag for link activity hook
+#define bplinkon	4	;1 = link activity hook active
+#define notempdelete	6	;1 = do not delete temporary programs at homescreen
 ;----------------------------------------------------------------------
-hookflags2		equ 34h ;also sysHookFlg
-getCSCHookActive	equ 0		;1 = GetCSC hook active
-libraryHookActive	equ 1		;1 = library hook active
-homescreenHookActive	equ 4		;1 = homescreen hook active
-rawKeyHookActive	equ 5		;1 = raw key hook active
-catalog2HookActive	equ 6		;1 = catalog 2 hook active
-cursorHookActive	equ 7		;1 = cursor hook active
+#define hookflags2	$34 ;also syshookflg
+#define getcschookactive	0	;1 = getcsc hook active
+#define libraryhookactive	1	;1 = library hook active
+#define homescreenhookactive	4	;1 = homescreen hook active
+#define rawkeyhookactive	5	;1 = raw key hook active
+#define catalog2ookactive	6	;1 = catalog 2 hook active
+#define cursorhookactive	7	;1 = cursor hook active
 ;----------------------------------------------------------------------
-hookflags3		equ 35h ;also sysHookFlg1
-tokenHookActive		equ 0		;1 = token hook active
-localizeHookActive	equ 1		;1 = localize hook active
-windowHookActive	equ 2		;1 = window hook active
-graphHookActive		equ 3		;1 = graph hook active
-yEquHookActive		equ 4		;1 = Y= hook active
-fontHookActive		equ 5		;1 = font hook active
-regraphHookActive	equ 6		;1 = regraph hook active
-drawingHookActive	equ 7		;1 = drawing hook active
+#define hookflags3	$35 ;also syshookflg1
+#define tokenhookactive	0	;1 = token hook active
+#define localizehookactive	1	;1 = localize hook active
+#define windowhookactive	2	;1 = window hook active
+#define graphhookactive	3	;1 = graph hook active
+#define yequhookactive	4	;1 = y= hook active
+#define fonthookactive	5	;1 = font hook active
+#define regraphhookactive	6	;1 = regraph hook active
+#define drawinghookactive	7	;1 = drawing hook active
 ;----------------------------------------------------------------------
-hookflags4		equ 36h ;also sysHookFlag2
-traceHookActive		equ 0		;1 = trace hook active
-parserHookActive	equ 1		;1 = parser hook active
-appChangeHookActive	equ 2		;1 = app change hook active
-catalog1HookActive	equ 3		;1 = catalog 1 hook active
-helpHookActive		equ 4		;1 = help hook active
-cxRedispHookActive	equ 5		;1 = cxRedisp hook active
-menuHookActive		equ 6		;1 = menu hook active
-silentLinkHookActive	equ 7		;1 = silent link hook active
+#define hookflags4	$36 ;also syshookflag2
+#define tracehookactive	0	;1 = trace hook active
+#define parserhookactive	1	;1 = parser hook active
+#define appchangehookactive	2	;1 = app change hook active
+#define catalog1ookactive	3	;1 = catalog 1 hook active
+#define helphookactive	4	;1 = help hook active
+#define cxredisphookactive	5	;1 = cxredisp hook active
+#define menuhookactive	6	;1 = menu hook active
+#define silentlinkhookactive	7	;1 = silent link hook active
 ;----------------------------------------------------------------------
-;hookflags2Override	equ 37h		;set corresponding bit to kill iy+35h hook when executing app
+;hookflags2override	$37	;set corresponding bit to kill iy+$35 hook when executing app
 ;----------------------------------------------------------------------
-;hookflags3Override	equ 38h		;set corresponding bit to kill iy+36h hook when executing app
+;hookflags3override	$38	;set corresponding bit to kill iy+$36 hook when executing app
 ;----------------------------------------------------------------------
-;hookflags4Override	equ 39h		;set corresponding bit to kill iy+37h hook when executing app
+;hookflags4override	$39	;set corresponding bit to kill iy+$37 hook when executing app
 ;----------------------------------------------------------------------
-plotFlag3		equ 3Ch  
-bufferOnly		equ 0
-useFastCirc		equ 4
+#define plotflag3	$3c
+#define bufferonly	0
+#define usefastcirc	4
 ;----------------------------------------------------------------------
-dBKeyFlags		equ 3Dh
-keyDefaultsF		equ 6		;1 = GetKey returns extended keycodes with TI-Keyboard
+#define dbkeyflags	$3d
+#define keydefaultsf	6	;1 = getkey returns extended keycodes with ti-keyboard
 ;----------------------------------------------------------------------
-clockFlags		equ 3Fh
-notMDYMode		equ 0		;0 = M/D/Y format
-isYMDMode		equ 1		;1 = Y/M/D format
-is24Hour		equ 2		;1 = clock in 24 hour mode
-clockOn			equ 6		;1 = clock on
+#define clockflags	$3f
+#define notmdymode	0	;0 = m/d/y format
+#define isymdmode	1	;1 = y/m/d format
+#define is24our	2	;1 = clock in 24 hour mode
+#define clockon	6	;1 = clock on
 ;----------------------------------------------------------------------
-USBFlag1		equ 40h
-usbReceiveZone1		equ 2		;1 = receive to RAM pages 3/2 ("zone 1")
+#define usbflag1	$40
+#define usbreceivezone1	2	;1 = receive to ram pages 3/2 ("zone 1")
 ;----------------------------------------------------------------------
-USBFlag2		equ 41h
+#define usbflag2	$41
 ;0
 ;2
-noUSBHostInit		equ 3		;1 = _InitSpecificUSBDevice must fail
-usbDataWaiting		equ 5
+#define nousbhostinit	3	;1 = _initspecificusbdevice must fail
+#define usbdatawaiting	5
 ;6
 ;7
 ;----------------------------------------------------------------------
-;There is a flag 43h.
+;there is a flag $43.
 ;----------------------------------------------------------------------
 
-;Character Font Equates  
+;character font equates
 ;-------------------------------
-LrecurN			equ 001h
-LrecurU			equ 002h
-LrecurV			equ 003h
-LrecurW			equ 004h
-Lconvert		equ 005h
-LsqUp			equ 006h
-LsqDown			equ 007h
-Lintegral		equ 008h
-Lcross			equ 009h
-LboxIcon 		equ 00Ah
-LcrossIcon 		equ 00Bh
-LdotIcon 		equ 00Ch
-LsubT   		equ 00Dh ;small capital T for parametric mode.
-LcubeR  		equ 00Eh ;slightly different 3 for cubed root.
-LhexF			equ 00Fh
-Lroot			equ 010h
-Linverse		equ 011h
-Lsquare			equ 012h
-Langle			equ 013h
-Ldegree			equ 014h
-Lradian			equ 015h
-Ltranspose		equ 016h
-LLE			equ 017h
-LNE			equ 018h
-LGE			equ 019h
-Lneg			equ 01Ah
-Lexponent		equ 01Bh
-Lstore			equ 01Ch
-Lten			equ 01Dh
-LupArrow		equ 01Eh
-LdownArrow		equ 01Fh
-Lspace			equ 020h
-Lexclam			equ 021h
-Lquote			equ 022h
-Lpound			equ 023h
-Lfourth			equ 024h
-Lpercent		equ 025h
-Lampersand		equ 026h
-Lapostrophe		equ 027h
-LlParen			equ 028h
-LrParen			equ 029h
-Lasterisk		equ 02Ah
-LplusSign		equ 02Bh
-Lcomma			equ 02Ch
-Ldash			equ 02Dh
-Lperiod			equ 02Eh
-Lslash			equ 02Fh
-L0			equ 030h
-L1			equ 031h
-L2			equ 032h
-L3			equ 033h
-L4			equ 034h
-L5			equ 035h
-L6			equ 036h
-L7			equ 037h
-L8			equ 038h
-L9			equ 039h
-Lcolon			equ 03Ah
-Lsemicolon		equ 03Bh
-LLT			equ 03Ch
-LEQ			equ 03Dh
-LGT			equ 03Eh
-Lquestion		equ 03Fh
-LatSign			equ 040h
-LcapA			equ 041h
-LcapB			equ 042h
-LcapC			equ 043h
-LcapD			equ 044h
-LcapE			equ 045h
-LcapF			equ 046h
-LcapG			equ 047h
-LcapH			equ 048h
-LcapI			equ 049h
-LcapJ			equ 04Ah
-LcapK			equ 04Bh
-LcapL			equ 04Ch
-LcapM			equ 04Dh
-LcapN			equ 04Eh
-LcapO			equ 04Fh
-LcapP			equ 050h
-LcapQ			equ 051h
-LcapR			equ 052h
-LcapS			equ 053h
-LcapT			equ 054h
-LcapU			equ 055h
-LcapV			equ 056h
-LcapW			equ 057h
-LcapX			equ 058h
-LcapY			equ 059h
-LcapZ			equ 05Ah
-Ltheta			equ 05Bh
-Lbackslash		equ 05Ch
-LrBrack			equ 05Dh
-Lcaret			equ 05Eh
-Lunderscore		equ 05Fh
-Lbackquote		equ 060h
-La			equ 061h
-Lb			equ 062h
-Lc			equ 063h
-Ld			equ 064h
-Le			equ 065h
-Lf			equ 066h
-Lg			equ 067h
-Lh			equ 068h
-Li			equ 069h
-Lj			equ 06Ah
-Lk			equ 06Bh
-Ll			equ 06Ch
-Lm			equ 06Dh
-Ln			equ 06Eh
-Lo			equ 06Fh
-Lp			equ 070h
-Lq			equ 071h
-Lr			equ 072h
-Ls			equ 073h
-Lt			equ 074h
-Lu			equ 075h
-Lv			equ 076h
-Lw			equ 077h
-Lx			equ 078h
-Ly			equ 079h
-Lz			equ 07Ah
-LlBrace			equ 07Bh
-Lbar			equ 07Ch
-LrBrace			equ 07Dh
-Ltilde			equ 07Eh
-LinvEQ			equ 07Fh
-Lsub0			equ 080h
-Lsub1			equ 081h
-Lsub2			equ 082h
-Lsub3			equ 083h
-Lsub4			equ 084h
-Lsub5			equ 085h
-Lsub6			equ 086h
-Lsub7			equ 087h
-Lsub8			equ 088h
-Lsub9			equ 089h
-LcapAAcute		equ 08Ah
-LcapAGrave		equ 08Bh
-LcapACaret		equ 08Ch
-LcapADier		equ 08Dh
-LaAcute			equ 08Eh
-LaGrave			equ 08Fh
-LaCaret			equ 090h
-LaDier			equ 091h
-LcapEAcute		equ 092h
-LcapEGrave		equ 093h
-LcapECaret		equ 094h
-LcapEDier		equ 095h
-LeAcute			equ 096h
-LeGrave			equ 097h
-LeCaret			equ 098h
-LeDier			equ 099h
-LcapIAcute		equ 09Ah
-LcapIGrave		equ 09Bh
-LcapICaret		equ 09Ch
-LcapIDier		equ 09Dh
-LiAcute			equ 09Eh
-LiGrave			equ 09Fh
-LiCaret			equ 0A0h
-LiDier			equ 0A1h
-LcapOAcute		equ 0A2h
-LcapOGrave		equ 0A3h
-LcapOCaret		equ 0A4h
-LcapODier		equ 0A5h
-LoAcute			equ 0A6h
-LoGrave			equ 0A7h
-LoCaret			equ 0A8h
-LoDier			equ 0A9h
-LcapUAcute		equ 0AAh
-LcapUGrave		equ 0ABh
-LcapUCaret		equ 0ACh
-LcapUDier		equ 0ADh
-LuAcute			equ 0AEh
-LuGrave			equ 0AFh
-LuCaret			equ 0B0h
-LuDier			equ 0B1h
-LcapCCed		equ 0B2h
-LcCed			equ 0B3h
-LcapNTilde		equ 0B4h
-LnTilde			equ 0B5h
-Laccent			equ 0B6h
-Lgrave			equ 0B7h
-Ldieresis		equ 0B8h
-LquesDown		equ 0B9h
-LexclamDown		equ 0BAh
-Lalpha			equ 0BBh
-Lbeta			equ 0BCh
-Lgamma			equ 0BDh
-LcapDelta		equ 0BEh
-Ldelta			equ 0BFh
-Lepsilon		equ 0C0h
-LlBrack 		equ 0C1h
-Llambda			equ 0C2h
-Lmu			equ 0C3h
-Lpi			equ 0C4h
-Lrho			equ 0C5h
-LcapSigma		equ 0C6h
-Lsigma			equ 0C7h
-Ltau			equ 0C8h
-Lphi			equ 0C9h
-LcapOmega		equ 0CAh
-LxMean			equ 0CBh
-LyMean			equ 0CCh
-LsupX			equ 0CDh
-Lellipsis		equ 0CEh
-Lleft			equ 0CFh
-Lblock			equ 0D0h
-Lper			equ 0D1h
-Lhyphen			equ 0D2h
-Larea			equ 0D3h
-Ltemp			equ 0D4h
-Lcube			equ 0D5h
-Lenter			equ 0D6h
-LimagI			equ 0D7h
-Lphat			equ 0D8h
-Lchi			equ 0D9h
-LstatF			equ 0DAh
-Llne			equ 0DBh
-LlistL			equ 0DCh
-LfinanN 		equ 0DDh
-L2_r_paren 		equ 0DEh
-LblockArrow     	equ 0DFh
-LcurO   		equ 0E0h
-LcurO2  		equ 0E1h
-LcurOcapA       	equ 0E2h
-LcurOa  		equ 0E3h
-LcurI   		equ 0E4h
-LcurI2  		equ 0E5h
-LcurIcapA       	equ 0E6h
-LcurIa  		equ 0E7h
-LGline          	equ 0E8h ; = 0
-LGthick         	equ 0E9h ; = 1
-LGabove			equ 0EAh ; = 2
-LGbelow			equ 0EBh ; = 3
-LGpath			equ 0ECh ; = 4
-LGanimate		equ 0EDh ; = 5
-LGdot			equ 0EEh ; = 6
-LUpBlk			equ 0EFh ;Up arrow and Block in solver
-LDnBlk			equ 0F0h ;Down arrow and Block in solver
-LcurFull		equ 0F1h ;note: must be last char (PutMap checks)
+#define lrecurn	$01
+#define lrecuru	$02
+#define lrecurv	$03
+#define lrecurw	$04
+#define lconvert	$05
+#define lsqup	$06
+#define lsqdown	$07
+#define lintegral	$08
+#define lcross	$09
+#define lboxicon 	$0a
+#define lcrossicon 	$0b
+#define ldoticon 	$0c
+#define lsubt   	$0d ;small capital t for parametric mode.
+#define lcuber  	$0e ;slightly different 3 for cubed root.
+#define lhexf	$0f
+#define lroot	$10
+#define linverse	$11
+#define lsquare	$12
+#define langle	$13
+#define ldegree	$14
+#define lradian	$15
+#define ltranspose	$16
+#define lle	$17
+#define lne	$18
+#define lge	$19
+#define lneg	$1a
+#define lexponent	$1b
+#define lstore	$1c
+#define lten	$1d
+#define luparrow	$1e
+#define ldownarrow	$1f
+#define lspace	$20
+#define lexclam	$21
+#define lquote	$22
+#define lpound	$23
+#define lfourth	$24
+#define lpercent	$25
+#define lampersand	$26
+#define lapostrophe	$27
+#define llparen	$28
+#define lrparen	$29
+#define lasterisk	$2a
+#define lplussign	$2b
+#define lcomma	$2c
+#define ldash	$2d
+#define lperiod	$2e
+#define lslash	$2f
+#define l0	$30
+#define l1	$31
+#define l2	$32
+#define l3	$33
+#define l4	$34
+#define l5	$35
+#define l6	$36
+#define l7	$37
+#define l8	$38
+#define l9	$39
+#define lcolon	$3a
+#define lsemicolon	$3b
+#define llt	$3c
+#define leq	$3d
+#define lgt	$3e
+#define lquestion	$3f
+#define latsign	$40
+#define lcapa	$41
+#define lcapb	$42
+#define lcapc	$43
+#define lcapd	$44
+#define lcape	$45
+#define lcapf	$46
+#define lcapg	$47
+#define lcaph	$48
+#define lcapi	$49
+#define lcapj	$4a
+#define lcapk	$4b
+#define lcapl	$4c
+#define lcapm	$4d
+#define lcapn	$4e
+#define lcapo	$4f
+#define lcapp	$50
+#define lcapq	$51
+#define lcapr	$52
+#define lcaps	$53
+#define lcapt	$54
+#define lcapu	$55
+#define lcapv	$56
+#define lcapw	$57
+#define lcapx	$58
+#define lcapy	$59
+#define lcapz	$5a
+#define ltheta	$5b
+#define lbackslash	$5c
+#define lrbrack	$5d
+#define lcaret	$5e
+#define lunderscore	$5f
+#define lbackquote	$60
+#define la	$61
+#define lb	$62
+#define lc	$63
+#define ld	$64
+#define le	$65
+#define lf	$66
+#define lg	$67
+#define lh	$68
+#define li	$69
+#define lj	$6a
+#define lk	$6b
+#define ll	$6c
+#define lm	$6d
+#define ln	$6e
+#define lo	$6f
+#define lp	$70
+#define lq	$71
+#define lr	$72
+#define ls	$73
+#define lt	$74
+#define lu	$75
+#define lv	$76
+#define lw	$77
+#define lx	$78
+#define ly	$79
+#define lz	$7a
+#define llbrace	$7b
+#define lbar	$7c
+#define lrbrace	$7d
+#define ltilde	$7e
+#define linveq	$7f
+#define lsub0	$80
+#define lsub1	$81
+#define lsub2	$82
+#define lsub3	$83
+#define lsub4	$84
+#define lsub5	$85
+#define lsub6	$86
+#define lsub7	$87
+#define lsub8	$88
+#define lsub9	$89
+#define lcapaacute	$8a
+#define lcapagrave	$8b
+#define lcapacaret	$8c
+#define lcapadier	$8d
+#define laacute	$8e
+#define lagrave	$8f
+#define lacaret	$90
+#define ladier	$91
+#define lcapeacute	$92
+#define lcapegrave	$93
+#define lcapecaret	$94
+#define lcapedier	$95
+#define leacute	$96
+#define legrave	$97
+#define lecaret	$98
+#define ledier	$99
+#define lcapiacute	$9a
+#define lcapigrave	$9b
+#define lcapicaret	$9c
+#define lcapidier	$9d
+#define liacute	$9e
+#define ligrave	$9f
+#define licaret	$a0
+#define lidier	$a1
+#define lcapoacute	$a2
+#define lcapograve	$a3
+#define lcapocaret	$a4
+#define lcapodier	$a5
+#define loacute	$a6
+#define lograve	$a7
+#define locaret	$a8
+#define lodier	$a9
+#define lcapuacute	$aa
+#define lcapugrave	$ab
+#define lcapucaret	$ac
+#define lcapudier	$ad
+#define luacute	$ae
+#define lugrave	$af
+#define lucaret	$b0
+#define ludier	$b1
+#define lcapcced	$b2
+#define lcced	$b3
+#define lcapntilde	$b4
+#define lntilde	$b5
+#define laccent	$b6
+#define lgrave	$b7
+#define ldieresis	$b8
+#define lquesdown	$b9
+#define lexclamdown	$ba
+#define lalpha	$bb
+#define lbeta	$bc
+#define lgamma	$bd
+#define lcapdelta	$be
+#define ldelta	$bf
+#define lepsilon	$c0
+#define llbrack 	$c1
+#define llambda	$c2
+#define lmu	$c3
+#define lpi	$c4
+#define lrho	$c5
+#define lcapsigma	$c6
+#define lsigma	$c7
+#define ltau	$c8
+#define lphi	$c9
+#define lcapomega	$ca
+#define lxmean	$cb
+#define lymean	$cc
+#define lsupx	$cd
+#define lellipsis	$ce
+#define lleft	$cf
+#define lblock	$d0
+#define lper	$d1
+#define lhyphen	$d2
+#define larea	$d3
+#define ltemp	$d4
+#define lcube	$d5
+#define lenter	$d6
+#define limagi	$d7
+#define lphat	$d8
+#define lchi	$d9
+#define lstatf	$da
+#define llne	$db
+#define llistl	$dc
+#define lfinann 	$dd
+#define l2_r_paren 	$de
+#define lblockarrow 	$df
+#define lcuro   	$e0
+#define lcuro2  	$e1
+#define lcurocapa   	$e2
+#define lcuroa  	$e3
+#define lcuri   	$e4
+#define lcuri2  	$e5
+#define lcuricapa   	$e6
+#define lcuria  	$e7
+#define lgline      	$e8 ; = 0
+#define lgthick     	$e9 ; = 1
+#define lgabove	$ea ; = 2
+#define lgbelow	$eb ; = 3
+#define lgpath	$ec ; = 4
+#define lganimate	$ed ; = 5
+#define lgdot	$ee ; = 6
+#define lupblk	$ef ;up arrow and block in solver
+#define ldnblk	$f0 ;down arrow and block in solver
+#define lcurfull	$f1 ;note: must be last char (putmap checks)
 
-;(MenuCurrent) Values
+;(menucurrent) values
 ;--------------------------
-mConfirmation		equ 01h
-mApps			equ 02h
-mProgramHome		equ 03h
-mPrgm_Run		equ 00h
-mPrgm_Edit		equ 01h
-mPrgm_New		equ 02h
-mZoom			equ 04h
-mZoom_Zoom		equ 00h
-mZoom_Memory		equ 01h
-mDraw			equ 05h
-mDraw_Draw		equ 00h
-mDraw_Points		equ 01h
-mDraw_Store		equ 02h
-mStatPlots		equ 06h
-mStat			equ 07h
-mStat_Edit		equ 00h
-mStat_Calc		equ 01h
-mStat_Tests		equ 02h
-mMath			equ 08h
-mMath_Math		equ 00h
-mMath_Number		equ 01h
-mMath_Complex		equ 02h
-mMath_Prob		equ 03h
-mTest			equ 09h
-mTest_Test		equ 00h
-mTest_Logic		equ 01h
-mVars			equ 0Ah
-mVars_Vars		equ 00h
-mVars_YVars		equ 01h
-mMemory			equ 0Ch
-mMatrix			equ 0Dh
-mMatrix_Name		equ 00h
-mMatrix_Math		equ 01h
-mMatrix_Edit		equ 02h
-mDistr			equ 0Eh
-mDistr_Distr		equ 00h
-mDistr_Draw		equ 01h
-mAngle			equ 0Fh
-mList			equ 10h
-mList_Names		equ 00h
-mList_Ops		equ 01h
-mList_Math		equ 02h
-mCalculate		equ 11h
-mVarsWin		equ 14h
-mVarsWin_XY		equ 00h
-mVarsWin_TTh		equ 01h
-mVarsWin_UVW		equ 02h
-mVarsZoom		equ 15h
-mVarsZoom_ZXY		equ 00h
-mVarsZoom_ZT		equ 01h
-mVarsZoom_UVW		equ 02h
-mVarsGDB		equ 16h
-mVarsPics		equ 17h
-mVarsStrings		equ 18h
-mVarsStat		equ 19h
-mVarsStat_XY		equ 00h
-mVarsStat_Sigma		equ 01h
-mVarsStat_EQ		equ 02h
-mVarsStat_Test		equ 03h
-mVarsStat_Pts		equ 04h
-mVarsTable		equ 1Ah
-mVarsYEqu		equ 1Bh
-mVarsParametric		equ 1Ch
-mVarsPolar		equ 1Dh
-mVarsFnOnOff		equ 1Eh
-mMemReset		equ 1Fh
-mMemReset_RAM		equ 00h
-mMemReset_ROM		equ 01h
-mMemReset_All		equ 02h
-mMemMgmtDel		equ 20h
-mMemResetDefaults	equ 21h
-mMemResetRAMAll		equ 23h
-mMemResetROMVars	equ 24h
-mMemResetROMApps	equ 25h
-mMemResetROMAll		equ 26h
-mMemResetAll		equ 27h
-mGroup			equ 28h
-mGroup_New		equ 00h
-mGroup_Ungroup		equ 01h
-mGroupVars		equ 29h
-mProgramEdit		equ 2Ah
-mPrgmEd_Ctrl		equ 00h
-mPrgmEd_IO		equ 01h
-mPrgmEd_Exec		equ 02h
-mPrgmZoom		equ 2Bh
-mPrgmZoom_Zoom		equ 00h
-mPrgmZoom_Mem		equ 01h
-mPrgmDraw		equ 2Ch
-mPrgmDraw_Draw		equ 00h
-mPrgmDraw_Pt		equ 01h
-mPrgmDraw_Store		equ 02h
-mPrgmStatPlot		equ 2Dh
-mPrgmSP_Plots		equ 00h
-mPrgmSP_Type		equ 01h
-mPrgmSP_Mark		equ 02h
-mPrgmStat		equ 2Eh
-mPrgmStat_Edit		equ 00h
-mPrgmStat_Calc		equ 01h
-mPrgmStat_Tests		equ 02h
-mPrgmMath		equ 2Fh
-mPrgmMath_Math		equ 00h
-mPrgmMath_Num		equ 01h
-mPrgmMath_Cplx		equ 02h
-mPrgmMath_Prob		equ 03h
-mLink			equ 30h
-mLink_Send		equ 00h
-mLink_Recieve		equ 01h
-mLinkTrasmit		equ 31h
-mLinkXmit_Xmit		equ 01h
-mGarbageCollect		equ 3Fh
-mSelectGroupVars	equ 40h
-mSelGrpVars_Sel		equ 00h
-mSelGrpVars_Grp		equ 01h
-mDuplicateName		equ 42h
-mCatalog		equ 45h
-mFinance		equ 22h
-mFinance_Calc		equ 00h
-mFinance_Vars		equ 01h
+#define mconfirmation	$01
+#define mapps	$02
+#define mprogramhome	$03
+#define mprgm_run	$00
+#define mprgm_edit	$01
+#define mprgm_new	$02
+#define mzoom	$04
+#define mzoom_zoom	$00
+#define mzoom_memory	$01
+#define mdraw	$05
+#define mdraw_draw	$00
+#define mdraw_points	$01
+#define mdraw_store	$02
+#define mstatplots	$06
+#define mstat	$07
+#define mstat_edit	$00
+#define mstat_calc	$01
+#define mstat_tests	$02
+#define mmath	$08
+#define mmath_math	$00
+#define mmath_number	$01
+#define mmath_complex	$02
+#define mmath_prob	$03
+#define mtest	$09
+#define mtest_test	$00
+#define mtest_logic	$01
+#define mvars	$0a
+#define mvars_vars	$00
+#define mvars_yvars	$01
+#define mmemory	$0c
+#define mmatrix	$0d
+#define mmatrix_name	$00
+#define mmatrix_math	$01
+#define mmatrix_edit	$02
+#define mdistr	$0e
+#define mdistr_distr	$00
+#define mdistr_draw	$01
+#define mangle	$0f
+#define mlist	$10
+#define mlist_names	$00
+#define mlist_ops	$01
+#define mlist_math	$02
+#define mcalculate	$11
+#define mvarswin	$14
+#define mvarswin_xy	$00
+#define mvarswin_tth	$01
+#define mvarswin_uvw	$02
+#define mvarszoom	$15
+#define mvarszoom_zxy	$00
+#define mvarszoom_zt	$01
+#define mvarszoom_uvw	$02
+#define mvarsgdb	$16
+#define mvarspics	$17
+#define mvarsstrings	$18
+#define mvarsstat	$19
+#define mvarsstat_xy	$00
+#define mvarsstat_sigma	$01
+#define mvarsstat_eq	$02
+#define mvarsstat_test	$03
+#define mvarsstat_pts	$04
+#define mvarstable	$1a
+#define mvarsyequ	$1b
+#define mvarsparametric	$1c
+#define mvarspolar	$1d
+#define mvarsfnonoff	$1e
+#define mmemreset	$1f
+#define mmemreset_ram	$00
+#define mmemreset_rom	$01
+#define mmemreset_all	$02
+#define mmemmgmtdel	$20
+#define mmemresetdefaults	$21
+#define mmemresetramall	$23
+#define mmemresetromvars	$24
+#define mmemresetromapps	$25
+#define mmemresetromall	$26
+#define mmemresetall	$27
+#define mgroup	$28
+#define mgroup_new	$00
+#define mgroup_ungroup	$01
+#define mgroupvars	$29
+#define mprogramedit	$2a
+#define mprgmed_ctrl	$00
+#define mprgmed_io	$01
+#define mprgmed_exec	$02
+#define mprgmzoom	$2b
+#define mprgmzoom_zoom	$00
+#define mprgmzoom_mem	$01
+#define mprgmdraw	$2c
+#define mprgmdraw_draw	$00
+#define mprgmdraw_pt	$01
+#define mprgmdraw_store	$02
+#define mprgmstatplot	$2d
+#define mprgmsp_plots	$00
+#define mprgmsp_type	$01
+#define mprgmsp_mark	$02
+#define mprgmstat	$2e
+#define mprgmstat_edit	$00
+#define mprgmstat_calc	$01
+#define mprgmstat_tests	$02
+#define mprgmmath	$2f
+#define mprgmmath_math	$00
+#define mprgmmath_num	$01
+#define mprgmmath_cplx	$02
+#define mprgmmath_prob	$03
+#define mlink	$30
+#define mlink_send	$00
+#define mlink_recieve	$01
+#define mlinktrasmit	$31
+#define mlinkxmit_xmit	$01
+#define mgarbagecollect	$3f
+#define mselectgroupvars	$40
+#define mselgrpvars_sel	$00
+#define mselgrpvars_grp	$01
+#define mduplicatename	$42
+#define mcatalog	$45
+#define mfinance	$22
+#define mfinance_calc	$00
+#define mfinance_vars	$01
 
-;Keypress Equates
+;keypress equates
 ;-------------------------------
-kRight			equ 001h
-kLeft			equ 002h
-kUp			equ 003h
-kDown			equ 004h
-kEnter			equ 005h
-kAlphaEnter		equ 006h
-kAlphaUp		equ 007h
-kAlphaDown		equ 008h
-kClear			equ 009h
-kDel			equ 00Ah
-kIns			equ 00Bh
-kRecall			equ 00Ch
-kLastEnt		equ 00Dh
-kBOL			equ 00Eh
-kEOL			equ 00Fh
+#define kright	$01
+#define kleft	$02
+#define kup	$03
+#define kdown	$04
+#define kenter	$05
+#define kalphaenter	$06
+#define kalphaup	$07
+#define kalphadown	$08
+#define kclear	$09
+#define kdel	$0a
+#define kins	$0b
+#define krecall	$0c
+#define klastent	$0d
+#define kbol	$0e
+#define keol	$0f
 
-kSelAll			equ 010h
-kUnselAll		equ 011h
-kLtoTI82		equ 012h
-kBackup			equ 013h
-kRecieve		equ 014h
-kLnkQuit		equ 015h
-kTrans			equ 016h
-kRename			equ 017h
-kOverw			equ 018h
-kOmit			equ 019h
-kCont			equ 01Ah
-kSendID			equ 01Bh
-kSendSW			equ 01Ch
-kYes			equ 01Dh
-kNoWay			equ 01Eh
-kvSendType		equ 01Fh
-kOverWAll		equ 020h
-kNo			equ 025h
-kKReset			equ 026h
-kApp			equ 027h
-kDoug			equ 028h
-kListflag		equ 029h
-menuStart		equ 02Bh
-kAreYouSure		equ 02Bh
-kAppsMenu		equ 02Ch
-kPrgm			equ 02Dh
-kZoom			equ 02Eh
-kDraw			equ 02Fh
-kSPlot			equ 030h
-kStat			equ 031h
-kMath			equ 032h
-kTest			equ 033h
-kChar			equ 034h
-kVars			equ 035h
-kMem			equ 036h
-kMatrix			equ 037h
-kDist			equ 038h
-kAngle			equ 039h
-kList			equ 03Ah
-kCalc			equ 03Bh
-kFin			equ 03Ch
-menuEnd			equ kFin
-kCatalog		equ 03Eh
-kInputDone		equ 03Fh
-kOff			equ kInputDone
-kQuit			equ 040h
-appStart		equ kQuit
-kLinkIO			equ 041h
-kMatrixEd		equ 042h
-kStatEd			equ 043h
-kGraph			equ 044h
-kMode			equ 045h
-kPrgmEd			equ 046h ;PROGRAM EDIT
-kPrgmCr			equ 047h ;PROGRAM CREATE
-kWindow			equ 048h ;RANGE EDITOR
-kYequ			equ 049h ;EQUATION EDITOR
-kTable			equ 04Ah ;TABLE EDITOR
-kTblSet			equ 04Bh ;TABLE SET
-kChkRAM			equ 04Ch ;CHECK RAM (About screen)
-kDelMem			equ 04Dh ;DELETE MEM
-kResetMem		equ 04Eh ;RESET MEM
-kResetDef		equ 04Fh ;RESET DEFAULT
-kPrgmInput		equ 050h ;PROGRAM INPUT
-kZFactEd		equ 051h ;ZOOM FACTOR EDITOR
-kError			equ 052h ;ERROR
-kSolveTVM		equ 053h ;TVM SOLVER
-kSolveRoot		equ 054h ;SOLVE EDITOR
-kStatP			equ 055h ;stat plot
-kInfStat		equ 056h ;Inferential Statistic
-kFormat			equ 057h ;FORMAT
-kExtApps		equ 058h ;External Applications.     NEW
-kNewApps		equ 059h ;New Apps for Cerberus.
-append			equ kNewApps
-echoStart1		equ 05Ah
-kTrace			equ 05Ah
-kZFit			equ 05Bh
-kZIn			equ 05Ch
-kZOut			equ 05Dh
-kZPrev			equ 05Eh
-kBox			equ 05Fh
-kDecml			equ 060h
-kSetZm			equ 061h
-kSquar			equ 062h
-kStd			equ 063h
-kTrig			equ 064h
-kUsrZm			equ 065h
-kZSto			equ 066h
-kZInt			equ 067h
-kZStat			equ 068h
-echoStart2		equ 069h
-kSelect			equ 069h
-kCircl			equ 06Ah
-kClDrw			equ 06Bh
-kLine			equ 06Ch
-kPen			equ 06Dh
-kPtChg			equ 06Eh
-kPtOff			equ 06Fh
-kPtOn			equ 070h
-kVert			equ 071h
-kHoriz			equ 072h
-kText			equ 073h
-kTanLn			equ 074h
-kEval			equ 075h
-kInters			equ 076h
-kDYDX			equ 077h
-kFnIntg			equ 078h
-kRootG			equ 079h
-kDYDT			equ 07Ah
-kDXDT			equ 07Bh
-kDRDo			equ 07Ch
-KGFMin			equ 07Dh
-KGFMax			equ 07Eh
-EchoStart		equ 07Fh
-kListName		equ 07Fh
-kAdd			equ 080h
-kSub			equ 081h
-kMul			equ 082h
-kDiv			equ 083h
-kExpon			equ 084h
-kLParen			equ 085h
-kRParen			equ 086h
-kLBrack			equ 087h
-kRBrack			equ 088h
-kShade			equ 089h
-kStore			equ 08Ah
-kComma			equ 08Bh
-kChs			equ 08Ch
-kDecPnt			equ 08Dh
-k0			equ 08Eh
-k1			equ 08Fh
-k2			equ 090h
-k3			equ 091h
-k4			equ 092h
-k5			equ 093h
-k6			equ 094h
-k7			equ 095h
-k8			equ 096h
-k9			equ 097h
-kEE			equ 098h
-kSpace			equ 099h
-kCapA			equ 09Ah
-kCapB			equ 09Bh
-kCapC			equ 09Ch
-kCapD			equ 09Dh
-kCapE			equ 09Eh
-kCapF			equ 09Fh
-kCapG			equ 0A0h
-kCapH			equ 0A1h
-kCapI			equ 0A2h
-kCapJ			equ 0A3h
-kCapK			equ 0A4h
-kCapL			equ 0A5h
-kCapM			equ 0A6h
-kCapN			equ 0A7h
-kCapO			equ 0A8h
-kCapP			equ 0A9h
-kCapQ			equ 0AAh
-kCapR			equ 0ABh
-kCapS			equ 0ACh
-kCapT			equ 0ADh
-kCapU			equ 0AEh
-kCapV			equ 0AFh
-kCapW			equ 0B0h
-kCapX			equ 0B1h
-kCapY			equ 0B2h
-kCapZ			equ 0B3h
-kVarx			equ 0B4h
-kPi			equ 0B5h
-kInv			equ 0B6h
-kSin			equ 0B7h
-kASin			equ 0B8h
-kCos			equ 0B9h
-kACos			equ 0BAh
-kTan			equ 0BBh
-kATan			equ 0BCh
-kSquare			equ 0BDh
-kSqrt			equ 0BEh
-kLn			equ 0BFh
-kExp			equ 0C0h
-kLog			equ 0C1h
-kALog			equ 0C2h
-kToABC			equ 0C3h
-kClrTbl			equ 0C4h
-kAns			equ 0C5h
-kColon			equ 0C6h
-kNDeriv			equ 0C7h
-kFnInt			equ 0C8h
-kRoot			equ 0C9h
-kQuest			equ 0CAh
-kQuote			equ 0CBh
-kTheta			equ 0CCh
-kIf			equ 0CDh
-kThen			equ 0CEh
-kElse			equ 0CFh
-kFor			equ 0D0h
-kWhile			equ 0D1h
-kRepeat			equ 0D2h
-kEnd			equ 0D3h
-kPause			equ 0D4h
-kLbl			equ 0D5h
-kGoto			equ 0D6h
-kISG			equ 0D7h
-kDSL			equ 0D8h
-kMenu			equ 0D9h
-kExec			equ 0DAh
-kReturn			equ 0DBh
-kStop			equ 0DCh
-kInput			equ 0DDh
-kPrompt			equ 0DEh
-kDisp			equ 0DFh
-kDispG			equ 0E0h
-kDispT			equ 0E1h
-kOutput			equ 0E2h
-kGetKey			equ 0E3h
-kClrHome		equ 0E4h
-kPrtScr			equ 0E5h
-kSinH			equ 0E6h
-kCosH			equ 0E7h
-kTanH			equ 0E8h
-kASinH			equ 0E9h
-kACosH			equ 0EAh
-kATanH			equ 0EBh
-kLBrace			equ 0ECh
-kRBrace			equ 0EDh
-kI			equ 0EEh
-kCONSTeA		equ 0EFh
-kPlot3			equ 0F0h
-kFMin			equ 0F1h
-kFMax			equ 0F2h
-kL1A			equ 0F3h
-kL2A			equ 0F4h
-kL3A			equ 0F5h
-kL4A			equ 0F6h
-kL5A			equ 0F7h
-kL6A			equ 0F8h
-kunA			equ 0F9h
-kvnA			equ 0FAh
-kwnA			equ 0FBh
+#define kselall	$10
+#define kunselall	$11
+#define kltoti82	$12
+#define kbackup	$13
+#define krecieve	$14
+#define klnkquit	$15
+#define ktrans	$16
+#define krename	$17
+#define koverw	$18
+#define komit	$19
+#define kcont	$1a
+#define ksendid	$1b
+#define ksendsw	$1c
+#define kyes	$1d
+#define knoway	$1e
+#define kvsendtype	$1f
+#define koverwall	$20
+#define kno	$25
+#define kkreset	$26
+#define kapp	$27
+#define kdoug	$28
+#define klistflag	$29
+#define menustart	$2b
+#define kareyousure	$2b
+#define kappsmenu	$2c
+#define kprgm	$2d
+#define kzoom	$2e
+#define kdraw	$2f
+#define ksplot	$30
+#define kstat	$31
+#define kmath	$32
+#define ktest	$33
+#define kchar	$34
+#define kvars	$35
+#define kmem	$36
+#define kmatrix	$37
+#define kdist	$38
+#define kangle	$39
+#define klist	$3a
+#define kcalc	$3b
+#define kfin	$3c
+#define menuend	$kfin
+#define kcatalog	$3e
+#define kinputdone	$3f
+#define koff	$kinputdone
+#define kquit	$40
+#define appstart	$kquit
+#define klinkio	$41
+#define kmatrixed	$42
+#define kstated	$43
+#define kgraph	$44
+#define kmode	$45
+#define kprgmed	$46 ;program edit
+#define kprgmcr	$47 ;program create
+#define kwindow	$48 ;range editor
+#define kyequ	$49 ;equation editor
+#define ktable	$4a ;table editor
+#define ktblset	$4b ;table set
+#define kchkram	$4c ;check ram (about screen)
+#define kdelmem	$4d ;delete mem
+#define kresetmem	$4e ;reset mem
+#define kresetdef	$4f ;reset default
+#define kprgminput	$50 ;program input
+#define kzfacted	$51 ;zoom factor editor
+#define kerror	$52 ;error
+#define ksolvetvm	$53 ;tvm solver
+#define ksolveroot	$54 ;solve editor
+#define kstatp	$55 ;stat plot
+#define kinfstat	$56 ;inferential statistic
+#define kformat	$57 ;format
+#define kextapps	$58 ;external applications.     new
+#define knewapps	$59 ;new apps for cerberus.
+#define append	$knewapps
+#define echostart1	$5a
+#define ktrace	$5a
+#define kzfit	$5b
+#define kzin	$5c
+#define kzout	$5d
+#define kzprev	$5e
+#define kbox	$5f
+#define kdecml	$60
+#define ksetzm	$61
+#define ksquar	$62
+#define kstd	$63
+#define ktrig	$64
+#define kusrzm	$65
+#define kzsto	$66
+#define kzint	$67
+#define kzstat	$68
+#define echostart2	$69
+#define kselect	$69
+#define kcircl	$6a
+#define kcldrw	$6b
+#define kline	$6c
+#define kpen	$6d
+#define kptchg	$6e
+#define kptoff	$6f
+#define kpton	$70
+#define kvert	$71
+#define khoriz	$72
+#define ktext	$73
+#define ktanln	$74
+#define keval	$75
+#define kinters	$76
+#define kdydx	$77
+#define kfnintg	$78
+#define krootg	$79
+#define kdydt	$7a
+#define kdxdt	$7b
+#define kdrdo	$7c
+#define kgfmin	$7d
+#define kgfmax	$7e
+#define echostart	$7f
+#define klistname	$7f
+#define kadd	$80
+#define ksub	$81
+#define kmul	$82
+#define kdiv	$83
+#define kexpon	$84
+#define klparen	$85
+#define krparen	$86
+#define klbrack	$87
+#define krbrack	$88
+#define kshade	$89
+#define kstore	$8a
+#define kcomma	$8b
+#define kchs	$8c
+#define kdecpnt	$8d
+#define k0	$8e
+#define k1	$8f
+#define k2	$90
+#define k3	$91
+#define k4	$92
+#define k5	$93
+#define k6	$94
+#define k7	$95
+#define k8	$96
+#define k9	$97
+#define kee	$98
+#define kspace	$99
+#define kcapa	$9a
+#define kcapb	$9b
+#define kcapc	$9c
+#define kcapd	$9d
+#define kcape	$9e
+#define kcapf	$9f
+#define kcapg	$a0
+#define kcaph	$a1
+#define kcapi	$a2
+#define kcapj	$a3
+#define kcapk	$a4
+#define kcapl	$a5
+#define kcapm	$a6
+#define kcapn	$a7
+#define kcapo	$a8
+#define kcapp	$a9
+#define kcapq	$aa
+#define kcapr	$ab
+#define kcaps	$ac
+#define kcapt	$ad
+#define kcapu	$ae
+#define kcapv	$af
+#define kcapw	$b0
+#define kcapx	$b1
+#define kcapy	$b2
+#define kcapz	$b3
+#define kvarx	$b4
+#define kpi	$b5
+#define kinv	$b6
+#define ksin	$b7
+#define kasin	$b8
+#define kcos	$b9
+#define kacos	$ba
+#define ktan	$bb
+#define katan	$bc
+#define ksquare	$bd
+#define ksqrt	$be
+#define kln	$bf
+#define kexp	$c0
+#define klog	$c1
+#define kalog	$c2
+#define ktoabc	$c3
+#define kclrtbl	$c4
+#define kans	$c5
+#define kcolon	$c6
+#define knderiv	$c7
+#define kfnint	$c8
+#define kroot	$c9
+#define kquest	$ca
+#define kquote	$cb
+#define ktheta	$cc
+#define kif	$cd
+#define kthen	$ce
+#define kelse	$cf
+#define kfor	$d0
+#define kwhile	$d1
+#define krepeat	$d2
+#define kend	$d3
+#define kpause	$d4
+#define klbl	$d5
+#define kgoto	$d6
+#define kisg	$d7
+#define kdsl	$d8
+#define kmenu	$d9
+#define kexec	$da
+#define kreturn	$db
+#define kstop	$dc
+#define kinput	$dd
+#define kprompt	$de
+#define kdisp	$df
+#define kdispg	$e0
+#define kdispt	$e1
+#define koutput	$e2
+#define kgetkey	$e3
+#define kclrhome	$e4
+#define kprtscr	$e5
+#define ksinh	$e6
+#define kcosh	$e7
+#define ktanh	$e8
+#define kasinh	$e9
+#define kacosh	$ea
+#define katanh	$eb
+#define klbrace	$ec
+#define krbrace	$ed
+#define ki	$ee
+#define kconstea	$ef
+#define kplot3	$f0
+#define kfmin	$f1
+#define kfmax	$f2
+#define kl1a	$f3
+#define kl2a	$f4
+#define kl3a	$f5
+#define kl4a	$f6
+#define kl5a	$f7
+#define kl6a	$f8
+#define kuna	$f9
+#define kvna	$fa
+#define kwna	$fb
 
-;THIS KEY MEANS THAT IT IS A 2 BYTE KEYCODE
-;THERE ARE 2 OF THESE KEYS; BE CAREFUL WITH USAGE
+;this key means that it is a 2 byte keycode
+;there are 2 of these keys; be careful with usage
 ;------------------------------------------------
-kExtendEcho2		equ 0FCh
+#define kextendecho2	$fc
 
-;THIS KEY MEANS THAT THE KEY PRESS IS ONE THAT ECHOS
-;INTO A BUFFER, AND IT IS A 2 BYTE KEY CODE, GO LOOK AT
-;(EXTECHO) FOR THE KEY VALUE 
+;this key means that the key press is one that echos
+;into a buffer, and it is a 2 byte key code, go look at
+;(extecho) for the key value
 ;------------------------------------------------------
-kExtendEcho		equ 0FEh
+#define kextendecho	$fe
 
-kE1BT			equ 0
-kDrawInv		equ kE1BT
-kDrawF			equ kE1BT+1
-kPixelOn		equ kE1BT+2
-kPixelOff		equ kE1BT+3
-kPxlTest		equ kE1BT+4
-kRCGDB			equ kE1BT+5
-kRCPic			equ kE1BT+6
-kSTGDB			equ kE1BT+7
-kSTPic			equ kE1BT+8
-kAbs			equ kE1BT+9
-kTEqu			equ kE1BT+10 ;==
-kTNoteQ			equ kE1BT+11 ;<>
-kTGT			equ kE1BT+12 ;>
-kTGTE			equ kE1BT+13 ;>=
-kTLT			equ kE1BT+14 ;<
-kTLTE			equ kE1BT+15 ;<=
-kAnd			equ kE1BT+16
-kOr			equ kE1BT+17
-kXor			equ kE1BT+18
-kNot			equ kE1BT+19
-kLR1			equ kE1BT+20
-kXRoot			equ kE1BT+21
-kCube			equ kE1BT+22
-kCbRt			equ kE1BT+23 ;Cube ROOT
-kToDec			equ kE1BT+24
-kCubicR			equ kE1BT+25
-kQuartR			equ kE1BT+26
-kPlot1			equ kE1BT+27
-kPlot2			equ kE1BT+28
-kRound			equ kE1BT+29
-kIPart			equ kE1BT+30
-kFPart			equ kE1BT+31
-kInt			equ kE1BT+32
-kRand			equ kE1BT+33
-kNPR			equ kE1BT+34
-kNCR			equ kE1BT+35
-kXFactorial		equ kE1BT+36
-kRad			equ kE1BT+37
-kDegr			equ kE1BT+38 ;DEGREES CONV
-kAPost			equ kE1BT+39
-kToDMS			equ kE1BT+40
-kRToPo			equ kE1BT+41 ;R
-kRToPr			equ kE1BT+42
-kPToRx			equ kE1BT+43
-kPToRy			equ kE1BT+44
-kRowSwap		equ kE1BT+45
-kRowPlus		equ kE1BT+46
-kTimRow			equ kE1BT+47
-kTRowP			equ kE1BT+48
-kSortA			equ kE1BT+49
-kSortD			equ kE1BT+50
-kSeq			equ kE1BT+51
-kMin			equ kE1BT+52
-kMax			equ kE1BT+53
-kMean			equ kE1BT+54
-kMedian			equ kE1BT+55
-kSum			equ kE1BT+56
-kProd			equ kE1BT+57
-kDet			equ kE1BT+58
-kTransp			equ kE1BT+59
-kDim			equ kE1BT+60
-kFill			equ kE1BT+61
-kIdent			equ kE1BT+62
-kRandm			equ kE1BT+63
-kAug			equ kE1BT+64
-kOneVar			equ kE1BT+65
-kTwoVar			equ kE1BT+66
-kLR			equ kE1BT+67
-kLRExp			equ kE1BT+68
-kLRLn			equ kE1BT+69
-kLRPwr			equ kE1BT+70
-kMedMed			equ kE1BT+71
-kQuad			equ kE1BT+72
-kClrLst			equ kE1BT+73
-kHist			equ kE1BT+74
-kxyLine			equ kE1BT+75
-kScatter		equ kE1BT+76
-kmRad			equ kE1BT+77
-kmDeg			equ kE1BT+78
-kmNormF			equ kE1BT+79
-kmSci			equ kE1BT+80
-kmEng			equ kE1BT+81
-kmFloat			equ kE1BT+82
-kFix			equ kE1BT+83
-kSplitOn		equ kE1BT+84
-kFullScreen		equ kE1BT+85
-kStndrd			equ kE1BT+86
-kParam			equ kE1BT+87
-kPolar			equ kE1BT+88
-kSeqG			equ kE1BT+89
-kAFillOn		equ kE1BT+90
-kAFillOff		equ kE1BT+91
-kACalcOn		equ kE1BT+92
-kACalcOff		equ kE1BT+93
-kFNOn			equ kE1BT+94
-kFNOff			equ kE1BT+95
-kPlotsOn		equ kE1BT+96
-kPlotsOff		equ kE1BT+97
-kPixelChg		equ kE1BT+98
-kSendMBL		equ kE1BT+99
-kRecvMBL		equ kE1BT+100
-kBoxPlot		equ kE1BT+101
-kBoxIcon		equ kE1BT+102
-kCrossIcon		equ kE1BT+103
-kDotIcon		equ kE1BT+104
-kE2BT			equ kE1BT+105
-kSeqential		equ kE2BT
-kSimulG			equ kE2BT+1
-kPolarG			equ kE2BT+2
-kRectG			equ kE2BT+3
-kCoordOn		equ kE2BT+4
-kCoordOff		equ kE2BT+5
-kDrawLine		equ kE2BT+6
-kDrawDot		equ kE2BT+7
-kAxisOn			equ kE2BT+8
-kAxisOff		equ kE2BT+9
-kGridOn			equ kE2BT+10
-kGridOff		equ kE2BT+11
-kLblOn			equ kE2BT+12
-kLblOff			equ kE2BT+13
-kL1			equ kE2BT+14
-kL2			equ kE2BT+15
-kL3			equ kE2BT+16
-kL4			equ kE2BT+17
-kL5			equ kE2BT+18
-kL6			equ kE2BT+19
+#define ke1bt	$00
+#define kdrawinv	ke1bt
+#define kdrawf	ke1bt+1
+#define kpixelon	ke1bt+2
+#define kpixeloff	ke1bt+3
+#define kpxltest	ke1bt+4
+#define krcgdb	ke1bt+5
+#define krcpic	ke1bt+6
+#define kstgdb	ke1bt+7
+#define kstpic	ke1bt+8
+#define kabs	ke1bt+9
+#define ktequ	ke1bt+10 ;==
+#define ktnoteq	ke1bt+11 ;<>
+#define ktgt	ke1bt+12 ;>
+#define ktgte	ke1bt+13 ;>=
+#define ktlt	ke1bt+14 ;<
+#define ktlte	ke1bt+15 ;<=
+#define kand	ke1bt+16
+#define kor	ke1bt+17
+#define kxor	ke1bt+18
+#define knot	ke1bt+19
+#define klr1	ke1bt+20
+#define kxroot	ke1bt+21
+#define kcube	ke1bt+22
+#define kcbrt	ke1bt+23 ;cube root
+#define ktodec	ke1bt+24
+#define kcubicr	ke1bt+25
+#define kquartr	ke1bt+26
+#define kplot1	ke1bt+27
+#define kplot2	ke1bt+28
+#define kround	ke1bt+29
+#define kipart	ke1bt+30
+#define kfpart	ke1bt+31
+#define kint	ke1bt+32
+#define krand	ke1bt+33
+#define knpr	ke1bt+34
+#define kncr	ke1bt+35
+#define kxfactorial	ke1bt+36
+#define krad	ke1bt+37
+#define kdegr	ke1bt+38 ;degrees conv
+#define kapost	ke1bt+39
+#define ktodms	ke1bt+40
+#define krtopo	ke1bt+41 ;r
+#define krtopr	ke1bt+42
+#define kptorx	ke1bt+43
+#define kptory	ke1bt+44
+#define krowswap	ke1bt+45
+#define krowplus	ke1bt+46
+#define ktimrow	ke1bt+47
+#define ktrowp	ke1bt+48
+#define ksorta	ke1bt+49
+#define ksortd	ke1bt+50
+#define kseq	ke1bt+51
+#define kmin	ke1bt+52
+#define kmax	ke1bt+53
+#define kmean	ke1bt+54
+#define kmedian	ke1bt+55
+#define ksum	ke1bt+56
+#define kprod	ke1bt+57
+#define kdet	ke1bt+58
+#define ktransp	ke1bt+59
+#define kdim	ke1bt+60
+#define kfill	ke1bt+61
+#define kident	ke1bt+62
+#define krandm	ke1bt+63
+#define kaug	ke1bt+64
+#define konevar	ke1bt+65
+#define ktwovar	ke1bt+66
+#define klr	ke1bt+67
+#define klrexp	ke1bt+68
+#define klrln	ke1bt+69
+#define klrpwr	ke1bt+70
+#define kmedmed	ke1bt+71
+#define kquad	ke1bt+72
+#define kclrlst	ke1bt+73
+#define khist	ke1bt+74
+#define kxyline	ke1bt+75
+#define kscatter	ke1bt+76
+#define kmrad	ke1bt+77
+#define kmdeg	ke1bt+78
+#define kmnormf	ke1bt+79
+#define kmsci	ke1bt+80
+#define kmeng	ke1bt+81
+#define kmfloat	ke1bt+82
+#define kfix	ke1bt+83
+#define kspliton	ke1bt+84
+#define kfullscreen	ke1bt+85
+#define kstndrd	ke1bt+86
+#define kparam	ke1bt+87
+#define kpolar	ke1bt+88
+#define kseqg	ke1bt+89
+#define kafillon	ke1bt+90
+#define kafilloff	ke1bt+91
+#define kacalcon	ke1bt+92
+#define kacalcoff	ke1bt+93
+#define kfnon	ke1bt+94
+#define kfnoff	ke1bt+95
+#define kplotson	ke1bt+96
+#define kplotsoff	ke1bt+97
+#define kpixelchg	ke1bt+98
+#define ksendmbl	ke1bt+99
+#define krecvmbl	ke1bt+100
+#define kboxplot	ke1bt+101
+#define kboxicon	ke1bt+102
+#define kcrossicon	ke1bt+103
+#define kdoticon	ke1bt+104
+#define ke2bt	ke1bt+105
+#define kseqential	ke2bt
+#define ksimulg	ke2bt+1
+#define kpolarg	ke2bt+2
+#define krectg	ke2bt+3
+#define kcoordon	ke2bt+4
+#define kcoordoff	ke2bt+5
+#define kdrawline	ke2bt+6
+#define kdrawdot	ke2bt+7
+#define kaxison	ke2bt+8
+#define kaxisoff	ke2bt+9
+#define kgridon	ke2bt+10
+#define kgridoff	ke2bt+11
+#define klblon	ke2bt+12
+#define klbloff	ke2bt+13
+#define kl1	ke2bt+14
+#define kl2	ke2bt+15
+#define kl3	ke2bt+16
+#define kl4	ke2bt+17
+#define kl5	ke2bt+18
+#define kl6	ke2bt+19
 
-;These keys are laid on top of existing keys to
+;these keys are laid on top of existing keys to
 ;enable localization in the inferential stats editor.
 ;----------------------------------------------------
-kinfData		equ kL1
-kinfStats		equ kL1+1
-kinfYes			equ kL1+2
-kinfNo			equ kL1+3
-kinfCalc		equ kL1+4
-kinfDraw		equ kL1+5
-kinfAlt1ne		equ kL1+6
-kinfAlt1lt		equ kL1+7
-kinfAlt1gt		equ kL1+8
-kinfAlt2ne		equ kL1+9
-kinfAlt2lt		equ kL1+10
-kinfAlt2gt		equ kL1+11
-kinfAlt3ne		equ kL1+12
-kinfAlt3lt		equ kL1+13
-kinfAlt3gt		equ kL1+14
-kinfAlt4ne		equ kL1+15
-kinfAlt4lt		equ kL1+16
-kinfAlt4gt		equ kL1+17
-kinfAlt5ne		equ kL1+18
-kinfAlt5lt		equ kL1+19
-kinfAlt5gt		equ kL1+20
-kinfAlt6ne		equ kL1+21
-kinfAlt6lt		equ kL1+22
-kinfAlt6gt		equ kL1+23
-kMatA			equ kE2BT+20
-kMatB			equ kE2BT+21
-kMatC			equ kE2BT+22
-kMatD			equ kE2BT+23
-kMatE			equ kE2BT+24
-kXmin			equ kE2BT+25
-kXmax			equ kE2BT+26
-kXscl			equ kE2BT+27
-kYmin			equ kE2BT+28
-kYmax			equ kE2BT+29
-kYscl			equ kE2BT+30
-kTmin			equ kE2BT+31
-kTmax			equ kE2BT+32
-kTStep			equ kE2BT+33
-kOmin			equ kE2BT+34
-kOmax			equ kE2BT+35
-kOStep			equ kE2BT+36
-ku0			equ kE2BT+37
-kv0			equ kE2BT+38
-knMin			equ kE2BT+39
-knMax			equ kE2BT+40
-kDeltaY			equ kE2BT+41
-kDeltaX			equ kE2BT+42
-kZXmin			equ kE2BT+43
-kZXmax			equ kE2BT+44
-kZXscl			equ kE2BT+45
-kZYmin			equ kE2BT+46
-kZYmax			equ kE2BT+47
-kZYscl			equ kE2BT+48
-kZTmin			equ kE2BT+49
-kZTmax			equ kE2BT+50
-kZTStep			equ kE2BT+51
-kZOmin			equ kE2BT+52
-kZOmax			equ kE2BT+53
-kZOStep			equ kE2BT+54
-kZu0			equ kE2BT+55
-kZv0			equ kE2BT+56
-kZnMin			equ kE2BT+57
-kZnMax			equ kE2BT+58
-kDelLast		equ kE2BT+59
-kSinReg			equ kE2BT+60
-kConstE			equ kE2BT+61
-kPic1			equ kE2BT+62
-kPic2			equ kE2BT+63
-kPic3			equ kE2BT+64
-kDelVar			equ kE2BT+65
-kGetCalc		equ kE2BT+66
-kRealM			equ kE2BT+67
-kPolarM			equ kE2BT+68
-kRectM			equ kE2BT+69
-kuv			equ kE2BT+70 ;U vs V
-kvw			equ kE2BT+71 ;V vs W
-kuw			equ kE2BT+72 ;U vs W
-kFinPMTend		equ kE2BT+73
-kFinPMTbeg		equ kE2BT+74
-kGraphStyle		equ kE2BT+75
-kExprOn			equ kE2BT+76
-kExprOff		equ kE2BT+77
-kStatA			equ kE2BT+78
-kStatB			equ kE2BT+79
-kStatC			equ kE2BT+80
-kCorr			equ kE2BT+81
-kStatD			equ kE2BT+82
-kStatE			equ kE2BT+83
-kRegEq			equ kE2BT+84
-kMinX			equ kE2BT+85
-kQ1			equ kE2BT+86
-kMD			equ kE2BT+87
-kQ3			equ kE2BT+88
-kMaxX			equ kE2BT+89
-kStatX1			equ kE2BT+90
-kStatY1			equ kE2BT+91
-kStatX2			equ kE2BT+92
-kStatY2			equ kE2BT+93
-kStatX3			equ kE2BT+94
-kStatY3			equ kE2BT+95
-kTblMin			equ kE2BT+96
-kTblStep		equ kE2BT+97
-kSetupLst		equ kE2BT+98
-kClrAllLst		equ kE2BT+99
-kLogistic		equ kE2BT+100
-kZTest			equ kE2BT+101
-kTTest			equ kE2BT+102
-k2SampZTest		equ kE2BT+103
-k2SampTTest		equ kE2BT+104
-k1PropZTest		equ kE2BT+105
-k2PropZTest		equ kE2BT+106
-kChiTest		equ kE2BT+107
-k2SampFTest		equ kE2BT+108
-kZIntVal		equ kE2BT+109
-kTIntVal		equ kE2BT+110
-k2SampTInt		equ kE2BT+111
-k2SampZInt		equ kE2BT+112
-k1PropZInt		equ kE2BT+113
-k2PropZInt		equ kE2BT+114
-kDNormal		equ kE2BT+115
-kInvNorm		equ kE2BT+116
-kDT			equ kE2BT+117
-kChi			equ kE2BT+118
-kDF			equ kE2BT+119
-kBinPDF			equ kE2BT+120
-kBinCDF			equ kE2BT+121
-kPoiPDF			equ kE2BT+122
-kPoiCDF			equ kE2BT+123
-kun			equ kE2BT+124
-kvn			equ kE2BT+125
-kwn			equ kE2BT+126
-kRecn			equ kE2BT+127
-kPlotStart		equ kE2BT+128
-kZPlotStart		equ kE2BT+129 ;recursion n
-kXFact			equ kE2BT+130 ;PlotStart
-kYFact			equ kE2BT+131 ;ZPlotStart
-kANOVA			equ kE2BT+132 ;XFact
-kMaxY			equ kE2BT+133 ;YFact
-kWebOn			equ kE2BT+134 ;MinY
-kWebOff			equ kE2BT+135 ;MaxY
-kTblInput		equ kE2BT+136 ;WEB ON
-kGeoPDF			equ kE2BT+137 ;WEB OFF
-kGeoCDF			equ kE2BT+138 ;WEB OFF
-kShadeNorm		equ kE2BT+139
-kShadeT			equ kE2BT+140
-kShadeChi		equ kE2BT+141
-kShadeF			equ kE2BT+142
-kPlotStep		equ kE2BT+143
-kZPlotStep		equ kE2BT+144
-kLinRegtTest		equ kE2BT+145
-KMGT			equ kE2BT+146 ;VERT SPLIT
-kSelectA		equ kE2BT+147
-kZFitA			equ kE2BT+148
-kE2BT_End		equ kZFitA
+#define kinfdata	kl1
+#define kinfstats	kl1+1
+#define kinfyes	kl1+2
+#define kinfno	kl1+3
+#define kinfcalc	kl1+4
+#define kinfdraw	kl1+5
+#define kinfalt1ne	kl1+6
+#define kinfalt1lt	kl1+7
+#define kinfalt1gt	kl1+8
+#define kinfalt2ne	kl1+9
+#define kinfalt2lt	kl1+10
+#define kinfalt2gt	kl1+11
+#define kinfalt3ne	kl1+12
+#define kinfalt3lt	kl1+13
+#define kinfalt3gt	kl1+14
+#define kinfalt4ne	kl1+15
+#define kinfalt4lt	kl1+16
+#define kinfalt4gt	kl1+17
+#define kinfalt5ne	kl1+18
+#define kinfalt5lt	kl1+19
+#define kinfalt5gt	kl1+20
+#define kinfalt6ne	kl1+21
+#define kinfalt6lt	kl1+22
+#define kinfalt6gt	kl1+23
+#define kmata	ke2bt+20
+#define kmatb	ke2bt+21
+#define kmatc	ke2bt+22
+#define kmatd	ke2bt+23
+#define kmate	ke2bt+24
+#define kxmin	ke2bt+25
+#define kxmax	ke2bt+26
+#define kxscl	ke2bt+27
+#define kymin	ke2bt+28
+#define kymax	ke2bt+29
+#define kyscl	ke2bt+30
+#define ktmin	ke2bt+31
+#define ktmax	ke2bt+32
+#define ktstep	ke2bt+33
+#define komin	ke2bt+34
+#define komax	ke2bt+35
+#define kostep	ke2bt+36
+#define ku0	ke2bt+37
+#define kv0	ke2bt+38
+#define knmin	ke2bt+39
+#define knmax	ke2bt+40
+#define kdeltay	ke2bt+41
+#define kdeltax	ke2bt+42
+#define kzxmin	ke2bt+43
+#define kzxmax	ke2bt+44
+#define kzxscl	ke2bt+45
+#define kzymin	ke2bt+46
+#define kzymax	ke2bt+47
+#define kzyscl	ke2bt+48
+#define kztmin	ke2bt+49
+#define kztmax	ke2bt+50
+#define kztstep	ke2bt+51
+#define kzomin	ke2bt+52
+#define kzomax	ke2bt+53
+#define kzostep	ke2bt+54
+#define kzu0	ke2bt+55
+#define kzv0	ke2bt+56
+#define kznmin	ke2bt+57
+#define kznmax	ke2bt+58
+#define kdellast	ke2bt+59
+#define ksinreg	ke2bt+60
+#define kconste	ke2bt+61
+#define kpic1	ke2bt+62
+#define kpic2	ke2bt+63
+#define kpic3	ke2bt+64
+#define kdelvar	ke2bt+65
+#define kgetcalc	ke2bt+66
+#define krealm	ke2bt+67
+#define kpolarm	ke2bt+68
+#define krectm	ke2bt+69
+#define kuv	ke2bt+70 ;u vs v
+#define kvw	ke2bt+71 ;v vs w
+#define kuw	ke2bt+72 ;u vs w
+#define kfinpmtend	ke2bt+73
+#define kfinpmtbeg	ke2bt+74
+#define kgraphstyle	ke2bt+75
+#define kexpron	ke2bt+76
+#define kexproff	ke2bt+77
+#define kstata	ke2bt+78
+#define kstatb	ke2bt+79
+#define kstatc	ke2bt+80
+#define kcorr	ke2bt+81
+#define kstatd	ke2bt+82
+#define kstate	ke2bt+83
+#define kregeq	ke2bt+84
+#define kminx	ke2bt+85
+#define kq1	ke2bt+86
+#define kmd	ke2bt+87
+#define kq3	ke2bt+88
+#define kmaxx	ke2bt+89
+#define kstatx1	ke2bt+90
+#define kstaty1	ke2bt+91
+#define kstatx2	ke2bt+92
+#define kstaty2	ke2bt+93
+#define kstatx3	ke2bt+94
+#define kstaty3	ke2bt+95
+#define ktblmin	ke2bt+96
+#define ktblstep	ke2bt+97
+#define ksetuplst	ke2bt+98
+#define kclralllst	ke2bt+99
+#define klogistic	ke2bt+100
+#define kztest	ke2bt+101
+#define kttest	ke2bt+102
+#define k2sampztest	ke2bt+103
+#define k2sampttest	ke2bt+104
+#define k1propztest	ke2bt+105
+#define k2propztest	ke2bt+106
+#define kchitest	ke2bt+107
+#define k2sampftest	ke2bt+108
+#define kzintval	ke2bt+109
+#define ktintval	ke2bt+110
+#define k2samptint	ke2bt+111
+#define k2sampzint	ke2bt+112
+#define k1propzint	ke2bt+113
+#define k2propzint	ke2bt+114
+#define kdnormal	ke2bt+115
+#define kinvnorm	ke2bt+116
+#define kdt	ke2bt+117
+#define kchi	ke2bt+118
+#define kdf	ke2bt+119
+#define kbinpdf	ke2bt+120
+#define kbincdf	ke2bt+121
+#define kpoipdf	ke2bt+122
+#define kpoicdf	ke2bt+123
+#define kun	ke2bt+124
+#define kvn	ke2bt+125
+#define kwn	ke2bt+126
+#define krecn	ke2bt+127
+#define kplotstart	ke2bt+128
+#define kzplotstart	ke2bt+129 ;recursion n
+#define kxfact	ke2bt+130 ;plotstart
+#define kyfact	ke2bt+131 ;zplotstart
+#define kanova	ke2bt+132 ;xfact
+#define kmaxy	ke2bt+133 ;yfact
+#define kwebon	ke2bt+134 ;miny
+#define kweboff	ke2bt+135 ;maxy
+#define ktblinput	ke2bt+136 ;web on
+#define kgeopdf	ke2bt+137 ;web off
+#define kgeocdf	ke2bt+138 ;web off
+#define kshadenorm	ke2bt+139
+#define kshadet	ke2bt+140
+#define kshadechi	ke2bt+141
+#define kshadef	ke2bt+142
+#define kplotstep	ke2bt+143
+#define kzplotstep	ke2bt+144
+#define klinregttest	ke2bt+145
+#define kmgt	ke2bt+146 ;vert split
+#define kselecta	ke2bt+147
+#define kzfita	ke2bt+148
+#define ke2bt_end	kzfita
 
-;More 2 Byte Keys 
+;more 2 byte keys
 ;------------------------------------
-kE2BT2			equ 0
-kGDB1			equ kE2BT2
-kGDB2			equ kE2BT2+1
-kGDB3			equ kE2BT2+2
-kY1			equ kE2BT2+3
-kY2			equ kE2BT2+4
-kY3			equ kE2BT2+5
-kY4			equ kE2BT2+6
-kY5			equ kE2BT2+7
-kY6			equ kE2BT2+8
-kY7			equ kE2BT2+9
-kY8			equ kE2BT2+10
-kY9			equ kE2BT2+11
-kY0			equ kE2BT2+12
-kX1T			equ kE2BT2+13
-kY1T			equ kE2BT2+14
-kX2T			equ kE2BT2+15
-kY2T			equ kE2BT2+16
-kX3T			equ kE2BT2+17
-kY3T			equ kE2BT2+18
-kX4T			equ kE2BT2+19
-kY4T			equ kE2BT2+20
-kX5T			equ kE2BT2+21
-kY5T			equ kE2BT2+22
-kX6T			equ kE2BT2+23
-kY6T			equ kE2BT2+24
-kR1			equ kE2BT2+25
-kR2			equ kE2BT2+26
-kR3			equ kE2BT2+27
-kR4			equ kE2BT2+28
-kR5			equ kE2BT2+29
-kR6			equ kE2BT2+30
-kGDB4			equ kE2BT2+31
-kGDB5			equ kE2BT2+32
-kGDB6			equ kE2BT2+33
-kPic4			equ kE2BT2+34
-kPic5			equ kE2BT2+35
-kPic6			equ kE2BT2+36
-kGDB7			equ kE2BT2+37
-kGDB8			equ kE2BT2+38
-kGDB9			equ kE2BT2+39
-kGDB0			equ kE2BT2+40
-kPic7			equ kE2BT2+41
-kPic8			equ kE2BT2+42
-kPic9			equ kE2BT2+43
-kPic0			equ kE2BT2+44
-kStatN			equ kE2BT2+45
-kXMean			equ kE2BT2+46
-kConj			equ kE2BT2+47
-kReal			equ kE2BT2+48
-kFAngle			equ kE2BT2+49
-kLCM			equ kE2BT2+50
-kGCD			equ kE2BT2+51
-kRandInt		equ kE2BT2+52
-kRandNorm		equ kE2BT2+53
-kToPolar		equ kE2BT2+54
-kToRect			equ kE2BT2+55
-kYMean			equ kE2BT2+56
-kStdX			equ kE2BT2+57
-kStdX1			equ kE2BT2+58
-kw0			equ kE2BT2+59
-kMatF			equ kE2BT2+60
-kMatG			equ kE2BT2+61
-kMatRH			equ kE2BT2+62
-kMatI			equ kE2BT2+63
-kMatJ			equ kE2BT2+64
-kYMean1			equ kE2BT2+65
-kStdY			equ kE2BT2+66
-kStdY1			equ kE2BT2+67
-kMatToLst		equ kE2BT2+68
-kLstToMat		equ kE2BT2+69
-kCumSum			equ kE2BT2+70
-kDeltaLst		equ kE2BT2+71
-kStdDev			equ kE2BT2+72
-kVariance		equ kE2BT2+73
-kLength			equ kE2BT2+74
-kEquToStrng		equ kE2BT2+75
-kStrngToEqu		equ kE2BT2+76
-kExpr			equ kE2BT2+77
-kSubStrng		equ kE2BT2+78
-kInStrng		equ kE2BT2+79
-kStr1			equ kE2BT2+80
-kStr2			equ kE2BT2+81
-kStr3			equ kE2BT2+82
-kStr4           	equ kE2BT2+83
-kStr5           	equ kE2BT2+84
-kStr6           	equ kE2BT2+85
-kStr7           	equ kE2BT2+86
-kStr8           	equ kE2BT2+87
-kStr9           	equ kE2BT2+88
-kStr0           	equ kE2BT2+89
-kFinN           	equ kE2BT2+90
-kFinI           	equ kE2BT2+91
-kFinPV          	equ kE2BT2+92
-kFinPMT         	equ kE2BT2+93
-kFinFV          	equ kE2BT2+94
-kFinPY          	equ kE2BT2+95
-kFinCY          	equ kE2BT2+96
-kFinFPMT        	equ kE2BT2+97
-kFinFI          	equ kE2BT2+98
-kFinFPV         	equ kE2BT2+99
-kFinFN          	equ kE2BT2+100
-kFinFFV         	equ kE2BT2+101
-kFinNPV         	equ kE2BT2+102
-kFinIRR         	equ kE2BT2+103
-kFinBAL         	equ kE2BT2+104
-kFinPRN         	equ kE2BT2+105
-kFinINT         	equ kE2BT2+106
-kSumX           	equ kE2BT2+107
-kSumX2          	equ kE2BT2+108
-kFinToNom       	equ kE2BT2+109
-kFinToEff       	equ kE2BT2+110
-kFinDBD         	equ kE2BT2+111
-kStatVP         	equ kE2BT2+112
-kStatZ          	equ kE2BT2+113
-kStatT          	equ kE2BT2+114
-kStatChi        	equ kE2BT2+115
-kStatF          	equ kE2BT2+116
-kStatDF         	equ kE2BT2+117
-kStatPhat       	equ kE2BT2+118
-kStatPhat1      	equ kE2BT2+119
-kStatPhat2      	equ kE2BT2+120
-kStatMeanX1     	equ kE2BT2+121
-kStatMeanX2     	equ kE2BT2+122
-kStatStdX1      	equ kE2BT2+123
-kStatStdX2      	equ kE2BT2+124
-kStatStdXP		equ kE2BT2+125
-kStatN1			equ kE2BT2+126
-kStatN2			equ kE2BT2+127
-kStatLower		equ kE2BT2+128
-kStatUpper		equ kE2BT2+129
-kuw0			equ kE2BT2+130
-kImag			equ kE2BT2+131
-kSumY			equ kE2BT2+132
-kXres			equ kE2BT2+133
-kStat_s			equ kE2BT2+134
-kSumY2			equ kE2BT2+135
-kSumXY			equ kE2BT2+136
-kuXres			equ kE2BT2+137
-kModBox			equ kE2BT2+138
-kNormProb		equ kE2BT2+139
-kNormalPDF		equ kE2BT2+140
-kTPDF			equ kE2BT2+141
-kChiPDF			equ kE2BT2+142
-kFPDF			equ kE2BT2+143
-kMinY			equ kE2BT2+144 ;MinY
-kRandBin		equ kE2BT2+145
-kRef			equ kE2BT2+146
-kRRef			equ kE2BT2+147
-kLRSqr			equ kE2BT2+148
-kBRSqr			equ kE2BT2+149
-kDiagOn			equ kE2BT2+150
-kDiagOff		equ kE2BT2+151
-kun1			equ kE2BT2+152 ;FOR RCL USE WHEN GOTTEN FROM 82
-kvn1			equ kE2BT2+153 ;FOR RCL USE WHEN GOTTEN FROM 82
-k83_00End		equ kvn1 ;end of original keys...
-kArchive		equ k83_00End + 1
-kUnarchive		equ k83_00End + 2
-kAsm			equ k83_00End + 3 ;Asm(
-kAsmPrgm		equ k83_00End + 4 ;AsmPrgm
-kAsmComp		equ k83_00End + 5 ;AsmComp(
-kcapAAcute		equ k83_00End + 6
-kcapAGrave		equ k83_00End + 7
-kcapACaret		equ k83_00End + 8
-kcapADier		equ k83_00End + 9
-kaAcute			equ k83_00End + 10
-kaGrave			equ k83_00End + 11
-kaCaret			equ k83_00End + 12
-kaDier			equ k83_00End + 13
-kcapEAcute		equ k83_00End + 14
-kcapEGrave		equ k83_00End + 15
-kcapECaret		equ k83_00End + 16
-kcapEDier		equ k83_00End + 17
-keAcute			equ k83_00End + 18
-keGrave			equ k83_00End + 19
-keCaret			equ k83_00End + 20
-keDier			equ k83_00End + 21
-kcapIAcute		equ k83_00End + 22
-kcapIGrave		equ k83_00End + 23
-kcapICaret		equ k83_00End + 24
-kcapIDier		equ k83_00End + 25
-kiAcute			equ k83_00End + 26
-kiGrave			equ k83_00End + 27
-kiCaret			equ k83_00End + 28
-kiDier			equ k83_00End + 29
-kcapOAcute		equ k83_00End + 30
-kcapOGrave		equ k83_00End + 31
-kcapOCaret		equ k83_00End + 32
-kcapODier		equ k83_00End + 33
-koAcute			equ k83_00End + 34
-koGrave			equ k83_00End + 35
-koCaret			equ k83_00End + 36
-koDier			equ k83_00End + 37
-kcapUAcute		equ k83_00End + 38
-kcapUGrave		equ k83_00End + 39
-kcapUCaret		equ k83_00End + 40
-kcapUDier		equ k83_00End + 41
-kuAcute			equ k83_00End + 42
-kuGrave			equ k83_00End + 43
-kuCaret			equ k83_00End + 44
-kuDier			equ k83_00End + 45
-kcapCCed		equ k83_00End + 46
-kcCed			equ k83_00End + 47
-kcapNTilde		equ k83_00End + 48
-knTilde			equ k83_00End + 49
-kaccent			equ k83_00End + 50
-kgrave			equ k83_00End + 51
-kdieresis		equ k83_00End + 52
-kquesDown		equ k83_00End + 53
-kexclamDown     	equ k83_00End + 54
-kalpha          	equ k83_00End + 55
-kbeta           	equ k83_00End + 56
-kgamma          	equ k83_00End + 57
-kcapDelta		equ k83_00End + 58
-kdelta			equ k83_00End + 59
-kepsilon		equ k83_00End + 60
-klambda			equ k83_00End + 61
-kmu			equ k83_00End + 62
-kpi2			equ k83_00End + 63
-krho			equ k83_00End + 64
-kcapSigma		equ k83_00End + 65
-ksigma			equ k83_00End + 66
-ktau			equ k83_00End + 67
-kphi			equ k83_00End + 68
-kcapOmega		equ k83_00End + 69
-kphat			equ k83_00End + 70
-kchi2			equ k83_00End + 71
-kstatF2			equ k83_00End + 72
-kLa			equ k83_00End + 73
-kLb			equ k83_00End + 74
-kLc			equ k83_00End + 75
-kLd			equ k83_00End + 76
-kLe			equ k83_00End + 77
-kLf			equ k83_00End + 78
-kLg			equ k83_00End + 79
-kLh			equ k83_00End + 80
-kLi			equ k83_00End + 81
-kLj			equ k83_00End + 82
-kLk			equ k83_00End + 83
-kLl			equ k83_00End + 84
-kLm			equ k83_00End + 85
-kLsmalln		equ k83_00End + 86
-kLo			equ k83_00End + 87
-kLp			equ k83_00End + 88
-kLq			equ k83_00End + 89
-kLsmallr		equ k83_00End + 90
-kLs			equ k83_00End + 91
-kLt			equ k83_00End + 92
-kLu			equ k83_00End + 93
-kLv			equ k83_00End + 94
-kLw			equ k83_00End + 95
-kLx			equ k83_00End + 96
-kLy			equ k83_00End + 97
-kLz			equ k83_00End + 98
-kGarbageC		equ k83_00End + 99 ;GarbageCollect
-kE2BT2_End		equ kGarbageC
+#define ke2bt2	$00
+#define kgdb1	ke2bt2
+#define kgdb2	ke2bt2+1
+#define kgdb3	ke2bt2+2
+#define ky1	ke2bt2+3
+#define ky2	ke2bt2+4
+#define ky3	ke2bt2+5
+#define ky4	ke2bt2+6
+#define ky5	ke2bt2+7
+#define ky6	ke2bt2+8
+#define ky7	ke2bt2+9
+#define ky8	ke2bt2+10
+#define ky9	ke2bt2+11
+#define ky0	ke2bt2+12
+#define kx1t	ke2bt2+13
+#define ky1t	ke2bt2+14
+#define kx2t	ke2bt2+15
+#define ky2t	ke2bt2+16
+#define kx3t	ke2bt2+17
+#define ky3t	ke2bt2+18
+#define kx4t	ke2bt2+19
+#define ky4t	ke2bt2+20
+#define kx5t	ke2bt2+21
+#define ky5t	ke2bt2+22
+#define kx6t	ke2bt2+23
+#define ky6t	ke2bt2+24
+#define kr1	ke2bt2+25
+#define kr2	ke2bt2+26
+#define kr3	ke2bt2+27
+#define kr4	ke2bt2+28
+#define kr5	ke2bt2+29
+#define kr6	ke2bt2+30
+#define kgdb4	ke2bt2+31
+#define kgdb5	ke2bt2+32
+#define kgdb6	ke2bt2+33
+#define kpic4	ke2bt2+34
+#define kpic5	ke2bt2+35
+#define kpic6	ke2bt2+36
+#define kgdb7	ke2bt2+37
+#define kgdb8	ke2bt2+38
+#define kgdb9	ke2bt2+39
+#define kgdb0	ke2bt2+40
+#define kpic7	ke2bt2+41
+#define kpic8	ke2bt2+42
+#define kpic9	ke2bt2+43
+#define kpic0	ke2bt2+44
+#define kstatn	ke2bt2+45
+#define kxmean	ke2bt2+46
+#define kconj	ke2bt2+47
+#define kreal	ke2bt2+48
+#define kfangle	ke2bt2+49
+#define klcm	ke2bt2+50
+#define kgcd	ke2bt2+51
+#define krandint	ke2bt2+52
+#define krandnorm	ke2bt2+53
+#define ktopolar	ke2bt2+54
+#define ktorect	ke2bt2+55
+#define kymean	ke2bt2+56
+#define kstdx	ke2bt2+57
+#define kstdx1	ke2bt2+58
+#define kw0	ke2bt2+59
+#define kmatf	ke2bt2+60
+#define kmatg	ke2bt2+61
+#define kmatrh	ke2bt2+62
+#define kmati	ke2bt2+63
+#define kmatj	ke2bt2+64
+#define kymean1	ke2bt2+65
+#define kstdy	ke2bt2+66
+#define kstdy1	ke2bt2+67
+#define kmattolst	ke2bt2+68
+#define klsttomat	ke2bt2+69
+#define kcumsum	ke2bt2+70
+#define kdeltalst	ke2bt2+71
+#define kstddev	ke2bt2+72
+#define kvariance	ke2bt2+73
+#define klength	ke2bt2+74
+#define kequtostrng	ke2bt2+75
+#define kstrngtoequ	ke2bt2+76
+#define kexpr	ke2bt2+77
+#define ksubstrng	ke2bt2+78
+#define kinstrng	ke2bt2+79
+#define kstr1	ke2bt2+80
+#define kstr2	ke2bt2+81
+#define kstr3	ke2bt2+82
+#define kstr4       	ke2bt2+83
+#define kstr5       	ke2bt2+84
+#define kstr6       	ke2bt2+85
+#define kstr7       	ke2bt2+86
+#define kstr8       	ke2bt2+87
+#define kstr9       	ke2bt2+88
+#define kstr0       	ke2bt2+89
+#define kfinn       	ke2bt2+90
+#define kfini       	ke2bt2+91
+#define kfinpv      	ke2bt2+92
+#define kfinpmt     	ke2bt2+93
+#define kfinfv      	ke2bt2+94
+#define kfinpy      	ke2bt2+95
+#define kfincy      	ke2bt2+96
+#define kfinfpmt    	ke2bt2+97
+#define kfinfi      	ke2bt2+98
+#define kfinfpv     	ke2bt2+99
+#define kfinfn      	ke2bt2+100
+#define kfinffv     	ke2bt2+101
+#define kfinnpv     	ke2bt2+102
+#define kfinirr     	ke2bt2+103
+#define kfinbal     	ke2bt2+104
+#define kfinprn     	ke2bt2+105
+#define kfinint     	ke2bt2+106
+#define ksumx       	ke2bt2+107
+#define ksumx2      	ke2bt2+108
+#define kfintonom   	ke2bt2+109
+#define kfintoeff   	ke2bt2+110
+#define kfindbd     	ke2bt2+111
+#define kstatvp     	ke2bt2+112
+#define kstatz      	ke2bt2+113
+#define kstatt      	ke2bt2+114
+#define kstatchi    	ke2bt2+115
+#define kstatf      	ke2bt2+116
+#define kstatdf     	ke2bt2+117
+#define kstatphat   	ke2bt2+118
+#define kstatphat1  	ke2bt2+119
+#define kstatphat2  	ke2bt2+120
+#define kstatmeanx1 	ke2bt2+121
+#define kstatmeanx2 	ke2bt2+122
+#define kstatstdx1  	ke2bt2+123
+#define kstatstdx2  	ke2bt2+124
+#define kstatstdxp	ke2bt2+125
+#define kstatn1	ke2bt2+126
+#define kstatn2	ke2bt2+127
+#define kstatlower	ke2bt2+128
+#define kstatupper	ke2bt2+129
+#define kuw0	ke2bt2+130
+#define kimag	ke2bt2+131
+#define ksumy	ke2bt2+132
+#define kxres	ke2bt2+133
+#define kstat_s	ke2bt2+134
+#define ksumy2	ke2bt2+135
+#define ksumxy	ke2bt2+136
+#define kuxres	ke2bt2+137
+#define kmodbox	ke2bt2+138
+#define knormprob	ke2bt2+139
+#define knormalpdf	ke2bt2+140
+#define ktpdf	ke2bt2+141
+#define kchipdf	ke2bt2+142
+#define kfpdf	ke2bt2+143
+#define kminy	ke2bt2+144 ;miny
+#define krandbin	ke2bt2+145
+#define kref	ke2bt2+146
+#define krref	ke2bt2+147
+#define klrsqr	ke2bt2+148
+#define kbrsqr	ke2bt2+149
+#define kdiagon	ke2bt2+150
+#define kdiagoff	ke2bt2+151
+#define kun1	ke2bt2+152 ;for rcl use when gotten from 82
+#define kvn1	ke2bt2+153 ;for rcl use when gotten from 82
+#define k83_00end	kvn1 ;end of original keys...
+#define karchive	k83_00end+1
+#define kunarchive	k83_00end+2
+#define kasm	k83_00end+3 ;asm(
+#define kasmprgm	k83_00end+4 ;asmprgm
+#define kasmcomp	k83_00end+5 ;asmcomp(
+#define kcapaacute	k83_00end+6
+#define kcapagrave	k83_00end+7
+#define kcapacaret	k83_00end+8
+#define kcapadier	k83_00end+9
+#define kaacute	k83_00end+10
+#define kagrave	k83_00end+11
+#define kacaret	k83_00end+12
+#define kadier	k83_00end+13
+#define kcapeacute	k83_00end+14
+#define kcapegrave	k83_00end+15
+#define kcapecaret	k83_00end+16
+#define kcapedier	k83_00end+17
+#define keacute	k83_00end+18
+#define kegrave	k83_00end+19
+#define kecaret	k83_00end+20
+#define kedier	k83_00end+21
+#define kcapiacute	k83_00end+22
+#define kcapigrave	k83_00end+23
+#define kcapicaret	k83_00end+24
+#define kcapidier	k83_00end+25
+#define kiacute	k83_00end+26
+#define kigrave	k83_00end+27
+#define kicaret	k83_00end+28
+#define kidier	k83_00end+29
+#define kcapoacute	k83_00end+30
+#define kcapograve	k83_00end+31
+#define kcapocaret	k83_00end+32
+#define kcapodier	k83_00end+33
+#define koacute	k83_00end+34
+#define kograve	k83_00end+35
+#define kocaret	k83_00end+36
+#define kodier	k83_00end+37
+#define kcapuacute	k83_00end+38
+#define kcapugrave	k83_00end+39
+#define kcapucaret	k83_00end+40
+#define kcapudier	k83_00end+41
+#define kuacute	k83_00end+42
+#define kugrave	k83_00end+43
+#define kucaret	k83_00end+44
+#define kudier	k83_00end+45
+#define kcapcced	k83_00end+46
+#define kcced	k83_00end+47
+#define kcapntilde	k83_00end+48
+#define kntilde	k83_00end+49
+#define kaccent	k83_00end+50
+#define kgrave	k83_00end+51
+#define kdieresis	k83_00end+52
+#define kquesdown	k83_00end+53
+#define kexclamdown 	k83_00end+54
+#define kalpha      	k83_00end+55
+#define kbeta       	k83_00end+56
+#define kgamma      	k83_00end+57
+#define kcapdelta	k83_00end+58
+#define kdelta	k83_00end+59
+#define kepsilon	k83_00end+60
+#define klambda	k83_00end+61
+#define kmu	k83_00end+62
+#define kpi2	k83_00end+63
+#define krho	k83_00end+64
+#define kcapsigma	k83_00end+65
+#define ksigma	k83_00end+66
+#define ktau	k83_00end+67
+#define kphi	k83_00end+68
+#define kcapomega	k83_00end+69
+#define kphat	k83_00end+70
+#define kchi2	k83_00end+71
+#define kstatf2	k83_00end+72
+#define kla	k83_00end+73
+#define klb	k83_00end+74
+#define klc	k83_00end+75
+#define kld	k83_00end+76
+#define kle	k83_00end+77
+#define klf	k83_00end+78
+#define klg	k83_00end+79
+#define klh	k83_00end+80
+#define kli	k83_00end+81
+#define klj	k83_00end+82
+#define klk	k83_00end+83
+#define kll	k83_00end+84
+#define klm	k83_00end+85
+#define klsmalln	k83_00end+86
+#define klo	k83_00end+87
+#define klp	k83_00end+88
+#define klq	k83_00end+89
+#define klsmallr	k83_00end+90
+#define kls	k83_00end+91
+#define klt	k83_00end+92
+#define klu	k83_00end+93
+#define klv	k83_00end+94
+#define klw	k83_00end+95
+#define klx	k83_00end+96
+#define kly	k83_00end+97
+#define klz	k83_00end+98
+#define kgarbagec	k83_00end+99 ;garbagecollect
+#define ke2bt2_end	kgarbagec
 
-;TI-83 Plus Context Equates
+;ti-83 plus context equates
 ;---------------------------------------------
-cxCmd			equ kQuit ;home screen
-cxMatEdit		equ kMatrixEd ;matrix editor
-cxPrgmEdit		equ kPrgmEd ;program editor
-cxEquEdit		equ kYequ ;equation editor
-cxGrRange		equ kWindow ;graph range editor
-cxGrZfact		equ kZFactEd ;graph zoom factors editor
-cxGraph			equ kGraph ;graph mode
-cxStatEdit		equ kStatEd ;statistics list editor
-cxPrgmInput		equ kPrgmInput ;programmed input
-cxError			equ kError ;error handler
-cxLinkIO		equ kLinkIO ;LINK I/O interface
-cxMem			equ kResetMem ;reset memory
-cxDefMem		equ kResetDef ;reset default
-cxRAMApp		equ kChkRAM ;RAM usage screen
-cxMode			equ kMode ;mode settings screen
-cxErase			equ kDelMem ;memory erase
-cxPrgmCreate		equ kPrgmCr ;PROGRAM CREATE
-cxTableEditor		equ kTable ;TABLE EDITOR
-cxTableSet		equ kTblSet ;TABLE SET UP
-cxStatPlot		equ kStatP ;STAT PLOTS
-cxInfStat		equ kInfStat ;Inferential Statistic
-cxFormat		equ kFormat ;FORMAT CONTEXT
-cxSolveTVM		equ kSolveTVM ;Solve TVM
-cxSolveRoot		equ kSolveRoot ;Solve Root
-lastOldApp		equ kExtApps ;external applications
-cxextapps		equ kExtApps
-cxNewApps		equ kNewApps ;new cerberus applications
-cxGroup			equ cxNewApps+0 ;1st new app.
-cxUnGroup		equ cxNewApps+1 ;2nd new app.
-lastNewApp		equ cxUnGroup ;last new app for this ver
+#define cxcmd	kquit ;home screen
+#define cxmatedit	kmatrixed ;matrix editor
+#define cxprgmedit	kprgmed ;program editor
+#define cxequedit	kyequ ;equation editor
+#define cxgrrange	kwindow ;graph range editor
+#define cxgrzfact	kzfacted ;graph zoom factors editor
+#define cxgraph	kgrap ;graph mode
+#define cxstatedit	kstated ;statistics list editor
+#define cxprgminput	kprgminput ;programmed input
+#define cxerror	kerror ;error handler
+#define cxlinkio	klinkio ;link i/o interface
+#define cxmem	kresetmem ;reset memory
+#define cxdefmem	kresetdef ;reset default
+#define cxramapp	kchkram ;ram usage screen
+#define cxmode	kmode ;mode settings screen
+#define cxerase	kdelmem ;memory erase
+#define cxprgmcreate	kprgmcr ;program create
+#define cxtableeditor	ktable ;table editor
+#define cxtableset	ktblset ;table set up
+#define cxstatplot	kstatp ;stat plots
+#define cxinfstat	kinfstat ;inferential statistic
+#define cxformat	kformat ;format context
+#define cxsolvetvm	ksolvetvm ;solve tvm
+#define cxsolveroot	ksolveroot ;solve root
+#define lastoldapp	kextapps ;external applications
+#define cxextapps	kextapps
+#define cxnewapps	knewapps ;new cerberus applications
+#define cxgroup	cxnewapps+0 ;$1st new app.
+#define cxungroup	cxnewapps+1 ;$2nd new app.
+#define lastnewapp	cxungroup ;last new app for this ver
 
-;Scan Code Equates
+;scan code equates
 ;-------------------------------
-skDown			equ 01h
-skLeft			equ 02h
-skRight			equ 03h
-skUp			equ 04h
-skEnter			equ 09h
-skAdd			equ 0Ah
-skSub			equ 0Bh
-skMul			equ 0Ch
-skDiv			equ 0Dh
-skPower			equ 0Eh
-skClear			equ 0Fh
-skChs			equ 11h
-sk3			equ 12h
-sk6			equ 13h
-sk9			equ 14h
-skRParen		equ 15h
-skTan			equ 16h
-skVars			equ 17h
-skDecPnt		equ 19h
-sk2			equ 1Ah
-sk5			equ 1Bh
-sk8			equ 1Ch
-skLParen		equ 1Dh
-skCos			equ 1Eh
-skPrgm			equ 1Fh
-skStat			equ 20h
-sk0			equ 21h
-sk1			equ 22h
-sk4			equ 23h
-sk7			equ 24h
-skComma			equ 25h
-skSin			equ 26h
-skMatrix		equ 27h
-skGraphvar		equ 28h
-skStore			equ 2Ah
-skLn			equ 2Bh
-skLog			equ 2Ch
-skSquare		equ 2Dh
-skRecip			equ 2Eh
-skMath			equ 2Fh
-skAlpha			equ 30h
-skGraph			equ 31h
-skTrace			equ 32h
-skZoom			equ 33h
-skWindow		equ 34h
-skYEqu			equ 35h
-sk2nd			equ 36h
-skMode			equ 37h
-skDel			equ 38h
+#define skdown	$01
+#define skleft	$02
+#define skright	$03
+#define skup	$04
+#define skenter	$09
+#define skadd	$0a
+#define sksub	$0b
+#define skmul	$0c
+#define skdiv	$0d
+#define skpower	$0e
+#define skclear	$0f
+#define skchs	$11
+#define sk3	$12
+#define sk6	$13
+#define sk9	$14
+#define skrparen	$15
+#define sktan	$16
+#define skvars	$17
+#define skdecpnt	$19
+#define sk2	$1a
+#define sk5	$1b
+#define sk8	$1c
+#define sklparen	$1d
+#define skcos	$1e
+#define skprgm	$1f
+#define skstat	$20
+#define sk0	$21
+#define sk1	$22
+#define sk4	$23
+#define sk7	$24
+#define skcomma	$25
+#define sksin	$26
+#define skmatrix	$27
+#define skgraphvar	$28
+#define skstore	$2a
+#define skln	$2b
+#define sklog	$2c
+#define sksquare	$2d
+#define skrecip	$2e
+#define skmath	$2f
+#define skalpha	$30
+#define skgraph	$31
+#define sktrace	$32
+#define skzoom	$33
+#define skwindow	$34
+#define skyequ	$35
+#define sk2nd	$36
+#define skmode	$37
+#define skdel	$38
 
-;Tokens
+;tokens
 ;----------------------------------------------------
-EOSSTART		equ 0
+#define eosstart	$00
 
-;DISPLAY CONVERSIONS COME IMMEDIATELY BEFORE 'TSTORE'
+;display conversions come immediately before 'tstore'
 ;
-DCONV			equ 01h
+#define dconv	$01
 ;
-tToDMS			equ DCONV ;01h
-tToDEC			equ DCONV+1 ;02h
-tToAbc			equ DCONV+2 ;03h > A b/c
+#define ttodms	dconv ;$01
+#define ttodec	dconv+1 ;$02
+#define ttoabc	dconv+2 ;$03 > a b/c
 ;
-tStore			equ DCONV+3 ;04h Lstore 01
+#define tstore	dconv+3 ;$04 lstore 01
 ;
-tBoxPlot		equ 05h
+#define tboxplot	$05
 ;
-BRACKS			equ 06h
+#define bracks	$06
 ;
-tLBrack			equ BRACKS ;06h '['
-tRBrack			equ BRACKS+1 ;07h ']'
-tLBrace			equ BRACKS+2 ;08h '{'
-tRBrace			equ BRACKS+3 ;09h '}'
+#define tlbrack	bracks ;$06 '['
+#define trbrack	bracks+1 ;$07 ']'
+#define tlbrace	bracks+2 ;$08 '{'
+#define trbrace	bracks+3 ;$09 '}'
 ;
-tPOST1			equ BRACKS+4
+#define tpost1	bracks+4
 ;
-tFromRad		equ tPOST1 ;0Ah Lradian
-tFromDeg		equ tPOST1+1 ;0Bh Ldegree
-tRecip			equ tPOST1+2 ;0Ch Linverse
-tSqr			equ tPOST1+3 ;0Dh Lsquare
-tTrnspos		equ tPOST1+4 ;0Eh Ltranspose
-tCube			equ tPOST1+5 ;0Fh '^3'
+#define tfromrad	tpost1 ;$0a lradian
+#define tfromdeg	tpost1+1 ;$0b ldegree
+#define trecip	tpost1+2 ;$0c linverse
+#define tsqr	tpost1+3 ;$0d lsquare
+#define ttrnspos	tpost1+4 ;$0e ltranspose
+#define tcube	tpost1+5 ;$0f '^3'
 ;
-tLParen			equ 10h ;10h '('
-tRParen			equ 11h ;11h ')'
+#define tlparen	$10 ;$10 '('
+#define trparen	$11 ;$11 ')'
 ;
-IMUN			equ 12h
+#define imun	$12
 ;
-tRound			equ IMUN ;12h 'round'
-tPxTst			equ IMUN+1 ;13h 'PXL-TEST'
-tAug			equ IMUN+2 ;14h 'aug'
-tRowSwap		equ IMUN+3 ;15h 'rSwap'
-tRowPlus		equ IMUN+4 ;16h 'rAdd'
-tmRow			equ IMUN+5 ;17h 'multR'
-tmRowPlus		equ IMUN+6 ;18h 'mRAdd'
-tMax			equ IMUN+7 ;19h 'max'
-tMin			equ IMUN+8 ;1Ah 'min'
-tRToPr			equ IMUN+9 ;1Bh 'R>Pr
-tRToPo			equ IMUN+10 ;1Ch 'R>Po
-tPToRx			equ IMUN+11 ;1Dh 'P>Rx
-tPToRy			equ IMUN+12 ;1Eh 'P>Ry
-tMedian			equ IMUN+13 ;1Fh 'MEDIAN
-tRandM			equ IMUN+14 ;20h 'randM'
-tMean			equ IMUN+15 ;21h
-tRoot			equ IMUN+16 ;22h 'ROOT'
-tSeries			equ IMUN+17 ;23h 'seq'
-tFnInt			equ IMUN+18 ;24h 'fnInt'
-tNDeriv			equ IMUN+19 ;25h 'fnIr'
-tEvalF			equ IMUN+20 ;26h
-tFmin			equ IMUN+21 ;27h
-tFmax			equ IMUN+22 ;28h
+#define tround	imun ;$12 'round'
+#define tpxtst	imun+1 ;$13 'pxl-test'
+#define taug	imun+2 ;$14 'aug'
+#define trowswap	imun+3 ;$15 'rswap'
+#define trowplus	imun+4 ;$16 'radd'
+#define tmrow	imun+5 ;$17 'multr'
+#define tmrowplus	imun+6 ;$18 'mradd'
+#define tmax	imun+7 ;$19 'max'
+#define tmin	imun+8 ;$1a 'min'
+#define trtopr	imun+9 ;$1b 'r>pr
+#define trtopo	imun+10 ;$1c 'r>po
+#define tptorx	imun+11 ;$1d 'p>rx
+#define tptory	imun+12 ;$1e 'p>ry
+#define tmedian	imun+13 ;$1f 'median
+#define trandm	imun+14 ;$20 'randm'
+#define tmean	imun+15 ;$21
+#define troot	imun+16 ;$22 'root'
+#define tseries	imun+17 ;$23 'seq'
+#define tfnint	imun+18 ;$24 'fnint'
+#define tnderiv	imun+19 ;$25 'fnir'
+#define tevalf	imun+20 ;$26
+#define tfmin	imun+21 ;$27
+#define tfmax	imun+22 ;$28
 ;
-tEOSEL			equ IMUN+23
+#define teosel	imun+23
 ;
-tSpace			equ tEOSEL ;29h ' '
-tString			equ tEOSEL+1 ;2Ah '"'
-tComma			equ tEOSEL+2 ;2Bh ','
+#define tspace	teosel ;$29 ' '
+#define tstring	teosel+1 ;$2a '"'
+#define tcomma	teosel+2 ;$2b ','
 ;
-tii			equ 2Ch ;i
+#define tii	$2c ;i
 
-;Postfix Functions
+;postfix functions
 ;-----------------------------------------
-tPost			equ 2Dh
+#define tpost	$2d
 ;
-tFact			equ tPost ;2Dh '!'
+#define tfact	tpost ;$2d '!'
 ;
-tCubicR			equ 2Eh
-tQuartR			equ 2Fh
+#define tcubicr	$2e
+#define tquartr	$2f
 
-;Number Tokens 
+;number tokens
 ;---------------------------------------
-NUMS			equ 30h
+#define nums	$30
 ;
-t0			equ NUMS ;30h
-t1			equ NUMS+1 ;31h
-t2			equ NUMS+2 ;32h
-t3			equ NUMS+3 ;33h
-t4			equ NUMS+4 ;34h
-t5			equ NUMS+5 ;35h
-t6			equ NUMS+6 ;36h
-t7			equ NUMS+7 ;37h
-t8			equ NUMS+8 ;38h
-t9			equ NUMS+9 ;39h
-tDecPt			equ NUMS+10 ;3Ah
-tee			equ NUMS+11 ;3Bh
+#define t0	nums ;$30
+#define t1	nums+1 ;$31
+#define t2	nums+2 ;$32
+#define t3	nums+3 ;$33
+#define t4	nums+4 ;$34
+#define t5	nums+5 ;$35
+#define t6	nums+6 ;$36
+#define t7	nums+7 ;$37
+#define t8	nums+8 ;$38
+#define t9	nums+9 ;$39
+#define tdecpt	nums+10 ;$3a
+#define tee	nums+11 ;$3b
 
-;Binary OP
+;binary op
 ;-------------------------------------------
-tOr			equ 3Ch ;3Ch '_or_'
-tXor			equ 3Dh ;3Dh
+#define tor	$3c ;$3c '_or_'
+#define txor	$3d ;$3d
 ;
-tColon			equ 3Eh ;3Eh ':'
-tEnter			equ 3Fh ;3Fh Lenter
+#define tcolon	$3e ;$3e ':'
+#define tenter	$3f ;$3f lenter
 ;
-tAnd			equ 40h ;40h '_and_'
+#define tand	$40 ;$40 '_and_'
 
-;Letter Tokens
+;letter tokens
 ;--------------------------------------
-LET			equ 41h
-tA			equ LET ;41h
-tB			equ LET+1 ;42h
-tC			equ LET+2 ;43h
-tD			equ LET+3 ;44h
-tE			equ LET+4 ;45h
-tF			equ LET+5 ;46h
-tG			equ LET+6 ;47h
-tH			equ LET+7 ;48h
-tI			equ LET+8 ;49h
-tJ			equ LET+9 ;4Ah
-tK			equ LET+10 ;4Bh
-tL			equ LET+11 ;4Ch
-tM			equ LET+12 ;4Dh
-tN			equ LET+13 ;4Eh
-tO			equ LET+14 ;4Fh
-tP			equ LET+15 ;50h
-tQ			equ LET+16 ;51h
-tR			equ LET+17 ;52h
-tS			equ LET+18 ;53h
-tT			equ LET+19 ;54h
-tU			equ LET+20 ;55h
-tV			equ LET+21 ;56h
-tW			equ LET+22 ;57h
-tX			equ LET+23 ;58h
-tY			equ LET+24 ;59h
-tZ			equ LET+25 ;5Ah
-tTheta			equ LET+26 ;5Bh
+#define let	$41
+#define ta	let ;$41
+#define tb	let+1 ;$42
+#define tc	let+2 ;$43
+#define td	let+3 ;$44
+#define te	let+4 ;$45
+#define tf	let+5 ;$46
+#define tg	let+6 ;$47
+#define th	let+7 ;$48
+#define ti	let+8 ;$49
+#define tj	let+9 ;$4a
+#define tk	let+10 ;$4b
+#define tl	let+11 ;$4c
+#define tm	let+12 ;$4d
+#define tn	let+13 ;$4e
+#define to	let+14 ;$4f
+#define tp	let+15 ;$50
+#define tq	let+16 ;$51
+#define tr	let+17 ;$52
+#define ts	let+18 ;$53
+#define tt	let+19 ;$54
+#define tu	let+20 ;$55
+#define tv	let+21 ;$56
+#define tw	let+22 ;$57
+#define tx	let+23 ;$58
+#define ty	let+24 ;$59
+#define tz	let+25 ;$5a
+#define ttheta	let+26 ;$5b
 
-;These Var Tokens Are 1st Of A Double Token
+;these var tokens are 1st of a double token
 ;------------------------------------------
 
-vToks			equ LET+27
+#define vtoks	let+27
 
-;User Matrix Token, 2nd Token Needed For Name
+;user matrix token, 2nd token needed for name
 ;
-tVarMat			equ vToks ;5Ch
+#define tvarmat	vtoks ;$5c
 ;
-;User List Token, 2nd Token Needed For Name
+;user list token, 2nd token needed for name
 ;
-tVarLst			equ vToks+1 ;5Dh
+#define tvarlst	vtoks+1 ;$5d
 ;
-;User Equation Token, 2nd Token Needed For Name
+;user equation token, 2nd token needed for name
 ;
-tVarEqu			equ vToks+2 ;5Eh
-tProg			equ vToks+3 ;5Fh
+#define tvarequ	vtoks+2 ;$5e
+#define tprog	vtoks+3 ;$5f
 ;
-;User Pict Token, 2nd Token Needed For Name
+;user pict token, 2nd token needed for name
 ;
-tVarPict		equ vToks+4 ;60h
+#define tvarpict	vtoks+4 ;$60
 ;
-;User GDB Token, 2nd Token Needed For Name
+;user gdb token, 2nd token needed for name
 ;
-tVarGDB			equ vToks+5 ;61h
-tVarOut			equ vToks+6 ;62h
-tVarSys			equ vToks+7 ;63h
+#define tvargdb	vtoks+5 ;$61
+#define tvarout	vtoks+6 ;$62
+#define tvarsys	vtoks+7 ;$63
 
-;Mode Setting Commands
+;mode setting commands
 ;-------------------------------------------------
-MODESA			equ vToks+8 ;64h
-tRad			equ MODESA ;64h 'Radian'
-tDeg			equ MODESA+1 ;65h 'Degree'
-tNormF			equ MODESA+2 ;66h 'Normal'
-tSci			equ MODESA+3 ;67h 'Sci'
-tEng			equ MODESA+4 ;68h 'Eng'
-tFloat			equ MODESA+5 ;69h 'Float'
-CMPS			equ 6Ah
-tEQ			equ CMPS ;6Ah '=='
-tLT			equ CMPS+1 ;6Bh '<'
-tGT			equ CMPS+2 ;6Ch '>'
-tLE			equ CMPS+3 ;6Dh LLE
-tGE			equ CMPS+4 ;6Eh LGE
-tNE			equ CMPS+5 ;6Fh LNE
+#define modesa	vtoks+8 ;$64
+#define trad	modesa ;$64 'radian'
+#define tdeg	modesa+1 ;$65 'degree'
+#define tnormf	modesa+2 ;$66 'normal'
+#define tsci	modesa+3 ;$67 'sci'
+#define teng	modesa+4 ;$68 'eng'
+#define tfloat	modesa+5 ;$69 'float'
+#define cmps	$6a
+#define teq	cmps ;$6a '=='
+#define tlt	cmps+1 ;$6b '<'
+#define tgt	cmps+2 ;$6c '>'
+#define tle	cmps+3 ;$6d lle
+#define tge	cmps+4 ;$6e lge
+#define tne	cmps+5 ;$6f lne
 
-;Binary OP
+;binary op
 ;---------------------------------------
-tAdd			equ 70h ;70h '+'
-tSub			equ 71h ;71h '-'
-tAns			equ 72h ;72h
+#define tadd	$70 ;$70 '+'
+#define tsub	$71 ;$71 '-'
+#define tans	$72 ;$72
 
-;Mode Setting Commands
+;mode setting commands
 ;-------------------------------------------------------
-MODES			equ 73h
-tFix			equ MODES ;73h 'Fix_'
-tSplitOn		equ MODES+1 ;74h
-tFullScreen		equ MODES+2 ;75h
-tStndrd			equ MODES+3 ;76h 'Func'
-tParam			equ MODES+4 ;77h 'Param'
-tPolar			equ MODES+5 ;78h 'Pol'
-tSeqG			equ MODES+6 ;79h
-tAFillOn		equ MODES+7 ;7Ah 'AUTO FILL ON'
-tAFillOff		equ MODES+8 ;7Bh
-tACalcOn		equ MODES+9 ;7Ch
-tACalcOff		equ MODES+10 ;7Dh 'AutoFill OFF'
+#define modes	$73
+#define tfix	modes ;$73 'fix_'
+#define tspliton	modes+1 ;$74
+#define tfullscreen	modes+2 ;$75
+#define tstndrd	modes+3 ;$76 'func'
+#define tparam	modes+4 ;$77 'param'
+#define tpolar	modes+5 ;$78 'pol'
+#define tseqg	modes+6 ;$79
+#define tafillon	modes+7 ;$7a 'auto fill on'
+#define tafilloff	modes+8 ;$7b
+#define tacalcon	modes+9 ;$7c
+#define tacalcoff	modes+10 ;$7d 'autofill off'
 
-;Graph Format Tokens Are 2 Byte Tokens
+;graph format tokens are 2 byte tokens
 ;----------------------------------------
-tGFormat		equ MODES+11 ;7Eh
-tBoxIcon		equ 7Fh
-tCrossIcon		equ 80h
-tDotIcon		equ 81h
+#define tgformat	modes+11 ;$7e
+#define tboxicon	$7f
+#define tcrossicon	$80
+#define tdoticon	$81
 
-;(More) Binary OP
+;(more) binary op
 ;---------------------------------------
-tMul			equ 82h ;82h '*'
-tDiv			equ 83h ;83h '/'
+#define tmul	$82 ;$82 '*'
+#define tdiv	$83 ;$83 '/'
 
-;Some Graph Commands
+;some graph commands
 ;------------------------------------------------------
-GRCMDS			equ 84h
-tTrace			equ GRCMDS ; 84h 'Trace'
-tClDrw			equ GRCMDS+1 ; 85h 'ClDrw'
-tZoomStd		equ GRCMDS+2 ; 86h 'ZStd'
-tZoomtrg		equ GRCMDS+3 ; 87h 'Ztrg'
-tZoomBox		equ GRCMDS+4 ; 88h 'ZBOX'
-tZoomIn			equ GRCMDS+5 ; 89h 'ZIn'
-tZoomOut		equ GRCMDS+6 ; 8Ah 'ZOut'
-tZoomSqr		equ GRCMDS+7 ; 8Bh 'ZSqr'
-tZoomInt		equ GRCMDS+8 ; 8Ch 'ZInt'
-tZoomPrev		equ GRCMDS+9 ; 8Dh 'ZPrev'
-tZoomDec		equ GRCMDS+10 ; 8Eh 'ZDecm'
-tZoomStat		equ GRCMDS+11 ; 8Fh 'ZStat
-tUsrZm			equ GRCMDS+12 ; 90h 'ZRcl'
-tPrtScrn		equ GRCMDS+13 ; 91h 'PrtScrn'
-tZoomSto		equ GRCMDS+14 ; 92h  ZOOM STORE
-tText			equ GRCMDS+15 ; 93h
+#define grcmds	$84
+#define ttrace	grcmds ;$84 'trace'
+#define tcldrw	grcmds+1 ;$85 'cldrw'
+#define tzoomstd	grcmds+2 ;$86 'zstd'
+#define tzoomtrg	grcmds+3 ;$87 'ztrg'
+#define tzoombox	grcmds+4 ;$88 'zbox'
+#define tzoomin	grcmds+5 ;$89 'zin'
+#define tzoomout	grcmds+6 ;$8a 'zout'
+#define tzoomsqr	grcmds+7 ;$8b 'zsqr'
+#define tzoomint	grcmds+8 ;$8c 'zint'
+#define tzoomprev	grcmds+9 ;$8d 'zprev'
+#define tzoomdec	grcmds+10 ;$8e 'zdecm'
+#define tzoomstat	grcmds+11 ;$8f 'zstat
+#define tusrzm	grcmds+12 ;$90 'zrcl'
+#define tprtscrn	grcmds+13 ;$91 'prtscrn'
+#define tzoomsto	grcmds+14 ;$92  zoom store
+#define ttext	grcmds+15 ;$93
 
-;Binary OP (Combination & Permutation)
+;binary op (combination & permutation)
 ;-------------------------------------------------
-tnPr			equ GRCMDS+16 ;94h '_nPr_'
-tnCr			equ GRCMDS+17 ;95h '_nCr_'
+#define tnpr	grcmds+16 ;$94 '_npr_'
+#define tncr	grcmds+17 ;$95 '_ncr_'
 
-;More Graph Commands
+;more graph commands
 ;--------------------------------------------------
-tYOn			equ GRCMDS+18 ;96h 'FnOn_'
-tYOff			equ GRCMDS+19 ;97h 'FnOff_'
-tStPic			equ GRCMDS+20 ;98h 'StPic_'
-tRcPic			equ GRCMDS+21 ;99h 'RcPic_'
-tStoDB			equ GRCMDS+22 ;9Ah 'StGDB_'
-tRclDB			equ GRCMDS+23 ;9Bh 'RcGDB_'
-tLine			equ GRCMDS+24 ;9Ch 'Line'
-tVert			equ GRCMDS+25 ;9Dh 'Vert_'
-tPtOn			equ GRCMDS+26 ;9Eh 'PtOn'
-tPtOff			equ GRCMDS+27 ;9Fh 'PtOff'
+#define tyon	grcmds+18 ;$96 'fnon_'
+#define tyoff	grcmds+19 ;$97 'fnoff_'
+#define tstpic	grcmds+20 ;$98 'stpic_'
+#define trcpic	grcmds+21 ;$99 'rcpic_'
+#define tstodb	grcmds+22 ;$9a 'stgdb_'
+#define trcldb	grcmds+23 ;$9b 'rcgdb_'
+#define tline	grcmds+24 ;$9c 'line'
+#define tvert	grcmds+25 ;$9d 'vert_'
+#define tpton	grcmds+26 ;$9e 'pton'
+#define tptoff	grcmds+27 ;$9f 'ptoff'
 
-;Token A0 Cannot Be An EOS Function Since Low MULT=A0 Already
+;token a0 cannot be an eos function since low mult=a0 already
 ;------------------------------------------------------------
-tPtChg			equ GRCMDS+28 ;A0h 'PtChg'
-tPXOn			equ GRCMDS+29 ;A1h
-tPXOff			equ GRCMDS+30 ;A2h
-tPXChg			equ GRCMDS+31 ;A3h
-tShade			equ GRCMDS+32 ;A4h 'Shade'
-tCircl			equ GRCMDS+33 ;A5h 'Circl'
-tHorz			equ GRCMDS+34 ;A6h 'HORIZONTAL'
-tTanLn			equ GRCMDS+35 ;A7h 'TanLn'
-tDrInv			equ GRCMDS+36 ;A8h 'DrInv_'
-tDrawF			equ GRCMDS+37 ;A9h 'DrawF_'
-tVarStrng		equ 0AAh
+#define tptchg	grcmds+28 ;$a0 'ptchg'
+#define tpxon	grcmds+29 ;$a1
+#define tpxoff	grcmds+30 ;$a2
+#define tpxchg	grcmds+31 ;$a3
+#define tshade	grcmds+32 ;$a4 'shade'
+#define tcircl	grcmds+33 ;$a5 'circl'
+#define thorz	grcmds+34 ;$a6 'horizontal'
+#define ttanln	grcmds+35 ;$a7 'tanln'
+#define tdrinv	grcmds+36 ;$a8 'drinv_'
+#define tdrawf	grcmds+37 ;$a9 'drawf_'
+#define tvarstrng	$aa
 
-;Functions with No Arguments                                    
+;functions with no arguments
 ;--------------------------------------------------
-NOARG			equ 0ABh
-tRand			equ NOARG ;ABh 'rand'
-tPi			equ NOARG+1 ;ACh  Lpi
-tGetKey			equ NOARG+2 ;ADh 'getKy'
-tAPost			equ tGetKey+1 ;APOSTROPHY
-tQuest			equ tAPost+1 ;QUESTION MARK
-UNARY			equ tQuest+1 ;B0h
-tChs			equ UNARY ;B0h
-tInt			equ UNARY+1 ;B1h
-tAbs			equ UNARY+2 ;B2h
-tDet			equ UNARY+3 ;B3h
-tIdent			equ UNARY+4 ;B4h
-tDim			equ UNARY+5 ;B5h
-tSum			equ UNARY+6 ;B6h
-tProd			equ UNARY+7 ;B7h
-tNot			equ UNARY+8 ;B8h
-tIPart			equ UNARY+9 ;B9h
-tFPart			equ UNARY+10 ;BAh
+#define noarg	$0ab
+#define trand	noarg ;$ab 'rand'
+#define tpi	noarg+1 ;$ac  lpi
+#define tgetkey	noarg+2 ;$ad 'getky'
+#define tapost	tgetkey+1 ;apostrophy
+#define tquest	tapost+1 ;question mark
+#define unary	tquest+1 ;$b0
+#define tchs	unary ;$b0
+#define tint	unary+1 ;$b1
+#define tabs	unary+2 ;$b2
+#define tdet	unary+3 ;$b3
+#define tident	unary+4 ;$b4
+#define tdim	unary+5 ;$b5
+#define tsum	unary+6 ;$b6
+#define tprod	unary+7 ;$b7
+#define tnot	unary+8 ;$b8
+#define tipart	unary+9 ;$b9
+#define tfpart	unary+10 ;$ba
 
-;New 2 Byte Tokens
+;new 2 byte tokens
 ;------------------------------------------
-t2ByteTok		equ 0BBh
-UNARYLR			equ UNARY+12
-tSqrt			equ UNARYLR ;BCh
-tCubRt			equ UNARYLR+1 ;BDh
-tLn			equ UNARYLR+2 ;BEh
-tExp			equ UNARYLR+3 ;BFh
-tLog			equ UNARYLR+4 ;C0h
-tALog			equ UNARYLR+5 ;C1h
-tSin			equ UNARYLR+6 ;C2h
-tASin			equ UNARYLR+7 ;C3h
-tCos			equ UNARYLR+8 ;C4h
-tACos			equ UNARYLR+9 ;C5h
-tTan			equ UNARYLR+10 ;C6h
-tATan			equ UNARYLR+11 ;C7h
-tSinH			equ UNARYLR+12 ;C8h
-tASinH			equ UNARYLR+13 ;C9h
-tCoshH			equ UNARYLR+14 ;CAh
-tACosH			equ UNARYLR+15 ;CBh
-tTanH			equ UNARYLR+16 ;CCh
-tATanH			equ UNARYLR+17 ;CDh
+#define t2bytetok	$bb
+#define unarylr	unary+12
+#define tsqrt	unarylr ;$bc
+#define tcubrt	unarylr+1 ;$bd
+#define tln	unarylr+2 ;$be
+#define texp	unarylr+3 ;$bf
+#define tlog	unarylr+4 ;$c0
+#define talog	unarylr+5 ;$c1
+#define tsin	unarylr+6 ;$c2
+#define tasin	unarylr+7 ;$c3
+#define tcos	unarylr+8 ;$c4
+#define tacos	unarylr+9 ;$c5
+#define ttan	unarylr+10 ;$c6
+#define tatan	unarylr+11 ;$c7
+#define tsinh	unarylr+12 ;$c8
+#define tasinh	unarylr+13 ;$c9
+#define tcoshh	unarylr+14 ;$ca
+#define tacosh	unarylr+15 ;$cb
+#define ttanh	unarylr+16 ;$cc
+#define tatanh	unarylr+17 ;$cd
 
-;Some Programming Commands
+;some programming commands
 ;------------------------------------------------------
-PROGTOK			equ UNARYLR+18
-tIf			equ PROGTOK ;CEh
-tThen			equ PROGTOK+1 ;CFh
-tElse			equ PROGTOK+2 ;D0h
-tWhile			equ PROGTOK+3 ;D1h
-tRepeat			equ PROGTOK+4 ;D2h
-tFor			equ PROGTOK+5 ;D3h
-tEnd			equ PROGTOK+6 ;D4h
-tReturn			equ PROGTOK+7 ;D5h
-tLbl			equ PROGTOK+8 ;D6h 'Lbl_'
-tGoto			equ PROGTOK+9 ;D7h 'Goto_'
-tPause			equ PROGTOK+10 ;D8h 'Pause_'
-tStop			equ PROGTOK+11 ;D9h 'Stop'
-tISG			equ PROGTOK+12 ;DAh 'IS>'
-tDSL			equ PROGTOK+13 ;DBh 'DS<'
-tInput			equ PROGTOK+14 ;DCh 'Input_'
-tPrompt			equ PROGTOK+15 ;DDh 'Prompt_'
-tDisp			equ PROGTOK+16 ;DEh 'Disp_'
-tDispG			equ PROGTOK+17 ;DFh 'DispG'
-tOutput			equ PROGTOK+18 ;E0h 'Outpt'
-tClLCD			equ PROGTOK+19 ;E1h 'ClLCD'
-tConst			equ PROGTOK+20 ;E2h 'Fill'
-tSortA			equ PROGTOK+21 ;E3h 'sortA_'
-tSortD			equ PROGTOK+22 ;E4h 'sortD_'
-tDispTab		equ PROGTOK+23 ;E5h 'Disp Table
-tMenu			equ PROGTOK+24 ;E6h 'Menu'
-tSendMBL		equ PROGTOK+25 ;E7h 'SEND'
-tGetMBL			equ PROGTOK+26 ;E8h 'GET'
+#define progtok	unarylr+18
+#define tif	progtok ;$ce
+#define tthen	progtok+1 ;$cf
+#define telse	progtok+2 ;$d0
+#define twhile	progtok+3 ;$d1
+#define trepeat	progtok+4 ;$d2
+#define tfor	progtok+5 ;$d3
+#define tend	progtok+6 ;$d4
+#define treturn	progtok+7 ;$d5
+#define tlbl	progtok+8 ;$d6 'lbl_'
+#define tgoto	progtok+9 ;$d7 'goto_'
+#define tpause	progtok+10 ;$d8 'pause_'
+#define tstop	progtok+11 ;$d9 'stop'
+#define tisg	progtok+12 ;$da 'is>'
+#define tdsl	progtok+13 ;$db 'ds<'
+#define tinput	progtok+14 ;$dc 'input_'
+#define tprompt	progtok+15 ;$dd 'prompt_'
+#define tdisp	progtok+16 ;$de 'disp_'
+#define tdispg	progtok+17 ;$df 'dispg'
+#define toutput	progtok+18 ;$e0 'outpt'
+#define tcllcd	progtok+19 ;$e1 'cllcd'
+#define tconst	progtok+20 ;$e2 'fill'
+#define tsorta	progtok+21 ;$e3 'sorta_'
+#define tsortd	progtok+22 ;$e4 'sortd_'
+#define tdisptab	progtok+23 ;$e5 'disp table
+#define tmenu	progtok+24 ;$e6 'menu'
+#define tsendmbl	progtok+25 ;$e7 'send'
+#define tgetmbl	progtok+26 ;$e8 'get'
 
-;Stat Plot Commands
+;stat plot commands
 ;------------------------------------------------------
-statPCmd		equ PROGTOK+27
-tPlotOn			equ statPCmd ;E9h ' PLOTSON'
-tPlotOff		equ statPCmd+1 ;EAh ' PLOTSOFF
-tListName		equ 0EBh ;LIST DESIGNATOR
-tPlot1			equ 0ECh
-tPlot2			equ 0EDh
-tPlot3			equ 0EEh
-tUnused01		equ 0EFh ;available?
-tPower			equ 0F0h ;'^'
-tXRoot			equ 0F1h ;LsupX,Lroot
-STATCMD			equ 0F2h
-tOneVar			equ STATCMD ;F2h 'OneVar_'
-tTwoVar			equ STATCMD+1 ;F3h
-tLR			equ STATCMD+2 ;F4h 'LinR(A+BX
-tLRExp			equ STATCMD+3 ;F5h 'ExpR_'
-tLRLn			equ STATCMD+4 ;F6h 'LnR_'
-tLRPwr			equ STATCMD+5 ;F7h 'PwrR_'
-tMedMed			equ STATCMD+6 ;F8h
-tQuad			equ STATCMD+7 ;F9h
-tClrLst			equ STATCMD+8 ;FAh 'CLEAR LIST
-tClrTbl			equ STATCMD+9 ;FBh CLEAR TABLE
-tHist			equ STATCMD+10 ;FCh 'Hist_'
-txyLine			equ STATCMD+11 ;FDh 'xyline_'
-tScatter		equ STATCMD+12 ;FEh 'Scatter_'
-tLR1			equ STATCMD+13 ;FFh 'LINR(AX+B
+#define statpcmd	progtok+27
+#define tploton	statpcmd ;$e9 ' plotson'
+#define tplotoff	statpcmd+1 ;$ea ' plotsoff
+#define tlistname	$eb ;list designator
+#define tplot1	$ec
+#define tplot2	$ed
+#define tplot3	$ee
+#define tunused01	$ef ;available?
+#define tpower	$f0 ;'^'
+#define txroot	$f1 ;lsupx,lroot
+#define statcmd	$f2
+#define tonevar	statcmd ;f2 'onevar_'
+#define ttwovar	statcmd+1 ;f3
+#define tlr	statcmd+2 ;f4 'linr(a+bx
+#define tlrexp	statcmd+3 ;f5 'expr_'
+#define tlrln	statcmd+4 ;f6 'lnr_'
+#define tlrpwr	statcmd+5 ;f7 'pwrr_'
+#define tmedmed	statcmd+6 ;f8
+#define tquad	statcmd+7 ;f9
+#define tclrlst	statcmd+8 ;$fa 'clear list
+#define tclrtbl	statcmd+9 ;$fb clear table
+#define thist	statcmd+10 ;$fc 'hist_'
+#define txyline	statcmd+11 ;$fd 'xyline_'
+#define tscatter	statcmd+12 ;$fe 'scatter_'
+#define tlr1	statcmd+13 ;$ff 'linr(ax+b
 
-;2nd Half Of Graph Format Tokens
+;$2nd half of graph format tokens
 ;----------------------------------------------
-;           Format settings commands
+;           format settings commands
 ;
-GFMT			equ 0
-tSeq			equ GFMT ; 'SeqG'
-tSimulG			equ GFMT+1 ; 'SimulG'
-tPolarG			equ GFMT+2 ; 'PolarGC'
-tRectG			equ GFMT+3 ; 'RectGC'
-tCoordOn		equ GFMT+4 ; 'CoordOn'
-tCoordOff		equ GFMT+5 ; 'CoordOff'
-tDrawLine		equ GFMT+6 ; 'DrawLine'
-tDrawDot		equ GFMT+7 ; 'DrawDot'
-tAxisOn			equ GFMT+8 ; 'AxesOn'
-tAxisOff		equ GFMT+9 ; 'AxesOff'
-tGridOn			equ GFMT+10 ; 'GridOn'
-tGridOff		equ GFMT+11 ; 'GridOff'
-tLblOn			equ GFMT+12 ; 'LabelOn'
-tLblOff			equ GFMT+13 ; 'LabelOff'
-tWebOn			equ GFMT+14 ; 'WebOn'
-tWebOff			equ GFMT+15 ; 'WebOFF'
-tuv			equ GFMT+16 ; U vs V
-tvw			equ GFMT+17 ; V vs W
-tuw			equ GFMT+18 ; U vs W
+#define gfmt	$00
+#define tseq	gfmt ; 'seqg'
+#define tsimulg	gfmt+1 ; 'simulg'
+#define tpolarg	gfmt+2 ; 'polargc'
+#define trectg	gfmt+3 ; 'rectgc'
+#define tcoordon	gfmt+4 ; 'coordon'
+#define tcoordoff	gfmt+5 ; 'coordoff'
+#define tdrawline	gfmt+6 ; 'drawline'
+#define tdrawdot	gfmt+7 ; 'drawdot'
+#define taxison	gfmt+8 ; 'axeson'
+#define taxisoff	gfmt+9 ; 'axesoff'
+#define tgridon	gfmt+10 ; 'gridon'
+#define tgridoff	gfmt+11 ; 'gridoff'
+#define tlblon	gfmt+12 ; 'labelon'
+#define tlbloff	gfmt+13 ; 'labeloff'
+#define twebon	gfmt+14 ; 'webon'
+#define tweboff	gfmt+15 ; 'weboff'
+#define tuv	gfmt+16 ; u vs v
+#define tvw	gfmt+17 ; v vs w
+#define tuw	gfmt+18 ; u vs w
 
-;2nd Half Of User Matrix Tokens
+;$2nd half of user matrix tokens
 ;-------------------------------------
-tMatA			equ 00h ;MAT A
-tMatB			equ 01h ;MAT B
-tMatC			equ 02h ;MAT C
-tMatD			equ 03h ;MAT D
-tMatE			equ 04h ;MAT E
-tMatF			equ 05h ;MAT F
-tMatG			equ 06h ;MAT G
-tMatH			equ 07h ;MAT H
-tMatI			equ 08h ;MAT I
-tMatJ			equ 09h ;MAT J
+#define tmata	$00 ;mat a
+#define tmatb	$01 ;mat b
+#define tmatc	$02 ;mat c
+#define tmatd	$03 ;mat d
+#define tmate	$04 ;mat e
+#define tmatf	$05 ;mat f
+#define tmatg	$06 ;mat g
+#define tmath	$07 ;mat
+#define tmati	$08 ;mat i
+#define tmatj	$09 ;mat j
 
-;2nd Half Of User List Tokens
+;$2nd half of user list tokens
 ;--------------------------------------
-tL1			equ 00h ;LIST 1
-tL2			equ 01h ;LIST 2
-tL3			equ 02h ;LIST 3
-tL4			equ 03h ;LIST 4
-tL5			equ 04h ;LIST 5
-tL6			equ 05h ;LIST 6
+#define tl1	$00 ;list 1
+#define tl2	$01 ;list 2
+#define tl3	$02 ;list 3
+#define tl4	$03 ;list 4
+#define tl5	$04 ;list 5
+#define tl6	$05 ;list 6
 
-;2nd Half Of User Equation Tokens
+;$2nd half of user equation tokens
 ;----------------------------------
-;  "Y" EQUATIONS HAVE BIT 4 SET
+;  "y" equations have bit 4 set
 ;
-tY1			equ 10h ;Y1
-tY2			equ 11h ;Y2
-tY3			equ 12h ;Y3
-tY4			equ 13h ;Y4
-tY5			equ 14h ;Y5
-tY6			equ 15h ;Y6
-tY7			equ 16h ;Y7
-tY8			equ 17h ;Y8
-tY9			equ 18h ;Y9
-tY0			equ 19h ;Y0
+#define ty1	$10 ;y1
+#define ty2	$11 ;y2
+#define ty3	$12 ;y3
+#define ty4	$13 ;y4
+#define ty5	$14 ;y5
+#define ty6	$15 ;y6
+#define ty7	$16 ;y7
+#define ty8	$17 ;y8
+#define ty9	$18 ;y9
+#define ty0	$19 ;y0
 
-;Param Equations Have Bit 5 Set
+;param equations have bit 5 set
 ;-----------------------------------
-tX1T			equ 20h ;X1t
-tY1T			equ 21h ;Y1t
-tX2T			equ 22h ;X2t
-tY2T			equ 23h ;Y2t
-tX3T			equ 24h ;X3t
-tY3T			equ 25h ;Y3t
-tX4T			equ 26h ;X4t
-tY4T			equ 27h ;Y4t
-tX5T			equ 28h ;X5t
-tY5T			equ 29h ;Y5t
-tX6T			equ 2Ah ;X6t
-tY6T			equ 2Bh ;Y6t
+#define tx1t	$20 ;x1t
+#define ty1t	$21 ;y1t
+#define tx2t	$22 ;x2t
+#define ty2t	$23 ;y2t
+#define tx3t	$24 ;x3t
+#define ty3t	$25 ;y3t
+#define tx4t	$26 ;x4t
+#define ty4t	$27 ;y4t
+#define tx5t	$28 ;x5t
+#define ty5t	$29 ;y5t
+#define tx6t	$2a ;x6t
+#define ty6t	$2b ;y6t
 
-;Polar Equations Have Bit 6 Set
+;polar equations have bit 6 set
 ;----------------------------------
-tR1			equ 40h ;R1
-tR2			equ 41h ;R2
-tR3			equ 42h ;R3
-tR4			equ 43h ;R4
-tR5			equ 44h ;R5
-tR6			equ 45h ;R6
+#define tr1	$40 ;r1
+#define tr2	$41 ;r2
+#define tr3	$42 ;r3
+#define tr4	$43 ;r4
+#define tr5	$44 ;r5
+#define tr6	$45 ;r6
 
-;Recursion Equations Have Bit 7 Set
+;recursion equations have bit 7 set
 ;----------------------------------
-tun			equ 80h ;Un
-tvn			equ 81h ;Vn
-twn			equ 82h ;Wn
+#define tun	$80 ;un
+#define tvn	$81 ;vn
+#define twn	$82 ;wn
 
-;2nd Half Of User Picture Tokens
+;$2nd half of user picture tokens
 ;------------------------------------
-tPic1			equ 00h ;PIC1
-tPic2			equ 01h ;PIC2
-tPic3			equ 02h ;PIC3
-tPic4			equ 03h ;PIC4
-tPic5			equ 04h ;PIC5
-tPic6			equ 05h ;PIC6
-tPic7			equ 06h ;PIC7
-tPic8			equ 07h ;PIC8
-tPic9			equ 08h ;PIC9
-tPic0			equ 09h ;PIC0
+#define tpic1	$00 ;pic1
+#define tpic2	$01 ;pic2
+#define tpic3	$02 ;pic3
+#define tpic4	$03 ;pic4
+#define tpic5	$04 ;pic5
+#define tpic6	$05 ;pic6
+#define tpic7	$06 ;pic7
+#define tpic8	$07 ;pic8
+#define tpic9	$08 ;pic9
+#define tpic0	$09 ;pic0
 
-;2nd Half Of User Graph Database Tokens
+;$2nd half of user graph database tokens
 ;--------------------------------------
-tGDB1			equ 00h ;GDB1
-tGDB2			equ 01h ;GDB2
-tGDB3			equ 02h ;GDB3
-tGDB4			equ 03h ;GDB4
-tGDB5			equ 04h ;GDB5
-tGDB6			equ 05h ;GDB6
-tGDB7			equ 06h ;GDB7
-tGDB8			equ 07h ;GDB8
-tGDB9			equ 08h ;GDB9
-tGDB0			equ 09h ;GDB0
+#define tgdb1	$00 ;gdb1
+#define tgdb2	$01 ;gdb2
+#define tgdb3	$02 ;gdb3
+#define tgdb4	$03 ;gdb4
+#define tgdb5	$04 ;gdb5
+#define tgdb6	$05 ;gdb6
+#define tgdb7	$06 ;gdb7
+#define tgdb8	$07 ;gdb8
+#define tgdb9	$08 ;gdb9
+#define tgdb0	$09 ;gdb0
 
-;2nd Half Of String Vars
+;$2nd half of string vars
 ;------------------------------
-tStr1			equ 00h
-tStr2			equ 01h
-tStr3			equ 02h
-tStr4			equ 03h
-tStr5			equ 04h
-tStr6			equ 05h
-tStr7			equ 06h
-tStr8			equ 07h
-tStr9			equ 08h
-tStr0			equ 09h
+#define tstr1	$00
+#define tstr2	$01
+#define tstr3	$02
+#define tstr4	$03
+#define tstr5	$04
+#define tstr6	$05
+#define tstr7	$06
+#define tstr8	$07
+#define tstr9	$08
+#define tstr0	$09
 
-;2nd Half Of System Output Only Variables
+;$2nd half of system output only variables
 ;-----------------------------------------------------------------
-;OPEN			equ 00h
-tRegEq			equ 01h ;REGRESSION EQUATION
-tStatN			equ 02h ;STATISTICS N
-tXMean			equ 03h ;X MEAN
-tSumX			equ 04h ;SUM(X)
-tSumXSqr		equ 05h ;SUM(X^2)
-tStdX			equ 06h ;STANDARD DEV X
-tStdPX			equ 07h ;STANDARD DEV POP X
-tMinX			equ 08h ;Min X VALUE
-tMaxX			equ 09h ;Max X VALUE
-tMinY			equ 0Ah ;Min Y VALUE
-tMaxY			equ 0Bh ;Max Y VALUE
-tYmean			equ 0Ch ;Y MEAN
-tSumY			equ 0Dh ;SUM(Y)
-tSumYSqr		equ 0Eh ;SUM(Y^2)
-tStdY			equ 0Fh ;STANDARD DEV Y
-tStdPY			equ 10h ;STANDARD DEV POP Y
-tSumXY			equ 11h ;SUM(XY)
-tCorr			equ 12h ;CORRELATION
-tMedX			equ 13h ;MED(X)
-tQ1			equ 14h ;1ST QUADRANT OF X
-tQ3			equ 15h ;3RD QUADRANT OF X
-tQuadA			equ 16h ;1ST TERM OF QUAD POLY REG/ Y-INT
-tQuadB			equ 17h ;2ND TERM OF QUAD POLY REG/ SLOPE
-tQuadC			equ 18h ;3RD TERM OF QUAD POLY REG
-tCubeD			equ 19h ;4TH TERM OF CUBIC POLY REG
-tQuartE			equ 1Ah ;5TH TERM OF QUART POLY REG
-tMedX1			equ 1Bh ;x1 FOR MED-MED
-tMedX2			equ 1Ch ;x2 FOR MED-MED
-tMedX3			equ 1Dh ;x3 FOR MED-MED
-tMedY1			equ 1Eh ;y1 FOR MED-MED
-tMedY2			equ 1Fh ;y2 FOR MED-MED
-tMedY3			equ 20h ;y3 FOR MED-MED
-tRecurn			equ 21h	;RECURSION N
-tStatP			equ 22h
-tStatZ			equ 23h
-tStatT			equ 24h
-tStatChi		equ 25h
-tStatF			equ 26h
-tStatDF			equ 27h
-tStatPhat		equ 28h
-tStatPhat1		equ 29h
-tStatPhat2		equ 2Ah
-tStatMeanX1		equ 2Bh
-tStatStdX1		equ 2Ch
-tStatN1			equ 2Dh
-tStatMeanX2		equ 2Eh
-tStatStdX2		equ 2Fh
-tStatN2			equ 30h
-tStatStdXP		equ 31h
-tStatLower		equ 32h
-tStatUpper		equ 33h
-tStat_s			equ 34h
-tLRSqr			equ 35h ;r^2
-tBRSqr			equ 36h ;R^2
+;open	$00
+#define tregeq	$01 ;regression equation
+#define tstatn	$02 ;statistics n
+#define txmean	$03 ;x mean
+#define tsumx	$04 ;sum(x)
+#define tsumxsqr	$05 ;sum(x^2)
+#define tstdx	$06 ;standard dev x
+#define tstdpx	$07 ;standard dev pop x
+#define tminx	$08 ;min x value
+#define tmaxx	$09 ;max x value
+#define tminy	$0a ;min y value
+#define tmaxy	$0b ;max y value
+#define tymean	$0c ;y mean
+#define tsumy	$0d ;sum(y)
+#define tsumysqr	$0e ;sum(y^2)
+#define tstdy	$0f ;standard dev y
+#define tstdpy	$10 ;standard dev pop y
+#define tsumxy	$11 ;sum(xy)
+#define tcorr	$12 ;correlation
+#define tmedx	$13 ;med(x)
+#define tq1	$14 ;1st quadrant of x
+#define tq3	$15 ;3rd quadrant of x
+#define tquada	$16 ;1st term of quad poly reg/ y-int
+#define tquadb	$17 ;2nd term of quad poly reg/ slope
+#define tquadc	$18 ;3rd term of quad poly reg
+#define tcubed	$19 ;4th term of cubic poly reg
+#define tquarte	$1a ;5th term of quart poly reg
+#define tmedx1	$1b ;x1 for med-med
+#define tmedx2	$1c ;x2 for med-med
+#define tmedx3	$1d ;x3 for med-med
+#define tmedy1	$1e ;y1 for med-med
+#define tmedy2	$1f ;y2 for med-med
+#define tmedy3	$20 ;y3 for med-med
+#define trecurn	$21	;recursion n
+#define tstatp	$22
+#define tstatz	$23
+#define tstatt	$24
+#define tstatchi	$25
+#define tstatf	$26
+#define tstatdf	$27
+#define tstatphat	$28
+#define tstatphat1	$29
+#define tstatphat2	$2a
+#define tstatmeanx1	$2b
+#define tstatstdx1	$2c
+#define tstatn1	$2d
+#define tstatmeanx2	$2e
+#define tstatstdx2	$2f
+#define tstatn2	$30
+#define tstatstdxp	$31
+#define tstatlower	$32
+#define tstatupper	$33
+#define tstat_s	$34
+#define tlrsqr	$35 ;r^2
+#define tbrsqr	$36 ;r^2
 
-;These next tokens are only used to access the data
+;these next tokens are only used to access the data
 ;they are display only and the user cannot access them at all
 ;------------------------------------------------------------
-tF_DF			equ 37h ;ANOFAV FACTOR DF
-tF_SS			equ 38h ;ANOFAV FACTOR SS
-tF_MS			equ 39h ;ANOFAV FACTOR MS
-tE_DF			equ 3Ah ;ANOFAV ERROR DF
-tE_SS			equ 3Bh ;ANOFAV ERROR SS
-tE_MS			equ 3Ch ;ANOFAV ERROR MS
+#define tf_df	$37 ;anofav factor df
+#define tf_ss	$38 ;anofav factor ss
+#define tf_ms	$39 ;anofav factor ms
+#define te_df	$3a ;anofav error df
+#define te_ss	$3b ;anofav error ss
+#define te_ms	$3c ;anofav error ms
 
-;2nd Half Of System Input/Output Variables
+;$2nd half of system input/output variables
 ;------------------------------------------------
-;      SYSTEM VARIABLE EQUATES
+;      system variable equates
 ;
-tuXscl			equ 0
-tuYscl			equ 1
-tXscl			equ 2
-tYscl			equ 3
-tRecuru0		equ 4 ;U 1ST INITIAL COND
-tRecurv0		equ 5 ;V 1ST INITIAL COND
-tun1			equ 6 ;U(N-1); NOT USED
-tvn1			equ 7 ;V(N-1); NOT USED
-tuRecuru0		equ 8 ;
-tuRecurv0		equ 9 ;
-tXmin			equ 0Ah
-tXmax			equ 0Bh
-tYmin			equ 0Ch
-tYmax			equ 0Dh
-tTmin			equ 0Eh
-tTmax			equ 0Fh
-tThetaMin		equ 10h
-tThetaMax		equ 11h
-tuXmin			equ 12h
-tuXmax			equ 13h
-tuYmin			equ 14h
-tuYmax			equ 15h
-tuThetMin		equ 16h
-tuThetMax		equ 17h
-tuTmin			equ 18h
-tuTmax			equ 19h
-tTblMin			equ 1Ah
-tPlotStart		equ 1Bh
-tuPlotStart		equ 1Ch
-tnMax			equ 1Dh
-tunMax			equ 1Eh
-tnMin			equ 1Fh
-tunMin			equ 20h
-tTblStep		equ 21h
-tTStep			equ 22h
-tThetaStep		equ 23h
-tuTStep			equ 24h
-tuThetStep		equ 25h
-tDeltaX			equ 26h
-tDeltaY			equ 27h
-tXFact			equ 28h
-tYFact			equ 29h
-tTblInput		equ 2Ah
-tFinN			equ 2Bh
-tFinI			equ 2Ch
-tFinPV			equ 2Dh
-tFinPMT			equ 2Eh
-tFinFV			equ 2Fh
-tFinPY			equ 30h
-tFinCY			equ 31h
-tRecurw0		equ 32h ;w0(1)
-tuRecurw0		equ 33h
-tPlotStep		equ 34h
-tuPlotStep		equ 35h
-tXres			equ 36h
-tuXres			equ 37h
-tRecuru02		equ 38h ;u0(2)
-tuRecuru02		equ 39h
-tRecurv02		equ 3Ch ;v0(2)
-tuRecurv02		equ 3Dh
-tRecurw02		equ 3Eh ;w0(2)
-tuRecurw02		equ 3Fh
+#define tuxscl	$00
+#define tuyscl	$01
+#define txscl	$02
+#define tyscl	$03
+#define trecuru0	$04 ;u 1st initial cond
+#define trecurv0	$05 ;v 1st initial cond
+#define tun1	$06 ;u(n-1); not used
+#define tvn1	$07 ;v(n-1); not used
+#define turecuru0	$08 ;
+#define turecurv0	$09 ;
+#define txmin	$0a
+#define txmax	$0b
+#define tymin	$0c
+#define tymax	$0d
+#define ttmin	$0e
+#define ttmax	$0f
+#define tthetamin	$10
+#define tthetamax	$11
+#define tuxmin	$12
+#define tuxmax	$13
+#define tuymin	$14
+#define tuymax	$15
+#define tuthetmin	$16
+#define tuthetmax	$17
+#define tutmin	$18
+#define tutmax	$19
+#define ttblmin	$1a
+#define tplotstart	$1b
+#define tuplotstart	$1c
+#define tnmax	$1d
+#define tunmax	$1e
+#define tnmin	$1f
+#define tunmin	$20
+#define ttblstep	$21
+#define ttstep	$22
+#define tthetastep	$23
+#define tutstep	$24
+#define tuthetstep	$25
+#define tdeltax	$26
+#define tdeltay	$27
+#define txfact	$28
+#define tyfact	$29
+#define ttblinput	$2a
+#define tfinn	$2b
+#define tfini	$2c
+#define tfinpv	$2d
+#define tfinpmt	$2e
+#define tfinfv	$2f
+#define tfinpy	$30
+#define tfincy	$31
+#define trecurw0	$32 ;w0(1)
+#define turecurw0	$33
+#define tplotstep	$34
+#define tuplotstep	$35
+#define txres	$36
+#define tuxres	$37
+#define trecuru02	$38 ;u0(2)
+#define turecuru02	$39
+#define trecurv02	$3c ;v0(2)
+#define turecurv02	$3d
+#define trecurw02	$3e ;w0(2)
+#define turecurw02	$3f
 
-;2nd Byte Of t2ByteTok Tokens
+;$2nd byte of t2bytetok tokens
 ;------------------------------
-tFinNPV			equ 00h
-tFinIRR			equ 01h
-tFinBAL			equ 02h
-tFinPRN			equ 03h
-tFinINT			equ 04h
-tFinToNom		equ 05h
-tFinToEff		equ 06h
-tFinDBD			equ 07h
-tLCM			equ 08h
-tGCD			equ 09h
-tRandInt		equ 0Ah
-tRandBin		equ 0Bh
-tSubStrng		equ 0Ch
-tStdDev			equ 0Dh
-tVariance		equ 0Eh
-tInStrng		equ 0Fh
-tDNormal		equ 10h
-tInvNorm		equ 11h
-tDT			equ 12h
-tChI			equ 13h
-tDF			equ 14h
-tBINPDF			equ 15h
-tBINCDF			equ 16h
-tPOIPDF			equ 17h
-tPOICDF			equ 18h
-tGEOPDF			equ 19h
-tGEOCDF			equ 1Ah
-tNormalPDF		equ 1Bh
-tTPDF			equ 1Ch
-tChiPDF			equ 1Dh
-tFPDF			equ 1Eh
-tRandNorm		equ 1Fh
-tFinFPMT		equ 20h
-tFinFI			equ 21h
-tFinFPV			equ 22h
-tFinFN			equ 23h
-tFinFFV			equ 24h
-tConj			equ 25h
-tReal			equ 26h
-tImag			equ 27h
-tAngle			equ 28h
-tCumSum			equ 29h
-tExpr			equ 2Ah
-tLength			equ 2Bh
-tDeltaLst		equ 2Ch
-tRef			equ 2Dh
-tRRef			equ 2Eh
-tToRect			equ 2Fh
-tToPolar		equ 30h
-tConste			equ 31h
-tSinReg			equ 32h
-tLogistic		equ 33h
-tLinRegTTest		equ 34h
-tShadeNorm		equ 35h
-tShadeT			equ 36h
-tShadeChi		equ 37h
-tShadeF			equ 38h
-tMatToLst		equ 39h
-tLstToMat		equ 3Ah
-tZTest			equ 3Bh
-tTTest			equ 3Ch
-t2SampZTest		equ 3Dh
-t1PropZTest		equ 3Eh
-t2PropZTest		equ 3Fh
-tChiTest		equ 40h
-tZIntVal		equ 41h
-t2SampZInt		equ 42h
-t1PropZInt		equ 43h
-t2PropZInt		equ 44h
-tGraphStyle		equ 45h
-t2SampTTest		equ 46h
-t2SampFTest		equ 47h
-tTIntVal		equ 48h
-t2SampTInt		equ 49h
-tSetupLst		equ 4Ah
-tFinPMTend		equ 4Bh
-tFinPMTbeg		equ 4Ch
-tRealM			equ 4Dh
-tPolarM			equ 4Eh
-tRectM			equ 4Fh
-tExprOn			equ 50h
-tExprOff		equ 51h
-tClrAllLst		equ 52h
-tGetCalc		equ 53h
-tDelVar			equ 54h
-tEquToStrng		equ 55h
-tStrngToEqu		equ 56h
-tDelLast		equ 57h
-tSelect			equ 58h
-tANOVA			equ 59h
-tModBox			equ 5Ah
-tNormProb		equ 5Bh
-tMGT			equ 64h ;VERTICAL SPLIT
-tZFit			equ 65h ;ZOOM FIT
-tDiag_on		equ 66h ;DIANOSTIC DISPLAY ON
-tDiag_off		equ 67h ;DIANOSTIC DISPLAY OFF
-tOkEnd2v0		equ 67h ;end of 2byte tokens for version 0.
-tArchive		equ 68h ;archive
-tUnarchive		equ 69h ;unarchive
-tasm			equ 6Ah
-tasmComp		equ 6Bh	;asm compile
-tasmPrgm		equ 6Ch	;signifies a program is asm
-tasmCmp			equ 6Dh	;asm program is compiled
-tLcapAAcute		equ 6Eh
-tLcapAGrave		equ 6Fh
-tLcapACaret		equ 70h
-tLcapADier		equ 71h
-tLaAcute		equ 72h
-tLaGrave		equ 73h
-tLaCaret		equ 74h
-tLaDier			equ 75h
-tLcapEAcute		equ 76h
-tLcapEGrave		equ 77h
-tLcapECaret		equ 78h
-tLcapEDier		equ 79h
-tLeAcute		equ 7Ah
-tLeGrave		equ 7Bh
-tLeCaret		equ 7Ch
-tLeDier			equ 7Dh
-tLcapIGrave		equ 7Fh
-tLcapICaret		equ 80h
-tLcapIDier		equ 81h
-tLiAcute		equ 82h
-tLiGrave		equ 83h
-tLiCaret		equ 84h
-tLiDier			equ 85h
-tLcapOAcute		equ 86h
-tLcapOGrave		equ 87h
-tLcapOCaret		equ 88h
-tLcapODier		equ 89h
-tLoAcute		equ 8Ah
-tLoGrave		equ 8Bh
-tLoCaret		equ 8Ch
-tLoDier			equ 8Dh
-tLcapUAcute		equ 8Eh
-tLcapUGrave		equ 8Fh
-tLcapUCaret		equ 90h
-tLcapUDier		equ 91h
-tLuAcute		equ 92h
-tLuGrave		equ 93h
-tLuCaret		equ 94h
-tLuDier			equ 95h
-tLcapCCed		equ 96h
-tLcCed			equ 97h
-tLcapNTilde		equ 98h
-tLnTilde		equ 99h
-tLaccent		equ 9Ah
-tLgrave			equ 9Bh
-tLdieresis		equ 9Ch
-tLquesDown		equ 9Dh
-tLexclamDown		equ 9Eh
-tLalpha			equ 9Fh
-tLbeta			equ 0A0h
-tLgamma			equ 0A1h
-tLcapDelta		equ 0A2h
-tLdelta			equ 0A3h
-tLepsilon		equ 0A4h
-tLlambda		equ 0A5h
-tLmu			equ 0A6h
-tLpi			equ 0A7h
-tLrho			equ 0A8h
-tLcapSigma		equ 0A9h
-tLphi			equ 0ABh
-tLcapOmega		equ 0ACh
-tLphat			equ 0ADh
-tLchi			equ 0AEh
-tLstatF			equ 0AFh
-tLa			equ 0B0h
-tLb			equ 0B1h
-tLc			equ 0B2h
-tLd			equ 0B3h
-tLsmalle		equ 0B4h
-tLf			equ 0B5h
-tLsmallg		equ 0B6h
-tLh			equ 0B7h
-tLi			equ 0B8h
-tLj			equ 0B9h
-tLk			equ 0BAh
-tLl			equ 0BCh
-tLm			equ 0BDh
-tLsmalln		equ 0BEh
-tLo			equ 0BFh
-tLp			equ 0C0h
-tLq			equ 0C1h
-tLsmallr		equ 0C2h
-tLs			equ 0C3h
-tLsmallt		equ 0C4h
-tLu			equ 0C5h
-tLv			equ 0C6h
-tLw			equ 0C7h
-tLx			equ 0C8h
-tLy			equ 0C9h
-tLz			equ 0CAh
-tLsigma			equ 0CBh
-tLtau			equ 0CCh
-tLcapIAcute		equ 0CDh
-tGarbagec		equ 0CEh
-LastToken		equ 0CEh ;tLAST TOKEN IN THIS VERSION...
+#define tfinnpv	$00
+#define tfinirr	$01
+#define tfinbal	$02
+#define tfinprn	$03
+#define tfinint	$04
+#define tfintonom	$05
+#define tfintoeff	$06
+#define tfindbd	$07
+#define tlcm	$08
+#define tgcd	$09
+#define trandint	$0a
+#define trandbin	$0b
+#define tsubstrng	$0c
+#define tstddev	$0d
+#define tvariance	$0e
+#define tinstrng	$0f
+#define tdnormal	$10
+#define tinvnorm	$11
+#define tdt	$12
+#define tchi	$13
+#define tdf	$14
+#define tbinpdf	$15
+#define tbincdf	$16
+#define tpoipdf	$17
+#define tpoicdf	$18
+#define tgeopdf	$19
+#define tgeocdf	$1a
+#define tnormalpdf	$1b
+#define ttpdf	$1c
+#define tchipdf	$1d
+#define tfpdf	$1e
+#define trandnorm	$1f
+#define tfinfpmt	$20
+#define tfinfi	$21
+#define tfinfpv	$22
+#define tfinfn	$23
+#define tfinffv	$24
+#define tconj	$25
+#define treal	$26
+#define timag	$27
+#define tangle	$28
+#define tcumsum	$29
+#define texpr	$2a
+#define tlength	$2b
+#define tdeltalst	$2c
+#define tref	$2d
+#define trref	$2e
+#define ttorect	$2f
+#define ttopolar	$30
+#define tconste	$31
+#define tsinreg	$32
+#define tlogistic	$33
+#define tlinregttest	$34
+#define tshadenorm	$35
+#define tshadet	$36
+#define tshadechi	$37
+#define tshadef	$38
+#define tmattolst	$39
+#define tlsttomat	$3a
+#define tztest	$3b
+#define tttest	$3c
+#define t2sampztest	$3d
+#define t1propztest	$3e
+#define t2propztest	$3f
+#define tchitest	$40
+#define tzintval	$41
+#define t2sampzint	$42
+#define t1propzint	$43
+#define t2propzint	$44
+#define tgraphstyle	$45
+#define t2sampttest	$46
+#define t2sampftest	$47
+#define ttintval	$48
+#define t2samptint	$49
+#define tsetuplst	$4a
+#define tfinpmtend	$4b
+#define tfinpmtbeg	$4c
+#define trealm	$4d
+#define tpolarm	$4e
+#define trectm	$4f
+#define texpron	$50
+#define texproff	$51
+#define tclralllst	$52
+#define tgetcalc	$53
+#define tdelvar	$54
+#define tequtostrng	$55
+#define tstrngtoequ	$56
+#define tdellast	$57
+#define tselect	$58
+#define tanova	$59
+#define tmodbox	$5a
+#define tnormprob	$5b
+#define tmgt	$64 ;vertical split
+#define tzfit	$65 ;zoom fit
+#define tdiag_on	$66 ;dianostic display on
+#define tdiag_off	$67 ;dianostic display off
+#define tokend2v0	$67 ;end of 2byte tokens for version 0.
+#define tarchive	$68 ;archive
+#define tunarchive	$69 ;unarchive
+#define tasm	$6a
+#define tasmcomp	$6b	;asm compile
+#define tasmprgm	$6c	;signifies a program is asm
+#define tasmcmp	$6d	;asm program is compiled
+#define tlcapaacute	$6e
+#define tlcapagrave	$6f
+#define tlcapacaret	$70
+#define tlcapadier	$71
+#define tlaacute	$72
+#define tlagrave	$73
+#define tlacaret	$74
+#define tladier	$75
+#define tlcapeacute	$76
+#define tlcapegrave	$77
+#define tlcapecaret	$78
+#define tlcapedier	$79
+#define tleacute	$7a
+#define tlegrave	$7b
+#define tlecaret	$7c
+#define tledier	$7d
+#define tlcapigrave	$7f
+#define tlcapicaret	$80
+#define tlcapidier	$81
+#define tliacute	$82
+#define tligrave	$83
+#define tlicaret	$84
+#define tlidier	$85
+#define tlcapoacute	$86
+#define tlcapograve	$87
+#define tlcapocaret	$88
+#define tlcapodier	$89
+#define tloacute	$8a
+#define tlograve	$8b
+#define tlocaret	$8c
+#define tlodier	$8d
+#define tlcapuacute	$8e
+#define tlcapugrave	$8f
+#define tlcapucaret	$90
+#define tlcapudier	$91
+#define tluacute	$92
+#define tlugrave	$93
+#define tlucaret	$94
+#define tludier	$95
+#define tlcapcced	$96
+#define tlcced	$97
+#define tlcapntilde	$98
+#define tlntilde	$99
+#define tlaccent	$9a
+#define tlgrave	$9b
+#define tldieresis	$9c
+#define tlquesdown	$9d
+#define tlexclamdown	$9e
+#define tlalpha	$9f
+#define tlbeta	$a0
+#define tlgamma	$a1
+#define tlcapdelta	$a2
+#define tldelta	$a3
+#define tlepsilon	$a4
+#define tllambda	$a5
+#define tlmu	$a6
+#define tlpi	$a7
+#define tlrho	$a8
+#define tlcapsigma	$a9
+#define tlphi	$ab
+#define tlcapomega	$ac
+#define tlphat	$ad
+#define tlchi	$ae
+#define tlstatf	$af
+#define tla	$b0
+#define tlb	$b1
+#define tlc	$b2
+#define tld	$b3
+#define tlsmalle	$b4
+#define tlf	$b5
+#define tlsmallg	$b6
+#define tlh	$b7
+#define tli	$b8
+#define tlj	$b9
+#define tlk	$ba
+#define tll	$bc
+#define tlm	$bd
+#define tlsmalln	$be
+#define tlo	$bf
+#define tlp	$c0
+#define tlq	$c1
+#define tlsmallr	$c2
+#define tls	$c3
+#define tlsmallt	$c4
+#define tlu	$c5
+#define tlv	$c6
+#define tlw	$c7
+#define tlx	$c8
+#define tly	$c9
+#define tlz	$ca
+#define tlsigma	$cb
+#define tltau	$cc
+#define tlcapiacute	$cd
+#define tgarbagec	$ce
+#define lasttoken	$ce ;tlast token in this version...
 
-;Data Type Equates                                                    
+;data type equates
 ;---------------------------------------------------------------------
-RealObj			equ 0
-ListObj			equ 1
-MatObj			equ 2
-EquObj			equ 3
-StrngObj		equ 4
-ProgObj			equ 5
-ProtProgObj		equ 6
-PictObj			equ 7
-GDBObj			equ 8
-UnknownObj		equ 9
-UnknownEquObj		equ 0Ah
-NewEquObj		equ 0Bh
-CplxObj			equ 0Ch
-CListObj		equ 0Dh
-UndefObj		equ 0Eh
-WindowObj		equ 0Fh
-ZStoObj			equ 10h
-TblRngObj		equ 11h
-LCDObj			equ 12h
-BackupObj		equ 13h
-AppObj			equ 14h	;application, only used in menus/link
-AppVarObj		equ 15h	;application variable
-TempProgObj		equ 16h ;program, home deletes when finished
-GroupObj		equ 17h ;group.
+#define realobj	$00
+#define listobj	$01
+#define matobj	$02
+#define equobj	$03
+#define strngobj	$04
+#define progobj	$05
+#define protprogobj	$06
+#define pictobj	$07
+#define gdbobj	$08
+#define unknownobj	$09
+#define unknownequobj	$0a
+#define newequobj	$0b
+#define cplxobj	$0c
+#define clistobj	$0d
+#define undefobj	$0e
+#define windowobj	$0f
+#define zstoobj	$10
+#define tblrngobj	$11
+#define lcdobj	$12
+#define backupobj	$13
+#define appobj	$14	;application, only used in menus/link
+#define appvarobj	$15	;application variable
+#define tempprogobj	$16 ;program, home deletes when finished
+#define groupobj	$17 ;group.
 
-;I/O Equates                                                          
+;i/o equates
 ;---------------------------------------------------
-D0D1_bits		equ 03h
-D0LD1L			equ 03h
-D0LD1H			equ 01h
-D0HD1L			equ 02h
-D0HD1H			equ 00h
-bport			equ 0 ;4-bit link port (I/O) 
+#define d0d1_bits	$03
+#define d0ld1l	$03
+#define d0ld1	$01
+#define d0d1l	$02
+#define d0d1	$00
+#define bport	$00 ;$4-bit link port (i/o)
 
-;Device Codes
+;device codes
 ;-----------------------------------------------------------------
-TI82DEV			equ 82h
-PC82DEV			equ 02h
-MAC82DEV		equ 12h
-TI83FDEV		equ 73h
-LINK83FDEV		equ 23h
-TI83DEV			equ 83h
-PC83DEV			equ 03h
-MAC83DEV		equ 13h
-TI85DEV			equ 95h ;different than real 85 so me talk
-PC85DEV			equ 05h
-MAC85DEV		equ 15h
-TI73DEV			equ 74h ;device x3 is always an 83
-PC73DEV			equ 07h
-MAC73DEV		equ 17h
-LINK73FDEV		equ 23h
-PC83FDEV		equ 23h
+#define ti82dev	$82
+#define pc82dev	$02
+#define mac82dev	$12
+#define ti83fdev	$73
+#define link83fdev	$23
+#define ti83dev	$83
+#define pc83dev	$03
+#define mac83dev	$13
+#define ti85dev	$95 ;different than real 85 so me talk
+#define pc85dev	$05
+#define mac85dev	$15
+#define ti73dev	$74 ;device x3 is always an 83
+#define pc73dev	$07
+#define mac73dev	$17
+#define link73fdev	$23
+#define pc83fdev	$23
 
-;System Error Codes                                                  
+;system error codes
 ;-----------------------------------------------------------
-E_EDITF			equ 7 ;allow re-entering application
-E_EDIT			equ 1<<E_EDITF
-E_Mask			equ 7Fh
-E_Overflow		equ 1+E_EDIT
-E_DivBy0		equ 2+E_EDIT
-E_SingularMat		equ 3+E_EDIT
-E_Domain		equ 4+E_EDIT
-E_Increment		equ 5+E_EDIT
-E_Break			equ 6+E_EDIT
-E_NonReal		equ 7+E_EDIT
-E_Syntax		equ 8+E_EDIT
-E_DataType		equ 9+E_EDIT
-E_Argument		equ 10+E_EDIT
-E_DimMismatch		equ 11+E_EDIT
-E_Dimension		equ 12+E_EDIT
-E_Undefined		equ 13+E_EDIT
-E_Memory		equ 14+E_EDIT
-E_Invalid		equ 15+E_EDIT
-E_IllegalNest		equ 16+E_EDIT
-E_Bound			equ 17+E_EDIT
-E_GraphRange		equ 18+E_EDIT
-E_Zoom			equ 19+E_EDIT
-E_Label			equ 20
-E_Stat			equ 21
-E_Solver		equ 22+E_EDIT
-E_Singularity		equ 23+E_EDIT
-E_SignChange		equ 24+E_EDIT
-E_Iterations		equ 25+E_EDIT
-E_BadGuess		equ 26+E_EDIT
-E_StatPlo		equ 27
-E_TolTooSmall		equ 28+E_EDIT
-E_Reserved		equ 29+E_EDIT
-E_Mode			equ 30+E_EDIT
-E_LnkErr		equ 31+E_EDIT
-E_LnkMemErr		equ 32+E_EDIT
-E_LnkTransErr		equ 33+E_EDIT
-E_LnkDupErr		equ 34+E_EDIT
-E_LnkMemFull		equ 35+E_EDIT
-E_Unknown		equ 36+E_EDIT
-E_Scale			equ 37+E_EDIT
-E_IdNotFound		equ 38
-E_NoMode		equ 39+E_EDIT
-E_Validation		equ 40
-E_Length		equ 41+E_EDIT
-E_Application		equ 42+E_EDIT
-E_AppErr1		equ 43+E_EDIT
-E_AppErr2		equ 44+E_EDIT
-E_ExpiredApp		equ 45
-E_BadAdd		equ 46
-E_Archived		equ 47+E_EDIT
-E_Version		equ 48
-E_ArchFull		equ 49
-E_Variable		equ 50+E_EDIT
-E_Duplicate		equ 51+E_EDIT
-HigErrNum		equ 51
-;Obsolete error numbers 34 ;first LINK error
-E_LinkIOChkSum		equ 34
-E_LinkIOTimeOut		equ 35
-E_LinkIOBusy		equ 36
-E_LinkIOVer		equ 37
+#define e_editf	7 ;allow re-entering application
+#define e_edit	1<<e_editf
+#define e_mask	$7f
+#define e_overflow	1+e_edit
+#define e_divby0	2+e_edit
+#define e_singularmat	3+e_edit
+#define e_domain	4+e_edit
+#define e_increment	5+e_edit
+#define e_break	6+e_edit
+#define e_nonreal	7+e_edit
+#define e_syntax	8+e_edit
+#define e_datatype	9+e_edit
+#define e_argument	10+e_edit
+#define e_dimmismatch	11+e_edit
+#define e_dimension	12+e_edit
+#define e_undefined	13+e_edit
+#define e_memory	14+e_edit
+#define e_invalid	15+e_edit
+#define e_illegalnest	16+e_edit
+#define e_bound	17+e_edit
+#define e_graphrange	18+e_edit
+#define e_zoom	19+e_edit
+#define e_label	20
+#define e_stat	21
+#define e_solver	22+e_edit
+#define e_singularity	23+e_edit
+#define e_signchange	24+e_edit
+#define e_iterations	25+e_edit
+#define e_badguess	26+e_edit
+#define e_statplo	27
+#define e_toltoosmall	28+e_edit
+#define e_reserved	29+e_edit
+#define e_mode	30+e_edit
+#define e_lnkerr	31+e_edit
+#define e_lnkmemerr	32+e_edit
+#define e_lnktranserr	33+e_edit
+#define e_lnkduperr	34+e_edit
+#define e_lnkmemfull	35+e_edit
+#define e_unknown	36+e_edit
+#define e_scale	37+e_edit
+#define e_idnotfound	38
+#define e_nomode	39+e_edit
+#define e_validation	40
+#define e_length	41+e_edit
+#define e_application	42+e_edit
+#define e_apperr1	43+e_edit
+#define e_apperr2	44+e_edit
+#define e_expiredapp	45
+#define e_badadd	46
+#define e_archived	47+e_edit
+#define e_version	48
+#define e_archfull	49
+#define e_variable	50+e_edit
+#define e_duplicate	51+e_edit
+#define higerrnum	51
+;obsolete error numbers 34 ;first link error
+#define e_linkiochksum	34
+#define e_linkiotimeout	35
+#define e_linkiobusy	36
+#define e_linkiover	37
 
-;Equates To RAM Locations For Stat Vars
+;equates to ram locations for stat vars
 ;----------------------------------------------------------------
-FPLEN			equ 9 ;Length of a floating-point number.
-StatN			equ statVars
-XMean			equ StatN + FPLEN
-SumX			equ XMean + FPLEN
-SumXSqr			equ SumX + FPLEN
-StdX			equ SumXSqr + FPLEN
-StdPX			equ StdX + FPLEN
-MinX			equ StdPX + FPLEN
-MaxX			equ MinX + FPLEN
-MinY			equ MaxX + FPLEN
-MaxY			equ MinY + FPLEN
-YMean			equ MaxY + FPLEN
-SumY			equ YMean + FPLEN
-SumYSqr			equ SumY + FPLEN
-StdY			equ SumYSqr + FPLEN
-StdPY			equ StdY + FPLEN
-SumXY			equ StdPY + FPLEN
-Corr			equ SumXY + FPLEN
-MedX			equ Corr + FPLEN
-Q1			equ MedX + FPLEN
-Q3			equ Q1 + FPLEN
-QuadA			equ Q3 + FPLEN
-QuadB			equ QuadA + FPLEN
-QuadC			equ QuadB + FPLEN
-CubeD			equ QuadC + FPLEN
-QuartE			equ CubeD + FPLEN
-MedX1			equ QuartE + FPLEN
-MedX2			equ MedX1 + FPLEN
-MedX3			equ MedX2 + FPLEN
-MedY1			equ MedX3 + FPLEN
-MedY2			equ MedY1 + FPLEN
-MedY3			equ MedY2 + FPLEN
-PStat			equ MedY3 + 2*FPLEN
-ZStat			equ PStat + FPLEN
-TStat			equ ZStat + FPLEN
-ChiStat			equ TStat + FPLEN
-FStat			equ ChiStat + FPLEN
-DF			equ FStat + FPLEN
-Phat			equ DF + FPLEN
-Phat1			equ Phat + FPLEN
-Phat2			equ Phat1 + FPLEN
-MeanX1			equ Phat2 + FPLEN
-StdX1			equ MeanX1 + FPLEN
-StatN1			equ StdX1 + FPLEN
-MeanX2			equ StatN1 + FPLEN
-StdX2			equ MeanX2 + FPLEN
-StatN2			equ StdX2 + FPLEN
-StdXP2			equ StatN2 + FPLEN
-SLower			equ StdXP2 + FPLEN
-SUpper			equ SLower + FPLEN
-SStat			equ SUpper + FPLEN
-F_DF			equ anovaf_vars
-F_SS			equ F_DF + FPLEN
-F_MS			equ F_SS + FPLEN
-E_DF			equ F_MS + FPLEN
-E_SS			equ E_DF + FPLEN
-E_MS			equ E_SS + FPLEN
-.list
+#define fplen	9 ;length of a floating-point number.
+#define statn	statvars
+#define xmean	statn+fplen
+#define sumx	xmean+fplen
+#define sumxsqr	sumx+fplen
+#define stdx	sumxsqr+fplen
+#define stdpx	stdx+fplen
+#define minx	stdpx+fplen
+#define maxx	minx+fplen
+#define miny	maxx+fplen
+#define maxy	miny+fplen
+#define ymean	maxy+fplen
+#define sumy	ymean+fplen
+#define sumysqr	sumy+fplen
+#define stdy	sumysqr+fplen
+#define stdpy	stdy+fplen
+#define sumxy	stdpy+fplen
+#define corr	sumxy+fplen
+#define medx	corr+fplen
+#define q1	medx+fplen
+#define q3	q1+fplen
+#define quada	q3+fplen
+#define quadb	quada+fplen
+#define quadc	quadb+fplen
+#define cubed	quadc+fplen
+#define quarte	cubed+fplen
+#define medx1	quarte+fplen
+#define medx2	medx1+fplen
+#define medx3	medx2+fplen
+#define medy1	medx3+fplen
+#define medy2	medy1+fplen
+#define medy3	medy2+fplen
+#define pstat	medy3+2*fplen
+#define zstat	pstat+fplen
+#define tstat	zstat+fplen
+#define chistat	tstat+fplen
+#define fstat	chistat+fplen
+#define df	fstat+fplen
+#define phat	df+fplen
+#define phat1	phat+fplen
+#define phat2	phat1+fplen
+#define meanx1	phat2+fplen
+#define stdx1	meanx1+fplen
+#define statn1	stdx1+fplen
+#define meanx2	statn1+fplen
+#define stdx2	meanx2+fplen
+#define statn2	stdx2+fplen
+#define stdxp2	statn2+fplen
+#define slower	stdxp2+fplen
+#define supper	slower+fplen
+#define sstat	supper+fplen
+#define f_df	anovaf_vars
+#define f_ss	f_df+fplen
+#define f_ms	f_ss+fplen
+#define e_df	f_ms+fplen
+#define e_ss	e_df+fplen
+#define e_ms	e_ss+fplen

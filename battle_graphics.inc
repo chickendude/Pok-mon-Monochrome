@@ -17,9 +17,9 @@ battle_wild_pokemon_intro:
 	xor a
 	ld bc,POKEMON_SPRITE_SIZE
 	ld l,0
-	call largeSprite_push
+	call large_sprite_push
 	push ix
-		call largeSprite
+		call large_sprite
 	pop ix
 	call fade_in
 
@@ -30,9 +30,9 @@ battle_wild_pokemon_intro_loop:
 		sub b
 		ld bc,POKEMON_SPRITE_SIZE
 		ld l,0
-		call largeSprite_push
+		call large_sprite_push
 		push ix
-			call largeSprite
+			call large_sprite
 		pop ix
 	pop bc
 	djnz battle_wild_pokemon_intro_loop
@@ -41,19 +41,19 @@ battle_wild_pokemon_intro_loop:
 	sub b
 	ld bc,POKEMON_SPRITE_SIZE
 	ld l,0
-	call largeSprite
+	call large_sprite
 ;afficher le texte du pokémon sauvage
 	ld hl,battle_wild_pokemon_intro1
 	jp draw_battle_dialogue
 
 ;sauver registres
-largeSprite_push:
+large_sprite_push:
 	push af
 	push bc
 	push hl
 	push ix
-		call largeSprite
-		call fastCopy
+		call large_sprite
+		call fast_copy
 	pop ix
 	pop hl
 	pop bc
@@ -85,7 +85,7 @@ battle_draw_player_next:
 	xor a
 	ld bc,$1704
 	ld l,26
-	jp largeSprite
+	jp large_sprite
 
 ;- Routines d'affichages de différentes choses durant les combats -------------------------------------------------
 battle_draw_screen:
@@ -106,7 +106,7 @@ battle_current_opponent_pokemon_address = $+1	;###
 	ld bc,POKEMON_SPRITE_SIZE
 	ld a,screen_width-pokemon_sprite_width-pokemon_sprite_battle_distance_from_screen
 	ld l,0
-	call largeSprite	; on affiche le sprite du pokémon adverse
+	call large_sprite	; on affiche le sprite du pokémon adverse
 
 	call battle_draw_opponent_pokemon_health_bar
 ;	call battle_draw_opponent_pokemon_state
@@ -116,14 +116,14 @@ battle_current_opponent_pokemon_address = $+1	;###
 		ld l,7
 		ld ix,battle_bar
 		push ix
-			call largeSprite	; on affiche sa barre de vie
+			call large_sprite	; on affiche sa barre de vie
 		pop ix
 	pop bc
 	; Ensuite lorsque ce sera un dresseur : afficher ses pokéballs
 	call flip_sprite	; on la flip horizontalement
 	ld a,39
 	ld l,32
-	call largeSprite	; puis on l'affiche de notre côté
+	call large_sprite	; puis on l'affiche de notre côté
 	;-------------------------------------------
 	; À partie de là on ne s'occupe plus que de notre côté
 	;-------------------------------------------
@@ -139,7 +139,7 @@ battle_current_player_pokemon_address = $+1		;###
 	call flip_sprite
 	ld a,pokemon_sprite_battle_distance_from_screen
 	ld l,23
-	call largeSprite	; on affiche le sprite du pokémon adverse
+	call large_sprite	; on affiche le sprite du pokémon adverse
 ;	call battle_draw_player_pokemon_state
 ;	call calculate_next_experience
 	call battle_draw_player_pokemon_health_bar
@@ -157,8 +157,8 @@ battle_player_pokemon_blink_sprite_loop:
 	call flip_sprite
 	ld a,pokemon_sprite_battle_distance_from_screen
 	ld l,23
-	call largeSprite
-	call fastCopy
+	call large_sprite
+	call fast_copy
 	ld b,battle_blink_sprite_speed
 	call wait
 	pop ix
@@ -175,8 +175,8 @@ battle_opponent_pokemon_blink_sprite_loop:
 		ld bc,POKEMON_SPRITE_SIZE
 		ld a,screen_width-pokemon_sprite_width-pokemon_sprite_battle_distance_from_screen
 		ld l,0
-		call largeSprite
-		call fastCopy
+		call large_sprite
+		call fast_copy
 		ld b,battle_blink_sprite_speed
 		call wait
 	pop ix
@@ -209,7 +209,7 @@ battle_draw_player_pokemon_state:	; input : hl = player pokemon state
 	pop af
 	call battle_draw_pokemon_state
 	ld de,$2a1f
-	ld (penCol),de
+	ld (pencol),de
 	bcall(_VPutS)
 	ret
 
@@ -224,7 +224,7 @@ battle_draw_opponent_pokemon_state:	; input : hl = opponent pokemon state
 	pop af
 	call battle_draw_pokemon_state
 	ld de,$1136
-	ld (penCol),de
+	ld (pencol),de
 	bcall(_VPutS)
 	ret
 
@@ -315,7 +315,7 @@ battle_draw_pokeball_if_already_captured:	; input : hl=id
 	ld l,17
 	ld b,4
 	ld ix,pokeball_pokemon_alread_captured
-	jp putSprite
+	jp put_sprite
 
 battle_draw_player_pokeballs:
 	xor a
@@ -345,7 +345,7 @@ battle_draw_player_pokeballs_count = $+1
 	add a,c
 	ld l,42
 	ld b,3
-	call putSprite
+	call put_sprite
 	ld a,(battle_draw_player_pokeballs_count)
 	inc a
 	ld (battle_draw_player_pokeballs_count),a
@@ -369,14 +369,14 @@ battle_draw_evolution:
 	ld a,28
 	ld l,11
 	push ix
-	call largeSprite
+	call large_sprite
 	pop ix
-	jp fastCopy
+	jp fast_copy
 
 ;- Routines graphiques pour le texte ------------------------------------------------------------------------------
-battle_draw_frame:	; affiche le cadre des textes et positionne penCol/penrow
+battle_draw_frame:	; affiche le cadre des textes et positionne pencol/penrow
 	ld de,$3202
-	ld (penCol),de
+	ld (pencol),de
 	ld bc,$0f60
 	ld de,$0031
 	jp draw_frame
@@ -426,6 +426,6 @@ battle_disp_evolution_things:
 	inc hl
 	call _v_type
 	ld de,$3802
-	ld (penCol),de
+	ld (pencol),de
 	ret
 ;------------------------------------------------------------------------------------------------------------------

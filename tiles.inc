@@ -13,5 +13,4 @@ event_tiles:
 	.db 27	\	.dw event_door
 event_block_tiles_end:
 
-
 event_tiles_end:

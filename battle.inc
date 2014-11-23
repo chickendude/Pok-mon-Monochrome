@@ -57,13 +57,13 @@ battle_menu_pokemon_valid:
 	push de
 	push hl
 	call battle_draw_screen
-	call battle_draw_frame	; smaller than having to restore penCol/penRow, even if the frame is already drawn by the previous routine
+	call battle_draw_frame	; smaller than having to restore pencol/penrow, even if the frame is already drawn by the previous routine
 	pop hl
 	call battle_disp_player_pokemon_name
 ;	ld hl,battle_player_pokemon_intro2
 	call _v_type
 	ld de,$3802
-	ld (penCol),de
+	ld (pencol),de
 	ld hl,battle_player_pokemon_change
 	call battle_disp_vputs
 	pop de	; de = called pokémon stats pointer
@@ -178,16 +178,16 @@ battle_menu_damages_loop:
 		call battle_reset_opponent_pokemon_health_bar_and_hp
 		ld hl,current_pokemon+CP_HPTOT
 		call battle_draw_opponent_pokemon_health_bar+3
-		ld de,$0A18
+		ld de,$0a18
 		ld hl,HP_txt
-		call draw_text_fastcopy	;draw the new HP and call fastcopy
+		call draw_text_fast_copy	;draw the new HP and call fastcopy
 	pop hl
 	pop bc
 	djnz battle_menu_damages_loop
 battle_attack_calculate_opponent_damages_skip:
-	ld de,$0A18
+	ld de,$0a18
 	ld hl,HP_txt
-	call draw_text_fastcopy	;draw the new HP and call fastcopy
+	call draw_text_fast_copy	;draw the new HP and call fastcopy
 	ld a,(CE)
 	cp 1
 	 call nz,battle_disp_effectivity
@@ -222,7 +222,7 @@ battle_fight_menu_next_type_loop:
 	add hl,de
 	djnz battle_fight_menu_next_type_loop
 	ld de,$2a02
-	ld (penCol),de
+	ld (pencol),de
 	bcall(_VPutS)
 	pop af
 	ld c,a
@@ -231,20 +231,20 @@ battle_fight_menu_next_type_loop:
 	inc hl
 	ld a,(hl)
 	ld de,$2a4b
-	ld (penCol),de
+	ld (pencol),de
 	call _vdispa
 	ld de,$2a53
-	ld (penCol),de
+	ld (pencol),de
 	ld a,$2f
-	bcall(_VPutMap)
+	bcall(_vputmap)
 	pop hl
 	inc hl	; ld de,attack_pp-attack_data
 	inc hl	; add hl,de
 	ld a,(hl)
 	ld de,$2a57
-	ld (penCol),de
+	ld (pencol),de
 	call _vdispa
-	jp fastCopy
+	jp fast_copy
 
 
 ;- Routine qui se charge de rechercher le prochain pokémon en vie sur les 6 qu'a le joueur + le place dans la liste des pokémons ayant combattus
@@ -462,7 +462,7 @@ battle_inc_experience_bar_no_draw = $+1
 	jr nz,battle_inc_experience_bar_skip
 	push de
 	call battle_draw_player_pokemon_experience_bar
-	call fastCopy
+	call fast_copy
 	pop de
 	pop hl
 
@@ -496,13 +496,13 @@ battle_inc_lvl:	; ici, hl=XP
 	ld a,vmode_type_no_pause
 	ld (_v_mode),a
 	ld hl,battle_str_level_up
-	call _VPutS_ml
+	call _vputs_ml
 	pop hl
 	push hl
 	ld a,(hl)
 	call _vdispa
 	ld a,$21
-	bcall(_VPutMap)	; affiche "!"
+	bcall(_vputmap)	; affiche "!"
 	call _v_disp_pause
 	pop hl
 	push hl
@@ -531,7 +531,7 @@ battle_check_evolution:
 	jp nz,battle_handle_next_experience_max
 ; gérer l'évolution du pokémon
 	push hl
-	bcall(_GrBufClr)
+	bcall(_grbufclr)
 	call battle_draw_frame	; clear entire screen then redraw the text frame
 	ld hl,(battle_current_player_pokemon_address)
 	push hl
@@ -580,7 +580,7 @@ evolution_loop:
 	ld hl,battle_str_evolution_done
 	ld a,vmode_type_no_pause
 	ld (_v_mode),a
-	call _VPutS_ml
+	call _vputs_ml
 	pop hl
 	push hl
 	call battle_disp_player_pokemon_name
@@ -630,7 +630,7 @@ battle_new_attack:
 	ld a,vmode_type_no_pause
 	ld (_v_mode),a
 	ld hl,battle_str_learn_attack
-	call _VPutS_ml
+	call _vputs_ml
 	pop hl
 	push hl
 	;call find_attack
@@ -642,12 +642,12 @@ battle_new_attack:
 	ld de,$3523
 	call draw_frame
 	ld de,$243b
-	ld (penCol),de
+	ld (pencol),de
 	xor a
 	ld (_v_mode),a
 ;	ld (menu_cursor),a
 	ld hl,battle_str_learn_attack_valid
-	call _VPutS_ml
+	call _vputs_ml
 	ld a,1
 ;	ld (menu_max_option),a
 	add a,35
@@ -708,22 +708,22 @@ battle_learn_new_attack_valid:
 	or a
 	jr z,battle_learn_new_attack_ok	; le slot est libre pour une nouvelle attaque
 	call battle_draw_screen	; ou pas
-	call battle_draw_frame	; smaller than having to do "ld de,$3202\	ld (penCol),de"
+	call battle_draw_frame	; smaller than having to do "ld de,$3202\	ld (pencol),de"
 
 	ld a,vmode_type_no_pause
 	ld (_v_mode),a
 	ld hl,battle_str_are_you_sure
-	call _VPutS_ml
+	call _vputs_ml
 	ld bc,$0f13
 	ld de,$4d23
 	call draw_frame
 	ld de,$2453
-	ld (penCol),de
+	ld (pencol),de
 	xor a
 	ld (_v_mode),a
 ;	ld (menu_cursor),a
 	ld hl,battle_str_yes_no
-	call _VPutS_ml
+	call _vputs_ml
 	ld a,1
 ;	ld (menu_max_option),a
 	add a,35

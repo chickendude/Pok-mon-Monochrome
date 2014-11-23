@@ -1,7 +1,7 @@
 new_game:
 	call fade_out
 	bcall(_GrBufClr)
-	call fastCopy
+	call fast_copy
 	call fade_in
 
 	ld hl,gender_str
@@ -12,12 +12,12 @@ new_game:
 	ld a,14				;a = x
 	ld l,10				;l = y
 	ld ix,opponent_man	;man sprite
-	call largeSprite
+	call large_sprite
 	pop bc
 	ld a,58
 	ld l,10
 	ld ix,opponent_woman
-	call largeSprite
+	call large_sprite
 	xor a
 	ld (menu_cursor),a	;default=left (man)
 	call draw_new_game_genre_select_cursor
@@ -62,8 +62,8 @@ new_game_valid_skip_man:
 	ld bc,$1a03
 	ld a,36				;a = x
 	ld l,10				;l = y
-	call largeSprite
-	call fastCopy
+	call large_sprite
+	call fast_copy
 	call fade_in
 
 	ld hl,new_game_str
@@ -74,9 +74,9 @@ new_game_valid_skip_man:
 	ld (player_y),a
 	ld a,NEW_GAME_X
 	ld (player_x),a
-	ld a,new_game_offset_x
+	ld a,NEW_GAME_X_OFFSET
 	ld (map_x),a
-	ld a,new_game_offset_y
+	ld a,NEW_GAME_Y_OFFSET
 	ld (map_y),a
 	xor a
 	ld (player_direction),a
@@ -92,11 +92,11 @@ draw_new_game_genre_select_cursor_no_screen_update:	;to avoid flickering !
 	ld l,6	;l = y
 	ld b,3
 	ld ix,scroll_cursor_sprite
-	jp putSprite
+	jp put_sprite
 
 draw_new_game_genre_select_cursor:
 	call draw_new_game_genre_select_cursor_no_screen_update
-	jp fastCopy
+	jp fast_copy
 
 draw_new_game_genre_select_cursor_left:
 	ld a,20 ;a = x

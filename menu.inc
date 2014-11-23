@@ -1,6 +1,6 @@
 ;LIST OF IMPORTANT ROUTINES :
-;	draw_text			draw a normal text, de = penCol/penRow
-;	draw_string			vPutS replacement (uses penCol/penRow)
+;	draw_text			draw a normal text, de = pencol/penrow
+;	draw_string			vPutS replacement (uses pencol/penrow)
 ;	draw_menu			draw a menu with routines
 ;	draw_menu_return	draw a menu without routines
 ;	draw_dialogue		draw a dialogue box (3 text rows)
@@ -25,20 +25,20 @@
 
 menu_beginning:
 	call fade_out
-	bcall(_GrBufClr)
+	bcall(_grbufclr)
 
 	ld bc,$240c			;c = width, b = height
 	xor a				;a = x
 	ld l,a				;l = y
 	ld ix,title			;title sprite
-	call largeSprite
+	call large_sprite
 	ld hl,$201d
-	ld (penCol),hl
+	ld (pencol),hl
 	ld hl,monochrome_str
-	bcall(_VPutS)		;put "MONOCHROME" under the title sprite
+	bcall(_vputs)		;put "MONOCHROME" under the title sprite
 
 	xor a				;default choice
-	ld de,$2b1d			;e = penCol, d = penRow
+	ld de,$2b1d			;e = pencol, d = penrow
 	ld hl,menu_beginning_str
 	call draw_menu		;draw the menu
 	call fade_in
@@ -62,7 +62,6 @@ menu_start:
 	call draw_menu			; draw the menu
 	call menu_key			; wait for a key, handles the cursor, returns if [Alpha] was pressed
 	jp draw_map				; if we return here, we've exited the menu, so now go back to the map
-
 
 ;hl = left menu pointer
 ;ix = right menu pointer (only for setup_sub_menu_l_r)
@@ -111,11 +110,11 @@ check_sub_menu:
 draw_battle_dialogue:
 	ld bc,draw_battle_dialogue
 	ld (dialogue_jump),bc
-	ld bc,$0F60			;b = height, c = width
+	ld bc,$0f60			;b = height, c = width
 	ld de,$0031			;d = x, e = y
 	push hl
 		call draw_frame
-		set textDelay,(iy+pokeFlags)	; turn on typewriter effect
+		set textdelay,(iy+pokeflags)	; turn on typewriter effect
 	pop hl
 	ld de,$3202
 	jr draw_menu_start
@@ -127,7 +126,7 @@ draw_dialogue:
 	ld de,$002b
 	push hl
 		call draw_frame
-		set textDelay,(iy+pokeFlags)	; turn on typewriter effect
+		set textdelay,(iy+pokeflags)	; turn on typewriter effect
 	pop hl
 	ld de,$2C02
 	jr draw_menu_start
@@ -146,7 +145,7 @@ draw_menu_return:
 	inc hl						; hl now points to start of text
 	ld ix,menu_coordinates+1
 	ld (ix-1),a					; number of menu options
-	jr draw_text_fastcopy
+	jr draw_text_fast_copy
 
 ;###########################
 draw_menu:
@@ -165,25 +164,25 @@ draw_menu:
 	ld c,a						; .. and point hl to start of text data
 	ld b,0						; 
 	add hl,bc					; hl now points to menu text
-;	jr draw_text_fastcopy
+;	jr draw_text_fast_copy
 ;###########################
-draw_text_fastcopy:
+draw_text_fast_copy:
 ;# Draws text and updates the LCD after
 ;# .. text has been drawn to gbuf
 ;###########################
-	res textDelay,(iy+pokeFlags); turn off typewriter effect
+	res textdelay,(iy+pokeflags); turn off typewriter effect
 	call draw_menu_start
-	jp fastCopy					; update LCD after drawing menu
+	jp fast_copy					; update LCD after drawing menu
 
 draw_text:
-	set textDelay,(iy+pokeFlags); turn on typewriter effect
-;at the end of the string we'll jump to draw_text_continue, this just skips the fastCopy
+	set textdelay,(iy+pokeflags); turn on typewriter effect
+;at the end of the string we'll jump to draw_text_continue, this just skips the fast_copy
 draw_menu_start:
-	ld (penCol),de
+	ld (pencol),de
 	ld a,e
-	ld (default_col),a			; penCol coord to load when we reach a NEWL
+	ld (default_col),a			; pencol coord to load when we reach a NEWL
 draw_string:
-	ld de,(penCol)				; some of the special routines use penCol
+	ld de,(pencol)				; some of the special routines use pencol
 	ld a,(hl)					; read the next character
 	or a						; 0 = EOS
 	 ret z						; quit if EOS
@@ -209,10 +208,10 @@ not_special:					; .. we'll return there after the special routine finishes
 	 jr c,insert_stat
 	push de
 	push ix
-		bcall(_VPutMap)			; draw letter in 'a', updates penRow/penCol
+		bcall(_vputmap)			; draw letter in 'a', updates penrow/pencol
 	pop ix
 	pop de
-	bit textDelay,(iy+pokeFlags); reset if no delay, set for typewriter effect
+	bit textdelay,(iy+pokeflags); reset if no delay, set for typewriter effect
 	 call nz,text_delay			; a short delay, also updates LCD
 	inc hl						; next character in string
 	jr draw_string
@@ -270,7 +269,7 @@ text_new_x_y:
 	ld e,(hl)
 	inc hl
 	ld d,(hl)
-	ld (penCol),de
+	ld (pencol),de
 	inc hl
 	ret
 
@@ -289,16 +288,16 @@ text_add_menu:
 text_new_x:
 	inc hl				; the next byte holds the new x value
 	ld e,(hl)
-	ld (penCol),de		; update penCol
+	ld (pencol),de		; update pencol
 	inc hl				; ready to read next byte in string
 	ret
 
 text_new_line:
 	ld a,d
-	add a,6				; penRow+6
+	add a,6				; penrow+6
 	ld de,(default_col)	; put the default column in e
 	ld d,a				; and store the new row into d
-	ld (penCol),de		; update penCol
+	ld (pencol),de		; update pencol
 	inc hl
 ;	ld a,(hl)
 	ret
@@ -306,7 +305,7 @@ text_new_line:
 text_pause:
 	pop bc			;clear stack (l'adresse de draw_menu_loop)
 	push hl
-	call fastCopy
+	call fast_copy
 	ld hl,cursor_wait
 	ld (hl),50
 	jr draw_cursor_wait
@@ -315,7 +314,7 @@ pause_text_loop:
 	ei
 	halt
 	di
-	ld a,$BF				;check 2nd
+	ld a,$bf				;check 2nd
 	call get_key
 	bit 5,a
 	 jr z,load_next_text
@@ -329,12 +328,12 @@ draw_cursor_wait:
 	ld l,59
 	ld b,3
 	ld ix,scroll_cursor_sprite
-	call putSprite
-	call fastCopy
+	call put_sprite
+	call fast_copy
 	jr pause_text_loop
 
 load_next_text:
-	set textDelay,(iy+pokeFlags)	; if we've pressed a key to advance quickly through text, turn typewriter effect back on
+	set textdelay,(iy+pokeflags)	; if we've pressed a key to advance quickly through text, turn typewriter effect back on
 	call release_key
 	pop hl
 	inc hl							; skip the $FD (BRK)
@@ -406,7 +405,7 @@ load_pokemon_data:					; load pokémon data to current_pokemon
 		inc hl						; skip pokemon state
 ;now load the attacks
 		ex af,af'					; a' = pokémon level
-		ld bc,$04FF					; can have up to four attacks, c is for the ldi
+		ld bc,$04ff					; can have up to four attacks, c is for the ldi
 		exx
 			ld de,current_pokemon+CP_ATK1STR
 		exx
@@ -476,10 +475,10 @@ text_delay:
 	call get_key
 	bit 7,a
 	 jr nz,$+6
-		res textDelay,(iy+pokeFlags)	; turn typewriter effect off
+		res textdelay,(iy+pokeflags)	; turn typewriter effect off
 	ld b,text_typing_speed
 	push bc
-		call nc,fastCopy
+		call nc,fast_copy
 	pop bc
 	djnz $-5
 	exx
@@ -535,14 +534,14 @@ menu_key_loop:
 	ei
 	halt
 	di
-	ld a,$DF			;check ALPHA
+	ld a,$df			;check ALPHA
 	call get_key
 	rla
 	 jr c,$+7
 		xor a
 		ld (sub_menu_flag),a
 		ret
-	ld a,$BF			;check [2nd] ($bf = key group #7 : Y=, WINDOW, ZOOM, TRACE, GRAPH, 2nd, MODE, DEL)
+	ld a,$bf			;check [2nd] ($bf = key group #7 : Y=, WINDOW, ZOOM, TRACE, GRAPH, 2nd, MODE, DEL)
 	call get_key
 	cp 223				;2nd
 	 jr z,menu_select
@@ -550,7 +549,7 @@ menu_key_loop:
 	ld hl,menu_key_loop	;*
 	push hl				;* where to jump
 ;*************************
-	ld a,$FE			;check arrows
+	ld a,$fe			;check arrows
 	call get_key
 	or $f0				;erase bits 4-7
 	ld b,a
@@ -665,11 +664,11 @@ draw_cursor_no_screen_update:	;to disable flickering
 	ld l,(hl)			;y
 	ld ix,cursor_sprite
 	ld b,5
-	jp putSprite
+	jp put_sprite
 
 draw_cursor:
 	call draw_cursor_no_screen_update
-	jp fastCopy
+	jp fast_copy
 
 get_cursor_coords:
 	ld a,(menu_cursor)
@@ -687,7 +686,7 @@ menu_pokemon_return:
 	push af								; default selected pokémon
 		ld hl,menu_pokemon_list				; [strings_XX.inc]
 		call string_to_RAM					; load the string into RAM so we can modify it
-		bcall(_GrBufClr)
+		bcall(_grbufclr)
 		ld de,player_party				; holds current configuration of player's party, 6 bytes
 		ld hl,RAM_string
 		ld b,MAX_PARTY					; max number of pokémon you can have
@@ -711,7 +710,7 @@ mp_count_end:
 	call menu_key_return				; return here after making a selection
 	 jp nc,menu_start					; nc means [Alpha] (cancel) has been pushed
 	ld (selected_pokemon),a				; save our selection
-	ld bc,$161F							; bc = $HHWW
+	ld bc,$161f							; bc = $HHWW
 	ld de,$4117							; de = $XXYY
 	call draw_frame
 	xor a								; default option is 0
@@ -741,21 +740,21 @@ menu_pokemon_stats:
 		call flip_sprite
 		ld a,4
 		ld l,0
-		call largeSprite
+		call large_sprite
 		ld ix,battle_bar
 		ld bc,$1007
 		ld a,39
 		ld l,7
-		call largeSprite
+		call large_sprite
 	pop hl
 	call load_pokemon_data			; loads pokémon into current_pokemon
 	ld bc,$2760						; b = height, c = width
 	ld de,$0019						; d = x, e = y
 	call draw_frame
-	ld de,$0102						; $YYXX (e = penCol, d = penRow)
+	ld de,$0102						; $YYXX (e = pencol, d = penrow)
 	ld hl,stats_text
-	call draw_text_fastcopy
-	call fastCopy
+	call draw_text_fast_copy
+	call fast_copy
 	call wait_key					; pause
 	ld a,(selected_pokemon)			; set the cursor to the last selected pokemon
 	jp menu_pokemon_return
@@ -768,7 +767,6 @@ string_to_RAM:
 	ld bc,200				; copy the string into RAM
 	ldir
 
-
 ;draws a one-byte number in a
 draw_number:
 _vdispa:
@@ -777,10 +775,10 @@ _vdispa:
 	push ix
 	ld h,0
 	ld l,a
-	bcall(_SetXXXXOP2)
-	bcall(_OP2ToOP1)	; to be able to put more than 99 into op1
+	bcall(_setxxxxop2)
+	bcall(_op2toop1)	; to be able to put more than 99 into op1
 	ld a,3
-	bcall(_DispOP1A)
+	bcall(_dispop1a)
 	pop ix
 	pop hl
 	pop de

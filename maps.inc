@@ -1,12 +1,12 @@
 map_table:	; ne sert pas encore (pour les transitions entre maps plus tard)
 	.dw map_test
 
-map_pokemons:	; les +2 sont là car l'adresse actuelle du mapper (mapAddr) saute toujours les deux premiers octets (tailles)
+map_pokemons:	; les +2 sont là car l'adresse actuelle du mapper (map_addr) saute toujours les deux premiers octets (tailles)
 	.dw map_test+2,map_test_pokemons
 
 map_pokemons_end:
 
-map_trainers:	; les +2 sont là car l'adresse actuelle du mapper (mapAddr) saute toujours les deux premiers octets (tailles)
+map_trainers:	; les +2 sont là car l'adresse actuelle du mapper (map_addr) saute toujours les deux premiers octets (tailles)
 	.dw map_test+2,map_test_trainers
 
 map_trainers_end:
