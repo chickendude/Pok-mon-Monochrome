@@ -1,6 +1,8 @@
 ;ti-83 plus include file
 ;$05/07/2007
 
+#define _GrBufClr _grbufclr
+
 ;system variable equates
 ;------------------------------
 #define xsclt	$02

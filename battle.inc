@@ -223,7 +223,7 @@ battle_fight_menu_next_type_loop:
 	djnz battle_fight_menu_next_type_loop
 	ld de,$2a02
 	ld (pencol),de
-	bcall(_VPutS)
+	bcall(_vputs)
 	pop af
 	ld c,a
 	ld hl,(battle_current_player_pokemon_address)
@@ -413,10 +413,10 @@ battle_experience_distribution_loop:
 	call find_pokemon_stats
 	push hl
 	call battle_disp_player_pokemon_name
-	ld a,vmode_type_no_pause
+	ld a,VMODE_TYPE_NO_PAUSE
 	ld (_v_mode),a
 	ld hl,battle_str_experience_earned
-	call _VPutS_ml
+	call _vputs_ml
 	pop hl
 	pop af
 	push af
@@ -493,7 +493,7 @@ battle_inc_lvl:	; ici, hl=XP
 	push hl
 	dec hl
 	call battle_disp_player_pokemon_name
-	ld a,vmode_type_no_pause
+	ld a,VMODE_TYPE_NO_PAUSE
 	ld (_v_mode),a
 	ld hl,battle_str_level_up
 	call _vputs_ml
@@ -545,7 +545,7 @@ battle_check_evolution:
 	pop de	; de = pokémon ID
 	pop hl
 	inc hl	; hl = evoluted pokémon ID
-	ld b,battle_evolution_blink_sprite_times
+	ld b,BATTLE_EVOLUTION_BLINK_SPRITE_TIMES
 
 evolution_loop:
 	ld a,$ff	; reset the keyboard port
@@ -561,7 +561,7 @@ evolution_loop:
 	ex de,hl	; hl = non evoluted pokémon ID
 	call find_and_flip_sprite
 	call battle_draw_evolution	; just to erase or draw it from the screen (since it's XORed)
-	ld b,battle_evolution_blink_sprite_speed
+	ld b,BATTLE_EVOLUTION_BLINK_SPRITE_SPEED
 	call wait
 	pop hl	; hl = evoluted pokémon ID
 	push hl
@@ -573,12 +573,12 @@ evolution_loop:
 	djnz evolution_loop
 	push hl	; hl = evoluted pokémon ID
 	push de	; de = non evoluted pokémon ID
-	call battle_draw_evolution	; to draw the evoluted pokémon sprite (erased in the last loop, if battle_evolution_blink_sprite_times was even)
+	call battle_draw_evolution	; to draw the evoluted pokémon sprite (erased in the last loop, if BATTLE_EVOLUTION_BLINK_SPRITE_TIMES was even)
 	call battle_draw_frame
 	pop hl
 	call battle_disp_player_pokemon_name
 	ld hl,battle_str_evolution_done
-	ld a,vmode_type_no_pause
+	ld a,VMODE_TYPE_NO_PAUSE
 	ld (_v_mode),a
 	call _vputs_ml
 	pop hl
@@ -627,7 +627,7 @@ battle_new_attack:
 	dec de
 	ex de,hl
 	call battle_disp_player_pokemon_name
-	ld a,vmode_type_no_pause
+	ld a,VMODE_TYPE_NO_PAUSE
 	ld (_v_mode),a
 	ld hl,battle_str_learn_attack
 	call _vputs_ml
@@ -710,7 +710,7 @@ battle_learn_new_attack_valid:
 	call battle_draw_screen	; ou pas
 	call battle_draw_frame	; smaller than having to do "ld de,$3202\	ld (pencol),de"
 
-	ld a,vmode_type_no_pause
+	ld a,VMODE_TYPE_NO_PAUSE
 	ld (_v_mode),a
 	ld hl,battle_str_are_you_sure
 	call _vputs_ml

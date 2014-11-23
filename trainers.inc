@@ -15,7 +15,7 @@
 #define TRAINER_DATA_LENGTH	14
 
 trainer_event:
-	sub trainer_tile	; a = trainer id
+	sub TRAINER_TILE	; a = trainer id
 	push af
 	ld hl,map_trainers
 	ld b,(map_trainers_end-map_trainers)/4

@@ -61,7 +61,7 @@
 
 start:
 	call fade_out				; [routines.inc]
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 	xor a
 	ld b,a
 	ld c,a

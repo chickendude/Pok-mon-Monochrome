@@ -70,6 +70,6 @@
 ;						= rambuf+1096	;
 
 ; Misc variables
-#define rand_data			= saferam3+60	; used for Ion's random routine
-#define contrast_var		= saferam3+61	; holds the current contrast
-#define _v_mode				= saferam3+62	; text drawing mode
+#define rand_data			saferam3+60	; used for Ion's random routine
+#define contrast_var		saferam3+61	; holds the current contrast
+#define _v_mode				saferam3+62	; text drawing mode

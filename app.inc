@@ -19,7 +19,7 @@
 
 			#define gappname	eval(appname)
 
-	_		.db appname
+_			.db appname
 			#define apnamlen	eval($ - -_)
 			echo_fill(apnamlen,"-","------------------------------------------")
 			.echo "Beginning APP \"",appname,"\", courtesy of SPASM macros"

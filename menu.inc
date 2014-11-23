@@ -25,7 +25,7 @@
 
 menu_beginning:
 	call fade_out
-	bcall(_grbufclr)
+	bcall(_GrBufClr)
 
 	ld bc,$240c			;c = width, b = height
 	xor a				;a = x
@@ -476,7 +476,7 @@ text_delay:
 	bit 7,a
 	 jr nz,$+6
 		res textdelay,(iy+pokeflags)	; turn typewriter effect off
-	ld b,text_typing_speed
+	ld b,TEXT_TYPING_SPEED
 	push bc
 		call nc,fast_copy
 	pop bc
@@ -686,7 +686,7 @@ menu_pokemon_return:
 	push af								; default selected pokémon
 		ld hl,menu_pokemon_list				; [strings_XX.inc]
 		call string_to_RAM					; load the string into RAM so we can modify it
-		bcall(_grbufclr)
+		bcall(_GrBufClr)
 		ld de,player_party				; holds current configuration of player's party, 6 bytes
 		ld hl,RAM_string
 		ld b,MAX_PARTY					; max number of pokémon you can have

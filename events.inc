@@ -23,15 +23,15 @@ event_cliff:
 
 event_grass:
 	call player_walk
-	ld b,pokemon_encounter_frequency
+	ld b,POKEMON_ENCOUNTER_FREQUENCY
 	call random
 	or a
 	ret nz
-	ld b,battle_flash_screen_frequency
+	ld b,BATTLE_FLASH_SCREEN_FREQUENCY
 	call flash_screen
 	call fade_out
 	jr battle
 
 event_door:
-	ld b,battle_flash_screen_frequency
+	ld b,BATTLE_FLASH_SCREEN_FREQUENCY
 	jp flash_screen

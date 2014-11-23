@@ -23,10 +23,10 @@ battle_wild_pokemon_intro:
 	pop ix
 	call fade_in
 
-	ld b,screen_width-pokemon_sprite_width-pokemon_sprite_battle_distance_from_screen
+	ld b,SCREEN_WIDTH-POKEMON_SPRITE_WIDTH-POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN
 battle_wild_pokemon_intro_loop:
 	push bc
-		ld a,screen_width-pokemon_sprite_width-pokemon_sprite_battle_distance_from_screen
+		ld a,SCREEN_WIDTH-POKEMON_SPRITE_WIDTH-POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN
 		sub b
 		ld bc,POKEMON_SPRITE_SIZE
 		ld l,0
@@ -37,7 +37,7 @@ battle_wild_pokemon_intro_loop:
 	pop bc
 	djnz battle_wild_pokemon_intro_loop
 ;afficher le sprite du pokémon sauvage
-	ld a,screen_width-pokemon_sprite_width-pokemon_sprite_battle_distance_from_screen
+	ld a,SCREEN_WIDTH-POKEMON_SPRITE_WIDTH-POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN
 	sub b
 	ld bc,POKEMON_SPRITE_SIZE
 	ld l,0
@@ -104,7 +104,7 @@ battle_current_opponent_pokemon_address = $+1	;###
 	call battle_draw_pokeball_if_already_captured	; On s'occupe d'abord d'afficher le cadre + les données du pokémon adverse
 	ld ix,(current_pokemon+CP_SPRITE)
 	ld bc,POKEMON_SPRITE_SIZE
-	ld a,screen_width-pokemon_sprite_width-pokemon_sprite_battle_distance_from_screen
+	ld a,SCREEN_WIDTH-POKEMON_SPRITE_WIDTH-POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN
 	ld l,0
 	call large_sprite	; on affiche le sprite du pokémon adverse
 
@@ -137,7 +137,7 @@ battle_current_player_pokemon_address = $+1		;###
 	ld ix,(current_pokemon+CP_SPRITE)
 	ld bc,POKEMON_SPRITE_SIZE
 	call flip_sprite
-	ld a,pokemon_sprite_battle_distance_from_screen
+	ld a,POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN
 	ld l,23
 	call large_sprite	; on affiche le sprite du pokémon adverse
 ;	call battle_draw_player_pokemon_state
@@ -155,11 +155,11 @@ battle_player_pokemon_blink_sprite_loop:
 	push ix
 	ld bc,POKEMON_SPRITE_SIZE
 	call flip_sprite
-	ld a,pokemon_sprite_battle_distance_from_screen
+	ld a,POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN
 	ld l,23
 	call large_sprite
 	call fast_copy
-	ld b,battle_blink_sprite_speed
+	ld b,BATTLE_BLINK_SPRITE_SPEED
 	call wait
 	pop ix
 	pop bc
@@ -173,11 +173,11 @@ battle_opponent_pokemon_blink_sprite_loop:
 	push bc
 	push ix
 		ld bc,POKEMON_SPRITE_SIZE
-		ld a,screen_width-pokemon_sprite_width-pokemon_sprite_battle_distance_from_screen
+		ld a,SCREEN_WIDTH-POKEMON_SPRITE_WIDTH-POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN
 		ld l,0
 		call large_sprite
 		call fast_copy
-		ld b,battle_blink_sprite_speed
+		ld b,BATTLE_BLINK_SPRITE_SPEED
 		call wait
 	pop ix
 	pop bc
@@ -195,7 +195,7 @@ battle_find_sprite:
 	add hl,bc
 	push hl
 	pop ix
-	ld b,battle_blink_sprite_times*2	; must be even
+	ld b,BATTLE_BLINK_SPRITE_TIMES*2	; must be even
 	ret
 
 battle_draw_player_pokemon_state:	; input : hl = player pokemon state
@@ -210,7 +210,7 @@ battle_draw_player_pokemon_state:	; input : hl = player pokemon state
 	call battle_draw_pokemon_state
 	ld de,$2a1f
 	ld (pencol),de
-	bcall(_VPutS)
+	bcall(_vputs)
 	ret
 
 battle_draw_opponent_pokemon_state:	; input : hl = opponent pokemon state
@@ -225,7 +225,7 @@ battle_draw_opponent_pokemon_state:	; input : hl = opponent pokemon state
 	call battle_draw_pokemon_state
 	ld de,$1136
 	ld (pencol),de
-	bcall(_VPutS)
+	bcall(_vputs)
 	ret
 
 battle_draw_pokemon_state:
@@ -410,7 +410,7 @@ battle_attack_missed:
 	ld hl,battle_str_attack_missed
 
 battle_disp_vputs:
-	ld a,vmode_type
+	ld a,VMODE_TYPE
 	ld (_v_mode),a
 	jp _vputs_ml
 

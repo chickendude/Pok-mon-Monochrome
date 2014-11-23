@@ -229,7 +229,7 @@ jp_hl:
 	jp (hl)
 
 
-_VPutS_ml:	;	_v_mode: 0=text is directly drawn; 1=text is typing; 2=text is typing with no pause at end (cf battle)	|	string:$d6=new line; $07=pause and next text
+_vputs_ml:	;	_v_mode: 0=text is directly drawn; 1=text is typing; 2=text is typing with no pause at end (cf battle)	|	string:$d6=new line; $07=pause and next text
 	ld a,(pencol)
 	push af
 	push hl
@@ -299,7 +299,7 @@ _v_disp_pause_count = $+1
 	ld a,0
 	inc a
 	ld (_v_disp_pause_count),a
-	cp scroll_cursor_speed
+	cp SCROLL_CURSOR_SPEED
 	call z,_v_disp_pause_blink
 	ld b,1
 	call wait
@@ -339,7 +339,7 @@ _v_disp_end:
 _v_new_line:
 	push af
 	ld a,(_v_mode)
-	cp vmode_type_no_pause
+	cp VMODE_TYPE_NO_PAUSE
 	pop bc
 	call z,_v_new_line_battle
 	ld a,b
@@ -413,7 +413,7 @@ _v_type:
 	call wait
 	pop bc
 
-	bcall(_VPutMap)
+	bcall(_vputmap)
 	push hl
 	call fast_copy
 	pop hl
@@ -438,7 +438,7 @@ fade_out_loop:
 	or $c0
 	bcall(_lcd_busy)
 	out (10h),a
-	ld b,fade_speed
+	ld b,FADE_SPEED
 	call wait
 	pop bc
 	djnz fade_out_loop
@@ -458,7 +458,7 @@ fade_in_loop:
 	or $c0
 	bcall(_lcd_busy)
 	out (10h),a
-	ld b,fade_speed
+	ld b,FADE_SPEED
 	call wait
 	pop bc
 	djnz fade_in_loop
@@ -617,7 +617,7 @@ flip_sprite_loop:
 	ret
 
 D_ZT_STR:
-	bcall(_PutC)
+	bcall(_putc)
 	inc hl
 	ld a,(hl)
 	or a
