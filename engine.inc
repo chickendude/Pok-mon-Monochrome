@@ -123,7 +123,7 @@ draw_player:
 	ld b,8					; sprite height
 	ld de,12
 	exx
-		ld hl,player_down	; player's sprite ***
+		ld hl,player_down_sprite	; player's sprite ***
 		ld a,(player_direction)
 		rlca
 		rlca

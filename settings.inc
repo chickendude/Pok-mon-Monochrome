@@ -4,4 +4,4 @@
 #define NEW_GAME_X_OFFSET	0	; starting map X
 #define NEW_GAME_Y_OFFSET	0	; starting map Y
 #define NEW_GAME_MAP	map_test	; the first map to load
-#define NEW_GAME_DIRECTION	player_down	;
+#define NEW_GAME_DIRECTION	player_down_sprite	;

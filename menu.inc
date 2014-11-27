@@ -25,7 +25,7 @@
 
 menu_beginning:
 	call fade_out
-	bcall(_GrBufClr)
+	bcall(_grbufclr)
 
 	ld bc,$240c			;c = width, b = height
 	xor a				;a = x
@@ -686,7 +686,7 @@ menu_pokemon_return:
 	push af								; default selected pokémon
 		ld hl,menu_pokemon_list				; [strings_XX.inc]
 		call string_to_RAM					; load the string into RAM so we can modify it
-		bcall(_GrBufClr)
+		bcall(_grbufclr)
 		ld de,player_party				; holds current configuration of player's party, 6 bytes
 		ld hl,RAM_string
 		ld b,MAX_PARTY					; max number of pokémon you can have
@@ -731,7 +731,7 @@ menu_pokemon_order:
 	jr menu_pokemon
 
 menu_pokemon_stats:
-	bcall(_GrBufClr)
+	bcall(_grbufclr)
 	call find_player_pokemon
 	call find_pokemon_stats
 	push hl							; save pointer to pokemon's stats
