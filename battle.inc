@@ -15,7 +15,7 @@ battle_type = $+1	;	0 = pokémon sauvage
 	call generate_wild_pokemon
 
 battle_intro:
-	bcall(_GrBufClr)
+	bcall(_grbufclr)
 	call battle_draw_player_back
 	call battle_draw_frame				;draw the player and the little text frame at the bottom
 	ld hl,opponent_pokemon_stats		;début des données du groupe de pokémon méchants

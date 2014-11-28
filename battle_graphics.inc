@@ -78,9 +78,9 @@ battle_draw_player_back:
 player_gender = $+1
 	ld a,0
 	or a
-	ld ix,player_woman_back
+	ld ix,player_woman_back_sprite
 	 jr nz,battle_draw_player_next
-		ld ix,player_man_back
+		ld ix,player_man_back_sprite
 battle_draw_player_next:
 	xor a
 	ld bc,$1704
@@ -89,7 +89,7 @@ battle_draw_player_next:
 
 ;- Routines d'affichages de différentes choses durant les combats -------------------------------------------------
 battle_draw_screen:
-	bcall(_GrBufClr)
+	bcall(_grbufclr)
 	call battle_draw_frame
 ;############# peut-être pas nécéssaire ############
 battle_current_opponent_pokemon_address = $+1	;###

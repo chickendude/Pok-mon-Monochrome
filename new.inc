@@ -1,6 +1,6 @@
 new_game:
 	call fade_out
-	bcall(_GrBufClr)
+	bcall(_grbufclr)
 	call fast_copy
 	call fade_in
 
@@ -11,12 +11,12 @@ new_game:
 	push bc
 	ld a,14				;a = x
 	ld l,10				;l = y
-	ld ix,opponent_man	;man sprite
+	ld ix,opponent_man_sprite	;man sprite
 	call large_sprite
 	pop bc
 	ld a,58
 	ld l,10
-	ld ix,opponent_woman
+	ld ix,opponent_woman_sprite
 	call large_sprite
 	xor a
 	ld (menu_cursor),a	;default=left (man)
@@ -38,24 +38,24 @@ new_game_genre_select:
 	jr nz,new_game_genre_select
 
 	call fade_out
-	bcall(_GrBufClr)
-	ld ix,opponent_woman
+	bcall(_grbufclr)
+	ld ix,opponent_woman_sprite
 	ld a,(menu_cursor)
 	ld (player_gender),a	; 0 = man, 1 = woman
-;	ld hl,player_woman_up
+;	ld hl,player_woman_up_sprite
 ;	ld (player_up),hl
-;	ld hl,player_woman_left
+;	ld hl,player_woman_left_sprite
 ;	ld (player_left),hl
-;	ld hl,player_woman_right
+;	ld hl,player_woman_right_sprite
 ;	ld (player_right),hl
 	or a
 	jr nz,new_game_valid_skip_man
-	ld ix,opponent_man
-;	ld hl,player_man_up
+	ld ix,opponent_man_sprite
+;	ld hl,player_man_up_sprite
 ;	ld (player_up),hl
-;	ld hl,player_man_left
+;	ld hl,player_man_left_sprite
 ;	ld (player_left),hl
-;	ld hl,player_man_right
+;	ld hl,player_man_right_sprite
 ;	ld (player_right),hl
 
 new_game_valid_skip_man:
