@@ -656,6 +656,11 @@ walk_right_loop:
 	inc (hl)
 	ret
 scroll_right:
+	ld a,(map_width)			; check if map has reached the edge
+	ld hl,map_x					; .. if so, continue moving the player
+	sub (hl)					; .. instead of the map
+	cp 12
+	 jr z,walk_right_player
 	call get_map_offset
 	ld de,12					; we need to load the tile to the right of the screen
 	add hl,de

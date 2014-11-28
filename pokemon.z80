@@ -100,20 +100,18 @@ main_loop:
 	ld a,$fe					; group 1
 	call get_key				; check arrow keys
 	rrca						; down
-	push af						; since we return from the call, we need to preserve a
-		call nc,walk_down
-	pop af
-	rrca
-	push af
-		call nc,walk_left
-	pop af
-	rrca
-	push af
-		call nc,walk_right
-	pop af
-	rrca
-	 call nc,walk_up
-	cp $ff						; if a key was pressed we don't need to reset the animation
+	 call nc,walk_down
+	in a,(1)
+	bit 1,a
+	 call z,walk_left
+	in a,(1)
+	bit 2,a
+	 call z,walk_right
+	in a,(1)
+	bit 3,a
+	 call z,walk_up
+	in a,(1)
+	inc a						; if a key was pressed we don't need to reset the animation
 	 ret nz
 	ld (walk_anim),a			; if no key was pressed, reset player's animation ($FF)
 	ret
