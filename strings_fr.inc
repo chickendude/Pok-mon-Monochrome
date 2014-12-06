@@ -1,22 +1,22 @@
-;Pokémons names
+;Pokémon names
 bulbasaur_txt:
-	.db "BULBIZARRE",0
+	.db "Bulbizarre",0
 ivysaur_txt:
-	.db "HERBIZARRE",0
+	.db "Herbizarre",0
 venusaur_txt:
-	.db "FLORIZARRE",0
+	.db "Florizarre",0
 charmander_txt:
 	.db "SALAM",$92,"CHE",0
 charmeleon_txt:
-	.db "REPTINCEL",0
+	.db "Reptincel",0
 charizard_txt:
-	.db "DRACAUFEU",0
+	.db "Dracaufeu",0
 squirtle_txt:
-	.db "CARAPUCE",0
+	.db "Carapuce",0
 wartortle_txt:
-	.db "CARABAFFE",0
+	.db "Carabaffe",0
 blastoise_txt:
-	.db "TORTANK",0
+	.db "Tortank",0
 caterpie_txt:
 	.db "CHENIPAN",0
 metapod_txt:
@@ -184,6 +184,7 @@ clefairy_txt:
 	.db "Dragonair",0
 	.db "Dragonite",0
 	.db "Mewtwo",0
+	.db "Mew",0
 
 monochrome_str:
 	.db "MONOCHROME",0
@@ -386,16 +387,15 @@ menu_pokemon_options:
 	.db MN,"Retour",0
 
 stats_text:
-	.db NEWX,40,_NAME,NEWL
-	.db NEWXY,40,10,"L: ",_LVL,"STATUS/",NEWL
-	.db NEWXY,2,26,"ATTACK",NEWX,40,"TYPE1:",NEWL
-	.db NEWX,10,_ATK,NEWX,45,"TYPE",NEWL
-	.db "DEFENSE",NEWX,40,"TYPE2:",NEWL
-	.db NEWX,10,_DEF,NEWX,45,"TYPE",NEWL
-	.db "SPEED",NEWX,40,"EXP:",NEWL
-	.db NEWX,10,NEWX,40,"NEXT LVL:",NEWL
+	.db NEWX,36,_NAME,NEWL
+	.db NEWXY,36,10,"L: ",_LVL,"STATUS/",NEWL
+	.db NEWXY,2,26,"ATTACK",NEWX,36,"SPECIAL:",NEWL
+	.db NEWX,10,_2BYTE,_ATK,NEWX,44,_2BYTE,_SP,NEWL
+	.db "DEFENSE",NEWX,36,"NEXT LVL:",NEWL
+	.db NEWX,10,_2BYTE,_DEF,NEWX,44,_2BYTE,_EXP,NEWL
+	.db "SPEED",NEWX,36,"TYPE1: ",_TYPE1,NEWL
+	.db NEWX,10,_2BYTE,_SPD,NEWX,36,"TYPE2: ",_TYPE2,NEWL
 	.db 0
-
 
 trainer_intro_str:
 	.db "Un dresseur veut se battre !",BRK,0

@@ -277,19 +277,20 @@ clefairy_attacks:
 	.db ATK_DEFENSE_CURL
 	.db ATK_LIGHT_SCREEN
 
-#define POKE_NAME	0
-#define POKE_HP		2
-#define POKE_ATK	3
-#define POKE_SP		4
-#define POKE_SPD	5
-#define POKE_DEF	6
-#define POKE_EXP	7
-#define POKE_TYPE1	8
-#define POKE_TYPE2	9
-#define POKE_EXPCURVE	10
-#define POKE_ATK_LIST	11
-#define POKE_EVOLVE	13
-
+#define POKE_NAME		0
+#define POKE_HP			2
+#define POKE_ATK		3
+#define POKE_DEF		4
+#define POKE_SPD		5
+#define POKE_SP			6
+#define POKE_TYPE1		7
+#define POKE_TYPE2		8
+#define POKE_CATCH		9
+#define POKE_EXP		10
+#define POKE_GROWTH		11
+#define POKE_ATK_LIST	12
+#define POKE_TM			14
+#define POKE_EVOLVE		21
 
 #define GSTATS_LENGTH ivysaur-bulbasaur
 
@@ -297,459 +298,529 @@ clefairy_attacks:
 pokemon_general_stats:
 bulbasaur:
 	.dw bulbasaur_txt
-	.db 45			;HP
-	.db 49			;Att
-	.db 49			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 64			;Base EXP
-	.db TYPE_GRASS	;Type 1
-	.db TYPE_POISON	;Type 2
-	.db 2			;EXP curve
+	.db 45				; HP
+	.db 49				; Att
+	.db 49				; Def
+	.db 45				; Speed
+	.db 65				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 45				; Catch rate
+	.db 64				; Base EXP yield
+	.db LVL_MED_SLOW	; Growth rate
 	.dw bulbasaur_attacks
-	.db 16			;niveau d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 16				; evolution level
 ivysaur:
 	.dw ivysaur_txt
-	.db 60			;HP
-	.db 62			;Att
-	.db 63			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 141			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 2			;EXP curve
+	.db 60				; HP
+	.db 62				; Att
+	.db 63				; Def
+	.db 60				; Speed
+	.db 80				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 45				; Catch rate
+	.db 141				; Base EXP yield
+	.db LVL_MED_SLOW	; Growth rate
 	.dw ivysaur_attacks
-	.db 32			;niveau d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 32				; evolution level
 venusaur:
 	.dw venusaur_txt
-	.db 80			;HP
-	.db 82			;Att
-	.db 83			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 208			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 2			;EXP curve
+	.db 80				; HP
+	.db 82				; Att
+	.db 83				; Def
+	.db 80				; Speed
+	.db 100				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 45				; Catch rate
+	.db 208				; Base EXP yield
+	.db LVL_MED_SLOW	; Growth rate
 	.dw venusaur_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 charmander:
 	.dw charmander_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_FIRE		; Type 1
+	.db TYPE_NULL		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw charmander_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 charmeleon:
 	.dw charmeleon_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw charmeleon_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 charizard:
 	.dw charizard_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw charizard_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 squirtle:
 	.dw squirtle_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw squirtle_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 wartortle:
 	.dw wartortle_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw wartortle_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 blastoise:
 	.dw blastoise_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw blastoise_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 caterpie:
 	.dw caterpie_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw caterpie_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 metapod:
 	.dw metapod_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw metapod_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 butterfree:
 	.dw butterfree_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw butterfree_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 weedle:
 	.dw weedle_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw weedle_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 kakuna:
 	.dw kakuna_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw kakuna_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 beedrill:
 	.dw beedrill_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw beedrill_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 pidgey:
 	.dw pidgey_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw pidgey_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 pidgeotto:
 	.dw pidgeotto_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw pidgeotto_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 pidgeot:
 	.dw pidgeot_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw pidgeot_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 rattata:
 	.dw rattata_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw rattata_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 raticate:
 	.dw raticate_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw raticate_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 spearow:
 	.dw spearow_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw spearow_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 fearow:
 	.dw fearow_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw fearow_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 ekans:
 	.dw ekans_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw ekans_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 arbok:
 	.dw arbok_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw arbok_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 pikachu:
 	.dw pikachu_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw pikachu_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 raichu:
 	.dw raichu_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw raichu_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 sandshrew:
 	.dw sandshrew_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw sandshrew_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 sandslash:
 	.dw sandslash_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw sandslash_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 nidoranF:
 	.dw nidoranF_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw nidoranF_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 nidorina:
 	.dw nidorina_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw nidorina_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 nidoqueen:
 	.dw nidoqueen_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw nidoqueen_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 nidoranM:
 	.dw nidoranM_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw nidoranM_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 nidorino:
 	.dw nidorino_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw nidorino_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 nidoking:
 	.dw nidoking_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw nidoking_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 clefairy:
 	.dw clefairy_txt
-	.db 1			;HP
-	.db 1			;Att
-	.db 1			;Def
-	.db 1			;Special
-	.db 1			;Speed
-	.db 1			;Base EXP
-	.db TYPE_GRASS
-	.db TYPE_POISON
-	.db 1			;EXP curve
+	.db 1				; HP
+	.db 1				; Att
+	.db 1				; Def
+	.db 1				; Speed
+	.db 1				; Special
+	.db TYPE_GRASS		; Type 1
+	.db TYPE_POISON		; Type 2
+	.db 1				; Catch rate
+	.db 1				; Base EXP yield
+	.db LVL_SLOW		; Growth rate
 	.dw clefairy_attacks
-	.db 0			;pas d'évolution
+	.db 0,0,0,0,0,0,0	; TM/HM flags
+	.db 0				; evolution level (0 = no evolution)
 
 pokemon_sprites:
 #include "sprites/pokemons/bulbasaur.bmp"

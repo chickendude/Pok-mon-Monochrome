@@ -4,31 +4,36 @@
 #define textdelay	1	; set = typewriter text (updates LCD), reset = no delay
 
 ; Current Pokémon constants
-CP_NAME			= 0	; strings
+CP_NAME			= 0		; strings
 CP_ATK1STR		= 2
 CP_ATK2STR		= 4
 CP_ATK3STR		= 6
 CP_ATK4STR		= 8
-CP_LVL			= 10	; 8-bit numbers
-CP_STATE		= 11
-CP_ATK1			= 12
-CP_ATK1PP		= 13
-CP_ATK1PPMAX	= 14
-CP_ATK2			= 15
-CP_ATK2PP		= 16
-CP_ATK2PPMAX	= 17
-CP_ATK3			= 18
-CP_ATK3PP		= 19
-CP_ATK3PPMAX	= 20
-CP_ATK4			= 21
-CP_ATK4PP		= 22
-CP_ATK4PPMAX	= 23
-CP_HP			= 24	; 16-bit numbers
-CP_HPTOT		= 26
-CP_ATK			= 28
-CP_DEF			= 30
-CP_EXP			= 32
-CP_SPRITE		= 34
+CP_TYPE1		= 10
+CP_TYPE2		= 12
+CP_LVL			= 14	; 8-bit numbers
+CP_STATE		= 15
+CP_ATK1			= 16
+CP_ATK1PP		= 17
+CP_ATK1PPMAX	= 18
+CP_ATK2			= 19
+CP_ATK2PP		= 20
+CP_ATK2PPMAX	= 21
+CP_ATK3			= 22
+CP_ATK3PP		= 23
+CP_ATK3PPMAX	= 24
+CP_ATK4			= 25
+CP_ATK4PP		= 26
+CP_ATK4PPMAX	= 27
+CP_HP			= 28	; 16-bit numbers
+CP_HPTOT		= 30
+CP_ATK			= 32
+CP_DEF			= 34
+CP_SPD			= 36
+CP_SP			= 38
+CP_EXP			= 40
+CP_SPRITE		= 42
+
 
 ; Text constants
 #define POKEMON_MENU_SIZE	menu_pokemon_list_end - menu_pokemon_list	; [strings_XX.inc]
@@ -50,11 +55,13 @@ CP_SPRITE		= 34
 #define ENEM	$fa	;same value as PKMN
 #define NEWXY	$f9
 ;+1 because 0 = end of string
-#define _NAME	CP_NAME+1		;1 strings
-#define _AT1	CP_ATK1STR+1	;3 (attack names)
-#define _AT2	CP_ATK2STR+1	;5
-#define _AT3	CP_ATK3STR+1	;7
-#define _AT4	CP_ATK4STR+1	;9
+#define _NAME	CP_NAME+1		; strings
+#define _AT1	CP_ATK1STR+1	; (attack names)
+#define _AT2	CP_ATK2STR+1	;
+#define _AT3	CP_ATK3STR+1	;
+#define _AT4	CP_ATK4STR+1	;
+#define _TYPE1	CP_TYPE1+1		; pokemon type strings
+#define _TYPE2	CP_TYPE2+1		;
 #define _LVL	CP_LVL+1		; 1 byte
 #define _STATE	CP_STATE+1		;
 #define _PP1	CP_ATK1PP+1		; attack pp
@@ -69,6 +76,8 @@ CP_SPRITE		= 34
 #define _HPTOT	CP_HPTOT+1		;
 #define _ATK	CP_ATK+1		;
 #define _DEF	CP_DEF+1		;
+#define _SPD	CP_SPD+1		;
+#define _SP		CP_SP+1			;
 #define _EXP	CP_EXP+1		;
 
 _2BYTE = _HP					; marker for 2-byte numbers
@@ -108,3 +117,9 @@ _2BYTE = _HP					; marker for 2-byte numbers
 #define VMODE_DIRECT		0
 #define VMODE_TYPE			1
 #define VMODE_TYPE_NO_PAUSE	2
+
+; Pokémon stat constants:
+LVL_SLOW		= 0
+LVL_MED_SLOW	= 1
+LVL_MED_FAST	= 2
+LVL_FAST		= 3

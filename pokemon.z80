@@ -39,6 +39,7 @@
 
 ; DEBUGGING - initial player party
 	ld ix,player_party
+	ld (ix-1),3					; party_number
 	ld (ix),1
 	ld (ix+1),2
 	ld (ix+2),3

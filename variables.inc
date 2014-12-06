@@ -49,26 +49,12 @@ number_string			= scrapspace+236	; where numbers are stored in decimal format
 #define player_x_offset	saferam3+26
 
 ; Pokémon variables
-#define player_party	rambuf+1000			; [6 bytes]
-#define current_pokemon	rambuf+1006			; currently [28 bytes], i'll leave 30 bytes for now
-;	.dw 0	;pokemon name string address
-;	.fill 8,0	;(attack string)*4
-;	;put more strings here
-;	.db 0		;lvl
-;	.db 0		;hp
-;	.db 0		;total hp
-;	.db 0		;att
-;	.db 0		;def
-;	.db 0		;state
-;	.dw 0		;atk 1 id, pp
-;	.dw 0		;atk 2 id, pp
-;	.dw 0		;atk 3 id, pp
-;	.dw 0		;atk 4 id, pp
-;	.dw 0		;exp
-;	.dw 0		;sprite address
-#define current_pokemon_player	rambuf+1036	; current player's pokemon data
-#define current_pokemon_enemy	rambuf+1070	; current enemy data
-;						= rambuf+1110		;
+#define party_number			rambuf+999	; how many pokémon are in the player's party
+#define player_party			rambuf+1000	; [6 bytes]
+#define current_pokemon			rambuf+1006	; currently [40+ bytes], i'll leave 50 bytes for now
+#define current_pokemon_player	rambuf+1056	; current player's pokemon data
+#define current_pokemon_enemy	rambuf+1106	; current enemy data
+;						= 		rambuf+1110	;
 
 ; Misc variables
 #define rand_data			saferam3+60	; used for Ion's random routine

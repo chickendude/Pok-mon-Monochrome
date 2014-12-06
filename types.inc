@@ -1,3 +1,4 @@
+#define TYPE_NULL	0
 #define TYPE_NORMAL	1
 #define TYPE_FIGHTING	2
 #define TYPE_FLYING	3
@@ -18,9 +19,9 @@ type_index:
 	.dw normal,fighting,flying,poison,ground,rock,bug,ghost,grass,fire,water,electric,psychic,ice,dragon
 
 normal:
-	.db 0	; types contre lesquels c'est super efficace (multiplie par deux l'attaque)
-	.db 1,TYPE_ROCK	; types résistants contre lesquel ça n'est pas très efficace (divise par deux l'attaque)
-	.db 1,TYPE_GHOST	; types contre lesquels l'attaque n'a aucun effet
+	.db 0			; number of types it's super effective against (double damage)
+	.db 1,TYPE_ROCK	; not very effective types (half damage)
+	.db 1,TYPE_GHOST	; no effect types (no damage)
 	.db "Normal",0
 
 fighting:

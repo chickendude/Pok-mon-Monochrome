@@ -251,8 +251,6 @@ insert_stat:
 		 call nz,draw_number_8		; draw an 8-bit number in a
 		jr insert_stat_end
 insert_stat_16:
-;$19 _HP
-;$1B _HPTOT
 		ld a,(hl)
 		inc hl
 		ld h,(hl)
@@ -368,6 +366,7 @@ load_next_text:
 dialogue_jump = $+1
 	jp draw_dialogue
 
+;loads enemy's pokémon
 text_load_enemy:
 	inc hl
 	push hl
@@ -382,6 +381,7 @@ text_load_enemy:
 	inc hl
 	ret
 
+;loads player's pokémon
 text_load_pokemon:
 	inc hl
 	ld a,(hl)
@@ -418,84 +418,8 @@ text_load_pokemon_data:
 	call slow_mult_hl_b
 	add hl,de				; hl points to the pokémon's data
 	push ix
-		call load_pokemon_data
+		call load_pokemon_data	; [stats.inc]
 	pop ix
-	ret
-
-;hl = pointer to pokémon's data, see [stats.inc]
-load_pokemon_data:					; load pokémon data to current_pokemon
-	push hl							; save pointer to d
-		inc hl						; skip pokémon id (used later for pokémon name)
-		ld de,current_pokemon+CP_LVL
-		ld a,(hl)					; level
-		ldi							; copy current level
-		ld de,current_pokemon+CP_HP
-		ldi
-		ldi							; copy current HP
-		inc hl						; skip pokemon state
-;now load the attacks
-		ex af,af'					; a' = pokémon level
-		ld bc,$04ff					; can have up to four attacks, c is for the ldi
-		exx
-			ld de,current_pokemon+CP_ATK1STR
-		exx
-		ld de,current_pokemon+CP_ATK1	; de = where to store attack ID and PP
-load_attacks:
-		ld a,(hl)					; attack id
-		exx
-			ld hl,null_text			; default is a pointer to a 0
-			or a					; if attack id = 0,
-			 jr z,store_attack		; .. store a null text pointer
-			call find_attack_data	; otherwise load attack pointer [routines.inc]
-			ld bc,ATK_NAME			; there are 5 bytes of data before the string
-			add hl,bc				; hl points to string
-store_attack:
-			ex de,hl
-			ld (hl),e				; store string pointer
-			inc hl
-			ld (hl),d
-			inc hl
-			ex de,hl
-		exx
-		ldi							; attack id
-		ldi							; attack PP
-		ldi							; attack max PP
-		djnz load_attacks
-;copier les stats precalculés du pokémon (hp total, attack, defense)
-	pop hl
-	push hl
-		call get_pokemon_sprite_ix	; hl = pointer to pokémon id [battle_graphics.inc]
-		ld (current_pokemon+CP_SPRITE),hl
-	pop hl
-	ld a,(hl)
-	call find_pokemon_data			; returns hl = pointer to start of pokémon data
-	ex af,af'						; a = pokemon level
-	push hl
-		push af						; save pokémon's level
-			inc hl
-			inc hl					; first two bytes are the string name pointer
-			push hl
-				call calculate_hp	; hl = max HP [maths.inc]
-				ld (current_pokemon+CP_HPTOT),hl	; store total HP
-			pop hl
-		pop af						; pokémon level
-;load the other values (find the pokemon's attack, defense, max HP, etc.)
-;		inc hl
-;		inc de
-;		ld b,1
-;attack_defense_loop:
-;		push hl
-;		push de
-;		push bc
-;			call calculate_stats
-;		pop bc
-;		pop de
-;		pop hl
-;		djnz attack_defense_loop
-;trouver le string du nom du pokémon
-	pop hl
-	call ld_hl_hl
-	ld (current_pokemon),hl	;sauver l'adresse du string
 	ret
 
 text_delay:
@@ -514,6 +438,7 @@ text_delay:
 	exx
 	ret
 
+; run when [2nd] is pressed
 menu_select:
 	call release_key
 	xor a
@@ -785,9 +710,27 @@ menu_pokemon_stats:
 	ld hl,stats_text
 	call draw_text_fast_copy
 	call fast_copy
-	call wait_key					; pause
-	ld a,(selected_pokemon)			; set the cursor to the last selected pokemon
-	jp menu_pokemon_return
+	call wait_key				; pause
+	ld a,$fe					; group 1
+	call get_key				; check arrow keys
+	ld hl,selected_pokemon
+	rra							; down
+	 jr nc,menu_pokemon_down	; if down was pressed, switch to next pokémon
+	bit 2,a
+	ld a,(hl)					; set the cursor to the last selected pokemon
+	 jp nz,menu_pokemon_return	; if a button other than down or up was pressed, quit
+	dec (hl)					; change currently selected pokemon
+	 jp p,menu_pokemon_stats
+	ld a,(party_number)
+	ld (hl),a
+	jr menu_pokemon_stats	
+menu_pokemon_down:
+	inc (hl)
+	ld a,(party_number)
+	cp (hl)
+	 jr nz,menu_pokemon_stats
+	ld (hl),0
+	jr menu_pokemon_stats
 
 ; copies a string into RAM, up to 200 bytes
 ; hl = pointer to string

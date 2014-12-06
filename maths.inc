@@ -148,64 +148,25 @@ calculate_damages_next:
 
 ; cf http://www.pokepedia.fr/index.php/Calcul_des_statistiques , je modifierai peut être la formule ci-dessous :
 calculate_hp:
-; input : hl = pokemon hp base pointer (1-255), a = level (1-100)
-; output : a = int(2*hl*a/100+a+10)
+; input : hl = base stat pointer (1-255), a = level (1-100)
+; output : hl = int(hl*a/50+a+10)
+	ld e,10						; amount to add at the end
+	jr calculate_stats_start
+calculate_stats:
+; output : hl = int(hl*a/50+a+5)
+	ld e,5						; amount to add at the end
+calculate_stats_start:
 	push af
-		add a,a					; a * 2
+	push de
 		ld e,(hl)
 		call mult_a_e			; hl=a*e -- (2*LVL)*BASE
-		ld c,100
+		ld c,50
 		call div_hl_c			; hl=hl/c -- (2*LVL*BASE)/100
+	pop de
 	pop af
-	add a,10
+	add a,e
 	ld c,a						; div_hl_c ends with a djnz, so b=0
 	add hl,bc
-	ret
-
-	call calculate_stats_or_hp	; perform basic stat calculation
-	add a,10					; level+10
-	ld h,0
-	ld l,a						; hl = pokémon level
-	bcall(_setxxxxop2)
-	bcall(_fpadd)				; add pokémon level to 
-;	ld a,10
-;	bcall(_setxxop2)
-;	bcall(_fpadd)
-	jp maths_functions_end
-
-;hl = base stat
-calculate_stats:	; output : op2 = int(2*hl*a/100+5), uses op5
-	push hl
-		bcall(_op1toop5)
-	pop hl
-	call calculate_stats_or_hp
-	ld a,5
-	bcall(_setxxop2)
-	bcall(_fpadd)
-	bcall(_op1toop2)
-	bcall(_op5toop1)
-	ret
-
-calculate_stats_or_hp:
-	push af
-		push hl
-			ld a,2
-			bcall(_setxxop1)	; 1 byte
-		pop hl
-		ld l,(hl)				; hl = base stat
-		ld h,0
-		bcall(_setxxxxop2)		; 2 bytes
-		bcall(_fpmult)			; OP1*OP2, BASE*2
-	pop af						; a = level
-	push af
-		ld h,0
-		ld l,a
-		bcall(_setxxxxop2)		; level to OP2
-		bcall(_fpmult)			; (2*BASE)*LVL
-		ld hl,100
-		bcall(_setxxxxop2)
-		bcall(_fpdiv)			; (2*BASE)*LVL/100
-	pop af
 	ret
 
 calculate_experience:	; output : a=experience de base du pokémon vaincu*niveau du pokémon vaincu/7/c
@@ -232,7 +193,6 @@ calculate_experience:	; output : a=experience de base du pokémon vaincu*niveau d
 	ld a,c
 	bcall(_setxxop2)
 	bcall(_fpdiv)
-
 maths_functions_end:	; a=op1
 	bcall(_int)			; je me demande si c'est utile
 	bcall(_convop1)
@@ -243,7 +203,7 @@ calculate_next_experience:	; input : none; output : de=XPmax
 	push hl
 	ld a,(hl)
 	call find_pokemon_data
-	ld e,POKE_EXPCURVE
+	ld e,POKE_GROWTH
 	add hl,de
 	ld a,(hl)	; a=experience curve #
 	pop hl
@@ -255,6 +215,7 @@ calculate_next_experience:	; input : none; output : de=XPmax
 	ld d,h
 	ld e,l
 	pop af
+; ******************** this all needs to be changed *********************
 	cp 1
 	jr z,calculate_next_experience_fast_curve
 	cp 2
