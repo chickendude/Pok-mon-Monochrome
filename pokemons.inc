@@ -137,6 +137,7 @@ clefairy_attacks:
 
 #define GSTATS_LENGTH ivysaur-bulbasaur
 
+;base stats for each pokémon
 pokemon_general_stats:
 bulbasaur:
 	.dw bulbasaur_txt
@@ -658,6 +659,7 @@ pokemon_sprites:
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/raichu.bmp"
 #include "sprites/pokemons/sandshrew.bmp"
 #include "sprites/pokemons/sandslash.bmp"
+#comment
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/nidoranf.bmp"
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/nidorina.bmp"
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/nidoqueen.bmp"
@@ -673,7 +675,6 @@ pokemon_sprites:
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/zubat.bmp"
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/golbat.bmp"
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/oddish.bmp"
-#comment
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/gloom.bmp"
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/vileplume.bmp"
 #include "sprites/pokemons/nosprite.bmp" ;#include "sprites/pokemons/paras.bmp"

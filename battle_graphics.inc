@@ -279,7 +279,7 @@ battle_draw_pokemon_health_bar:
 		dec hl
 		ld h,(hl)			;cur HP
 		ld l,0
-		call hl_div_c		;curHP/maxHP (l will hold the remainder, aka the fraction)
+		call div_hl_c		;curHP/maxHP (l will hold the remainder, aka the fraction)
 		ld b,50
 		call slow_mult_hl_b	;the bar takes up 50 pixels
 	pop de

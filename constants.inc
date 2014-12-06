@@ -4,31 +4,31 @@
 #define textdelay	1	; set = typewriter text (updates LCD), reset = no delay
 
 ; Current Pokémon constants
-#define CP_NAME			0	; strings
-#define CP_ATK1STR		2
-#define CP_ATK2STR		4
-#define CP_ATK3STR		6
-#define CP_ATK4STR		8
-#define CP_LVL			10	; numbers
-#define CP_HP			11
-#define CP_HPTOT		12
-#define CP_ATK			13
-#define CP_DEF			14
-#define CP_STATE		15
-#define CP_ATK1			16
-#define CP_ATK1PP		17
-#define CP_ATK1PPMAX	18
-#define CP_ATK2			19
-#define CP_ATK2PP		20
-#define CP_ATK2PPMAX	21
-#define CP_ATK3			22
-#define CP_ATK3PP		23
-#define CP_ATK3PPMAX	24
-#define CP_ATK4			25
-#define CP_ATK4PP		26
-#define CP_ATK4PPMAX	27
-#define CP_EXP			28
-#define CP_SPRITE		29
+CP_NAME			= 0	; strings
+CP_ATK1STR		= 2
+CP_ATK2STR		= 4
+CP_ATK3STR		= 6
+CP_ATK4STR		= 8
+CP_LVL			= 10	; 8-bit numbers
+CP_STATE		= 11
+CP_ATK1			= 12
+CP_ATK1PP		= 13
+CP_ATK1PPMAX	= 14
+CP_ATK2			= 15
+CP_ATK2PP		= 16
+CP_ATK2PPMAX	= 17
+CP_ATK3			= 18
+CP_ATK3PP		= 19
+CP_ATK3PPMAX	= 20
+CP_ATK4			= 21
+CP_ATK4PP		= 22
+CP_ATK4PPMAX	= 23
+CP_HP			= 24	; 16-bit numbers
+CP_HPTOT		= 26
+CP_ATK			= 28
+CP_DEF			= 30
+CP_EXP			= 32
+CP_SPRITE		= 34
 
 ; Text constants
 #define POKEMON_MENU_SIZE	menu_pokemon_list_end - menu_pokemon_list	; [strings_XX.inc]
@@ -55,21 +55,23 @@
 #define _AT2	CP_ATK2STR+1	;5
 #define _AT3	CP_ATK3STR+1	;7
 #define _AT4	CP_ATK4STR+1	;9
-#define _LVL	CP_LVL+1		;B numbers
-#define _HP		CP_HP+1			;C
-#define _HPTOT	CP_HPTOT+1		;D
-#define _ATK	CP_ATK+1		;E
-#define _DEF	CP_DEF+1		;F
-#define _STATE	CP_STATE+1		;10
-#define _PP1	CP_ATK1PP+1		;11 attack pp
-#define _PP1MAX	CP_ATK1PPMAX+1	;12 attack max pp
-#define _PP2	CP_ATK2PP+1		;13
-#define _PP2MAX	CP_ATK2PPMAX+1	;14
-#define _PP3	CP_ATK3PP+1		;15
-#define _PP3MAX	CP_ATK3PPMAX+1	;16
-#define _PP4	CP_ATK4PP+1		;17
-#define _PP4MAX	CP_ATK4PPMAX+1	;18
-#define _EXP	CP_EXP+1		;19
+#define _LVL	CP_LVL+1		; 1 byte
+#define _STATE	CP_STATE+1		;
+#define _PP1	CP_ATK1PP+1		; attack pp
+#define _PP1MAX	CP_ATK1PPMAX+1	; attack max pp
+#define _PP2	CP_ATK2PP+1		;
+#define _PP2MAX	CP_ATK2PPMAX+1	;
+#define _PP3	CP_ATK3PP+1		;
+#define _PP3MAX	CP_ATK3PPMAX+1	;
+#define _PP4	CP_ATK4PP+1		;
+#define _PP4MAX	CP_ATK4PPMAX+1	;
+#define _HP		CP_HP+1			; 2 bytes
+#define _HPTOT	CP_HPTOT+1		;
+#define _ATK	CP_ATK+1		;
+#define _DEF	CP_DEF+1		;
+#define _EXP	CP_EXP+1		;
+
+_2BYTE = _HP					; marker for 2-byte numbers
 
 ; Tiles/Maps constants
 #define NUM_EVENTS	(event_tiles_end-event_tiles)/3
@@ -77,32 +79,32 @@
 #define TRAINER_TILE	56	; tile # after which there's only trainers-related tiles
 
 ; Game constants
-#define SCREEN_WIDTH	96
-#define SCREEN_HEIGHT	64
+#define SCREEN_WIDTH			96
+#define SCREEN_HEIGHT			64
 #define POKEMON_SPRITE_WIDTH	32
 #define POKEMON_SPRITE_HEIGHT	26
-#define POKEMON_SPRITE_SIZE	$1A04
-#define INSERT_RAM	2000
+#define POKEMON_SPRITE_SIZE		$1A04
+#define INSERT_RAM				2000
 #define POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN	5
-#define CURSOR_SPEED	20
-#define SCROLL_CURSOR_SPEED	30
-#define TEXT_TYPING_SPEED	6
-#define WALK_SPEED	3
-#define WALK_FREQUENCY	2
-#define FADE_SPEED	2
+#define CURSOR_SPEED			20
+#define SCROLL_CURSOR_SPEED		30
+#define TEXT_TYPING_SPEED		6
+#define WALK_SPEED				3
+#define WALK_FREQUENCY			2
+#define FADE_SPEED				2
 #define POKEMON_ENCOUNTER_FREQUENCY	200
 #define BATTLE_FLASH_SCREEN_FREQUENCY	4
 #define BATTLE_BLINK_SPRITE_TIMES	4
 #define BATTLE_BLINK_SPRITE_SPEED	10
 #define BATTLE_EVOLUTION_BLINK_SPRITE_TIMES	26	; must be even
 #define BATTLE_EVOLUTION_BLINK_SPRITE_SPEED	10
-#define PLAYER_DOWN	0
-#define PLAYER_LEFT	1
-#define PLAYER_RIGHT	2
-#define PLAYER_UP	3
-#define MAX_PARTY	6					; maximum number of pokémon you can have in your party
+#define PLAYER_DOWN				0
+#define PLAYER_LEFT				1
+#define PLAYER_RIGHT			2
+#define PLAYER_UP				3
+#define MAX_PARTY				6				; maximum number of pokémon you can have in your party
 
 ; Misc constants
-#define VMODE_DIRECT	0
-#define VMODE_TYPE	1
+#define VMODE_DIRECT		0
+#define VMODE_TYPE			1
 #define VMODE_TYPE_NO_PAUSE	2

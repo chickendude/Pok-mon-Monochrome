@@ -148,21 +148,35 @@ calculate_damages_next:
 
 ; cf http://www.pokepedia.fr/index.php/Calcul_des_statistiques , je modifierai peut être la formule ci-dessous :
 calculate_hp:
-; input : hl = pokemon hp base pointer, a = level
+; input : hl = pokemon hp base pointer (1-255), a = level (1-100)
 ; output : a = int(2*hl*a/100+a+10)
-	call calculate_stats_or_hp
+	push af
+		add a,a					; a * 2
+		ld e,(hl)
+		call mult_a_e			; hl=a*e -- (2*LVL)*BASE
+		ld c,100
+		call div_hl_c			; hl=hl/c -- (2*LVL*BASE)/100
+	pop af
+	add a,10
+	ld c,a						; div_hl_c ends with a djnz, so b=0
+	add hl,bc
+	ret
+
+	call calculate_stats_or_hp	; perform basic stat calculation
+	add a,10					; level+10
 	ld h,0
-	ld l,a
+	ld l,a						; hl = pokémon level
 	bcall(_setxxxxop2)
-	bcall(_fpadd)
-	ld a,10
-	bcall(_setxxop2)
-	bcall(_fpadd)
+	bcall(_fpadd)				; add pokémon level to 
+;	ld a,10
+;	bcall(_setxxop2)
+;	bcall(_fpadd)
 	jp maths_functions_end
 
+;hl = base stat
 calculate_stats:	; output : op2 = int(2*hl*a/100+5), uses op5
 	push hl
-	bcall(_op1toop5)
+		bcall(_op1toop5)
 	pop hl
 	call calculate_stats_or_hp
 	ld a,5
@@ -174,23 +188,23 @@ calculate_stats:	; output : op2 = int(2*hl*a/100+5), uses op5
 
 calculate_stats_or_hp:
 	push af
-	push hl
-	ld a,2
-	bcall(_setxxop1)
-	pop hl
-	ld l,(hl)
-	ld h,0
-	bcall(_setxxxxop2)
-	bcall(_fpmult)
-	pop af
+		push hl
+			ld a,2
+			bcall(_setxxop1)	; 1 byte
+		pop hl
+		ld l,(hl)				; hl = base stat
+		ld h,0
+		bcall(_setxxxxop2)		; 2 bytes
+		bcall(_fpmult)			; OP1*OP2, BASE*2
+	pop af						; a = level
 	push af
-	ld h,0
-	ld l,a
-	bcall(_setxxxxop2
-	bcall(_fpmult)
-	ld hl,100
-	bcall(_setxxxxop2)
-	bcall(_fpdiv)
+		ld h,0
+		ld l,a
+		bcall(_setxxxxop2)		; level to OP2
+		bcall(_fpmult)			; (2*BASE)*LVL
+		ld hl,100
+		bcall(_setxxxxop2)
+		bcall(_fpdiv)			; (2*BASE)*LVL/100
 	pop af
 	ret
 
@@ -220,7 +234,7 @@ calculate_experience:	; output : a=experience de base du pokémon vaincu*niveau d
 	bcall(_fpdiv)
 
 maths_functions_end:	; a=op1
-	bcall(_int)	; je me demande si c'est utile
+	bcall(_int)			; je me demande si c'est utile
 	bcall(_convop1)
 	ret
 
@@ -262,7 +276,7 @@ calculate_next_experience_medium_fast_curve:	; exp=5.5*lvl^2
 calculate_next_experience_pre_end1:
 	call de_times_bc
 	ld c,2
-	call hl_div_c
+	call div_hl_c
 	jr calculate_next_experience_end
 
 calculate_next_experience_medium_slow_curve:	; exp=6*lvl^2
@@ -303,7 +317,7 @@ mul_loop_1:
 	djnz mul_loop_1
 	ret
 
-hl_div_c:
+div_hl_c:
 ;By Xeda112358
 ;Inputs:
 ;     HL is the numerator
@@ -337,4 +351,19 @@ slow_mult_hl_b:
 		djnz $-1
 slow_mult_hl_b_exit:
 	pop de
+	ret
+
+; From CoBB's z80 guide
+mult_a_e:
+	ld h,a
+mult_h_e:						; this routine performs the operation HL=H*E
+	ld d,0						; clearing D and L
+	ld l,d
+	ld b,8						; we have 8 bits
+mult_h_e_loop:
+	add hl,hl					; advancing a bit
+	 jr nc,mult_h_e_skip		; if zero, we skip the addition
+	add hl,de					; adding to the product if necessary
+mult_h_e_skip:
+	djnz mult_h_e_loop
 	ret

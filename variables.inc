@@ -27,6 +27,7 @@
 #define sub_menu_left	scrapspace+229	; pointer to left submenu
 #define sub_menu_right	scrapspace+231	; pointer to right submenu
 #define sub_menu_flag	scrapspace+234	; 
+number_string			= scrapspace+236	; where numbers are stored in decimal format 
 
 ; Map variables
 #define map_addr	saferam3	;128 bytes
@@ -66,8 +67,8 @@
 ;	.dw 0		;exp
 ;	.dw 0		;sprite address
 #define current_pokemon_player	rambuf+1036	; current player's pokemon data
-#define current_pokemon_enemy	rambuf+1066	; current enemy data
-;						= rambuf+1096	;
+#define current_pokemon_enemy	rambuf+1070	; current enemy data
+;						= rambuf+1110		;
 
 ; Misc variables
 #define rand_data			saferam3+60	; used for Ion's random routine

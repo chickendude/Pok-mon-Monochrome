@@ -204,7 +204,7 @@ draw_string:
 		push bc					; bc = routine adress where we want to jump
 		ret						; don't forget the "push bc" (draw_menu_loop)
 not_special:					; .. we'll return there after the special routine finishes
-	cp _EXP+1					; if <= _EXP, we are inserting a stat
+	cp _2BYTE+1					; if <= _2BYTE, we are inserting a stat
 	 jr c,insert_stat
 	push de
 	push ix
@@ -216,21 +216,49 @@ not_special:					; .. we'll return there after the special routine finishes
 	inc hl						; next character in string
 	jr draw_string
 
+
+fastcopy_debug:
+	push af
+	push bc
+	push de
+	push hl
+		call fast_copy
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
 ;a = stat id to display
 insert_stat:
+	cp _2BYTE					; check if it's a 16-bit number
+	 jr c,$+4
+		inc hl					; if so, we need to skip the _2BYTE token and read the stat token
+		ld a,(hl)
 	ld c,a
 	ld b,0
 	dec c
 	cp _LVL
 	push hl
-	 jr c,print_pokemon_name
-	ld hl,current_pokemon
-	add hl,bc
-	ld a,(hl)
-	or a
-	call nz,draw_number
-	jr insert_stat_end
-
+		 jr c,print_pokemon_name	; if less than _LVL, display a string
+		ld hl,current_pokemon
+		add hl,bc
+		cp _2BYTE					; check if it's a 16-bit number
+		 jr nc,insert_stat_16
+;8-bit number
+		ld a,(hl)
+		or a
+		 call nz,draw_number_8		; draw an 8-bit number in a
+		jr insert_stat_end
+insert_stat_16:
+;$19 _HP
+;$1B _HPTOT
+		ld a,(hl)
+		inc hl
+		ld h,(hl)
+		ld l,a
+		call draw_number_16			; draw a 16-bit number in hl
+		jr insert_stat_end
 print_pokemon_name:
 	ld hl,current_pokemon
 	add hl,bc
@@ -400,8 +428,10 @@ load_pokemon_data:					; load pokémon data to current_pokemon
 		inc hl						; skip pokémon id (used later for pokémon name)
 		ld de,current_pokemon+CP_LVL
 		ld a,(hl)					; level
+		ldi							; copy current level
+		ld de,current_pokemon+CP_HP
 		ldi
-		ldi							; current level and HP
+		ldi							; copy current HP
 		inc hl						; skip pokemon state
 ;now load the attacks
 		ex af,af'					; a' = pokémon level
@@ -434,34 +464,34 @@ store_attack:
 ;copier les stats precalculés du pokémon (hp total, attack, defense)
 	pop hl
 	push hl
-		call get_pokemon_sprite_ix	;hl = pointeur à l'id du pokémon
+		call get_pokemon_sprite_ix	; hl = pointer to pokémon id [battle_graphics.inc]
 		ld (current_pokemon+CP_SPRITE),hl
 	pop hl
 	ld a,(hl)
-	call find_pokemon_data	;returns hl = pointer to start of pokémon data
-	ex af,af'				;a = pokemon level
+	call find_pokemon_data			; returns hl = pointer to start of pokémon data
+	ex af,af'						; a = pokemon level
 	push hl
-		push af				;sauver niveau du pokémon
+		push af						; save pokémon's level
 			inc hl
-			inc hl			;first two bytes are the string name address
+			inc hl					; first two bytes are the string name pointer
 			push hl
-				call calculate_hp
-				ld (current_pokemon+CP_HPTOT),a	;HP totale
+				call calculate_hp	; hl = max HP [maths.inc]
+				ld (current_pokemon+CP_HPTOT),hl	; store total HP
 			pop hl
-		pop af				;niveau
+		pop af						; pokémon level
 ;load the other values (find the pokemon's attack, defense, max HP, etc.)
-;			inc hl
-;			inc de
-;			ld b,1
+;		inc hl
+;		inc de
+;		ld b,1
 ;attack_defense_loop:
-;			push hl
-;			push de
-;			push bc
-;				call calculate_stats
-;			pop bc
-;			pop de
-;			pop hl
-;			djnz attack_defense_loop
+;		push hl
+;		push de
+;		push bc
+;			call calculate_stats
+;		pop bc
+;		pop de
+;		pop hl
+;		djnz attack_defense_loop
 ;trouver le string du nom du pokémon
 	pop hl
 	call ld_hl_hl
@@ -768,7 +798,7 @@ string_to_RAM:
 	ldir
 
 ;draws a one-byte number in a
-draw_number:
+draw_number_8:
 _vdispa:
 	push de
 	push hl
@@ -782,4 +812,45 @@ _vdispa:
 	pop ix
 	pop hl
 	pop de
+	ret
+
+draw_number_16:
+	exx
+		ld hl,number_string	; where we will store the result
+	exx
+	ld de,-10000			; check how many 10,000s units there are
+	call dN_b2d
+	ld de,-1000				; check how many 1,000s units there are
+	call dN_b2d
+	ld de,-100				; hundreds
+	call dN_b2d
+	ld de,-10				; tens
+	call dN_b2d
+	ld de,-1				; single digits
+	call dN_b2d
+	exx
+	ld (hl),0				; EOS
+; remove leading 0s
+	ld hl,number_string-1	; where the string is stored
+		inc hl
+		ld a,(hl)
+		cp '0'				; if it's a 0, skip it
+	 jr z,$-4				; repeat until we find a non-zero number
+	or a
+	 jr nz,$+3				; if all numbers are zeros, move hl back one
+		dec hl				; .. to display one zero 
+	jp draw_string			; draw the string (_vPutS replacement)
+
+dN_b2d:
+	ld a,-1					; if there is no carry the first run through, # = 0
+dN_b2dloop:
+	inc a					; each iteration increase accumulator by 1
+	add hl,de
+	 jr c,dN_b2dloop
+	sbc hl,de				; 225 - 100 = 125 - 100 = 25 - 100 = -75. This adds 100 again so we can check the next digits.
+	exx
+		add a,'0'
+		ld (hl),a
+		inc hl
+	exx
 	ret
