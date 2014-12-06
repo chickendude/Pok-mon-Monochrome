@@ -277,21 +277,6 @@ clefairy_attacks:
 	.db ATK_DEFENSE_CURL
 	.db ATK_LIGHT_SCREEN
 
-#define POKE_NAME		0
-#define POKE_HP			2
-#define POKE_ATK		3
-#define POKE_DEF		4
-#define POKE_SPD		5
-#define POKE_SP			6
-#define POKE_TYPE1		7
-#define POKE_TYPE2		8
-#define POKE_CATCH		9
-#define POKE_EXP		10
-#define POKE_GROWTH		11
-#define POKE_ATK_LIST	12
-#define POKE_TM			14
-#define POKE_EVOLVE		21
-
 #define GSTATS_LENGTH ivysaur-bulbasaur
 
 ;base stats for each pokémon

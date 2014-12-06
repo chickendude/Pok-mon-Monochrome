@@ -268,7 +268,7 @@ print_pokemon_name:
 	pop bc						; clear stack and exit
 	ret
 insert_stat_end:
-	pop hl
+	pop hl						; restore string position and jump to next character
 	inc hl
 	jr draw_string
 

@@ -1,3 +1,17 @@
+; Math functions
+;####### 24 bit
+;div_ehl_d			; EHL=EHL/D, A = remainder
+;mult_dhl_e			; AHL=DHL*E
+;mult_de_a			; AHL=DE*A
+;####### 16 bit
+;hl_pow_2			; HL=HL²
+;de_times_bc		; HL=DE*BC
+;div_hl_c			; HL=HL/C
+;mult_hl_b			; slow
+;mult_a_e			; HL=A*E
+;mult_h_e			; HL=H*E
+
+
 calculate_proportionality:	; output : a = int((hl/bc)*a)
 	push af
 	push bc
@@ -147,9 +161,17 @@ calculate_damages_next:
 	ret
 
 ; cf http://www.pokepedia.fr/index.php/Calcul_des_statistiques , je modifierai peut être la formule ci-dessous :
+;###########################
 calculate_hp:
-; input : hl = base stat pointer (1-255), a = level (1-100)
-; output : hl = int(hl*a/50+a+10)
+;# Calculates a pokémon's HP based on
+;# .. its level and base HP stat
+;# input:
+;# - hl	= base stat pointer (1-255)
+;# - a	= level (1-100)
+;# output:
+;# - hl = int(hl*a/50+a+e)
+;#	(e = 10 for HP, 5 for all other stats)
+;###########################
 	ld e,10						; amount to add at the end
 	jr calculate_stats_start
 calculate_stats:
@@ -167,6 +189,130 @@ calculate_stats_start:
 	add a,e
 	ld c,a						; div_hl_c ends with a djnz, so b=0
 	add hl,bc
+	ret
+
+;###########################
+calculate_next_level:
+;# Calculates experience needed until
+;# .. reaching next level
+;# input:
+;# - e	= exp growth rate (0-3)
+;# - a	= level (1-100)
+;# output:
+;# - hl = experience remaining til next level
+;###########################
+	ld hl,calculate_slow_experience
+	dec e
+	 jr nz,$+5
+		ld hl,calculate_medslow_experience
+	dec e
+	 jr nz,$+5
+		ld hl,calculate_medfast_experience
+	dec e
+	 jr nz,$+5
+		ld hl,calculate_fast_experience
+
+	inc a						; check next level
+	call jp_hl					; ehl = next level's base experience (we toss out the MSB)
+	ld bc,(current_pokemon+CP_EXPTOT)
+	or a
+	sbc hl,bc					; subtract current level from next level (and the exp we currently have)
+	ret
+
+;a = level
+;returns EHL = experience
+calculate_slow_experience:
+	push af
+		ld e,a
+		ld d,0
+		call mult_de_a	; AHL = a² (but here it won't overflow into 24 bits)
+	pop af
+	ex de,hl
+	call mult_de_a		; AHL = a³ (here it might overflow into A)
+	ld d,a
+	ld e,5
+	call mult_dhl_e		; AHL = A³*5
+	ld e,a
+	ld d,4
+	call div_ehl_d		; EHL = (A³*5)/4
+	ret
+
+;a = level
+;returns EHL = experience (A³*6/5-15*A²+100*A-140)
+calculate_medslow_experience:
+	push af
+		push af				; level
+			ld e,a
+			ld d,0
+			call mult_de_a	; AHL = A² (but here it won't overflow into 24 bits)
+		pop af				; level
+		push hl				; HL = A²
+			ex de,hl
+			call mult_de_a	; AHL = A³ (here it might overflow into A)
+			ld d,a
+			ld e,6
+			call mult_dhl_e	; AHL = A³*6
+			ld e,a
+			ld d,5
+			call div_ehl_d	; EHL = (A³*6)/5
+		pop bc				; BC = A²
+		push hl
+		push de				; save EHL
+			ld e,c
+			ld d,b
+			ld a,15
+			call mult_de_a	; AHL = A²*15
+			ex de,hl
+		pop bc
+		pop hl
+		sbc hl,de
+		ld e,a
+		ld a,c
+		sbc a,e
+		ld de,140			;
+		sbc hl,de
+		sbc a,0
+	pop de					; d = level
+	push af
+	push hl
+		ld a,100
+		ld e,d
+		call mult_a_e
+	pop de
+	pop af
+	add hl,de
+	adc a,0
+	ld e,a
+	ret
+
+;a = level
+;returns EHL = experience
+calculate_medfast_experience:
+	push af
+		ld e,a
+		ld d,0
+		call mult_de_a	; AHL = a² (but here it won't overflow into 24 bits)
+	pop af
+	ex de,hl
+	call mult_de_a		; AHL = a³ (here it might overflow into A)
+	ret
+
+;a = level
+;returns EHL = experience
+calculate_fast_experience:
+	push af
+		ld e,a
+		ld d,0
+		call mult_de_a	; AHL = a² (but here it won't overflow into 24 bits)
+	pop af
+	ex de,hl
+	call mult_de_a		; AHL = a³ (here it might overflow into A)
+	ld d,a
+	ld e,4
+	call mult_dhl_e		; AHL = A³*4
+	ld e,a
+	ld d,5
+	call div_ehl_d		; EHL = (A³*4)/5
 	ret
 
 calculate_experience:	; output : a=experience de base du pokémon vaincu*niveau du pokémon vaincu/7/c
@@ -251,12 +397,67 @@ calculate_next_experience_end:
 	ld e,l
 	ret
 
+;################# MULTIPLICATION, DIVISION, ETC. #################
+
+;####### 24 bit
+div_ehl_d:		; returns EHL, a = remainder
+	xor a
+	ld b,24		; 24 bits to check
+div_ehl_d_loop
+	add hl,hl	; shift EHL left
+	rl e
+	rla			; shift carry into a
+	cp d		; repeat until a >= divisor
+	 jr c,$+4
+		sub d
+		inc l	; add one to EHL since we were able to subtract
+	djnz div_ehl_d_loop
+	ret
+
+; stores result in AHL
+mult_dhl_e:
+	ld a,e
+	exx
+		ld e,a
+		ld hl,0
+		ld d,h
+	exx
+	ld b,24
+mult_dhl_loop:
+	exx
+		add hl,hl
+	exx
+	rla
+	add hl,hl
+	rl d
+	 jr nc,$+5
+		exx
+			add hl,de
+		exx
+	djnz mult_dhl_loop
+	exx
+	ret
+
+; stores result in AHL
+mult_de_a
+	ld hl,0
+	ld b,8
+mul_loop_a:
+	add hl,hl
+	rla
+	 jr nc,$+5
+		add hl,de
+		adc a,0
+	djnz mul_loop_a
+	ret
+
+;####### 16 bit
+
 hl_pow_2:
 	push hl
 	push hl
 	pop bc
 	pop de
-
 de_times_bc:
 ;By Xeda112358 & Quigibo
 ;Inputs:
@@ -293,9 +494,9 @@ div_hl_c:
 	add hl,hl
 	rla
 	cp c
-	jr c,$+4
-	inc l
-	sub c
+	 jr c,$+4
+		inc l
+		sub c
 	djnz $-7
 	ret
 

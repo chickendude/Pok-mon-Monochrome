@@ -3,6 +3,22 @@
 #define rectxor	0	; set = XOR, reset = OR (for drawing rectangles)
 #define textdelay	1	; set = typewriter text (updates LCD), reset = no delay
 
+; Pokémon base stat constants
+#define POKE_NAME		0
+#define POKE_HP			2
+#define POKE_ATK		3
+#define POKE_DEF		4
+#define POKE_SPD		5
+#define POKE_SP			6
+#define POKE_TYPE1		7
+#define POKE_TYPE2		8
+#define POKE_CATCH		9
+#define POKE_EXP		10
+#define POKE_GROWTH		11
+#define POKE_ATK_LIST	12
+#define POKE_TM			14
+#define POKE_EVOLVE		21
+
 ; Current Pokémon constants
 CP_NAME			= 0		; strings
 CP_ATK1STR		= 2
@@ -31,8 +47,9 @@ CP_ATK			= 32
 CP_DEF			= 34
 CP_SPD			= 36
 CP_SP			= 38
-CP_EXP			= 40
-CP_SPRITE		= 42
+CP_EXPLVL		= 40	; experience to next level
+CP_EXPTOT		= 42	; total experience
+CP_SPRITE		= 45
 
 
 ; Text constants
@@ -78,7 +95,8 @@ CP_SPRITE		= 42
 #define _DEF	CP_DEF+1		;
 #define _SPD	CP_SPD+1		;
 #define _SP		CP_SP+1			;
-#define _EXP	CP_EXP+1		;
+#define _EXPLVL	CP_EXPLVL+1		;
+#define _EXPTOT	CP_EXPTOT+1		;
 
 _2BYTE = _HP					; marker for 2-byte numbers
 

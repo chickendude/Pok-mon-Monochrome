@@ -37,6 +37,10 @@ store_attack:
 		ldi							; attack PP
 		ldi							; attack max PP
 		djnz load_attacks
+		ld de,current_pokemon+CP_EXPTOT
+		ldi
+		ldi
+		ldi
 ;copier les stats precalculés du pokémon (hp total, attack, defense)
 	pop hl							; hl points to pokedex id
 	push hl
@@ -45,7 +49,7 @@ store_attack:
 	pop hl
 	ld a,(hl)						; pokémon pokédex id
 	call find_pokemon_data			; returns hl = pointer to start of pokémon data
-	ex af,af'						; a = pokemon level
+	ex af,af'						; restore a = pokemon level
 	push hl
 		push af						; save pokémon's level
 			inc hl
@@ -76,6 +80,15 @@ load_stats_loop:
 		ex de,hl
 		pop hl
 		djnz load_stats_loop
+; find experience needed to get to next level
+	pop hl
+	push hl
+		ld de,POKE_EXP
+		add hl,de
+		ld e,(hl)						; pokemon's level up rate
+		ld a,(current_pokemon+CP_LVL)	; pokemon's level
+		call calculate_next_level
+		ld (current_pokemon+CP_EXPLVL),hl
 ; find pokémon name string
 	pop hl
 	push hl
@@ -140,9 +153,9 @@ pokemon_state:
 pokemon_attacks:
 	.db ATK_TACKLE,35,35, 0,0,0, 0,0,0, 0,0,0
 pokemon_xp:
-	.dw 0
+	.db 0,0,0
 pokemon_stats_length:
-	.db IVYSAUR,26, 40,0, 0, ATK_BITE,25,25, ATK_FURY_SWIPES,14,15, ATK_FURY_SWIPES,8,10, 0,0,0, 0,0
-	.db VENUSAUR,32, 20,0, 0, ATK_TACKLE,35,35, ATK_GROWL,20,20, ATK_LEECH_SEED,30,35, ATK_VINE_WHIP,10,10, 0,0,$ff
+	.db IVYSAUR,26, 40,0, 0, ATK_BITE,25,25, ATK_FURY_SWIPES,14,15, ATK_FURY_SWIPES,8,10, 0,0,0, $D2,$55,0
+	.db VENUSAUR,32, 20,0, 0, ATK_TACKLE,35,35, ATK_GROWL,20,20, ATK_LEECH_SEED,30,35, ATK_VINE_WHIP,10,10, 0,$A0,0,$ff
 pokemon_stats_end:
 #define STATS_LENGTH	pokemon_stats_length-pokemon_stats
