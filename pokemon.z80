@@ -39,9 +39,9 @@
 
 ; DEBUGGING - initial player party
 	ld ix,player_party
-	ld (ix),3
+	ld (ix),1
 	ld (ix+1),2
-	ld (ix+2),1
+	ld (ix+2),3
 
 	ld hl,$0202
 	ld (player_y),hl			; update player_y and player_x

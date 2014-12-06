@@ -341,6 +341,7 @@ attack_index:
 #define ATK_WITHDRAW	164
 #define ATK_WRAP	165
 
+;type, special effect, PP, strength, accuracy, name
 absorb_atk:
 acid_atk:
 acid_armor_atk:
@@ -362,7 +363,7 @@ bubblebeam_atk:
 clamp_atk:
 comet_punch_atk:
 confuse_ray_atk:
-	.db TYPE_GHOST,4,10,0,100,"ONDE FOLIE",0
+	.db TYPE_GHOST,4,10,0,100,"Onde folie",0
 confusion_atk:
 constrict_atk:
 conversion_atk:
@@ -514,7 +515,7 @@ tri_attack_atk:
 twineedle_atk:
 vicegrip_atk:
 vine_whip_atk:
-	.db TYPE_GRASS,0,10,35,100,"Fouet Lianes",0
+	.db TYPE_GRASS,0,10,35,100,"Fouet Lianes",0	;type, effects, PP, strength, accuracy
 water_gun_atk:
 waterfall_atk:
 whirlwind_atk:

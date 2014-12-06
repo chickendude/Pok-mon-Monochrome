@@ -1,5 +1,157 @@
-;attaques des pokémons
-;level, id de l'attaque
+#define	BULBASAUR 	0	
+#define	IVYSAUR 	1	
+#define	VENUSAUR 	2	
+#define	CHARMANDER 	3	
+#define	CHARMELEON 	4	
+#define	CHARIZARD 	5	
+#define	SQUIRTLE 	6	
+#define	WARTORTLE 	7	
+#define	BLASTOISE 	8	
+#define	CATERPIE 	9	
+#define	METAPOD 	10	
+#define	BUTTERFREE 	11	
+#define	WEEDLE 		12	
+#define	KAKUNA 		13	
+#define	BEEDRILL 	14	
+#define	PIDGEY 		15	
+#define	PIDGEOTTO 	16	
+#define	PIDGEOT 	17	
+#define	RATTATA 	18	
+#define	RATICATE 	19	
+#define	SPEAROW 	20	
+#define	FEAROW 		21	
+#define	EKANS 		22	
+#define	ARBOK 		23	
+#define	PIKACHU 	24	
+#define	RAICHU 		25	
+#define	SANDSHREW 	26	
+#define	SANDSLASH 	27	
+#define	NIDORANF 	28	; note that it is nidoranf
+#define	NIDORINA 	29	
+#define	NIDOQUEEN 	30	
+#define	NIDORANM 	31	; nidoranm
+#define	NIDORINO 	32	
+#define	NIDOKING 	33	
+#define	CLEFAIRY 	34	
+#define	CLEFABLE 	35	
+#define	VULPIX 		36	
+#define	NINETALES 	37	
+#define	JIGGLYPUFF 	38	
+#define	WIGGLYTUFF 	39	
+#define	ZUBAT 		40	
+#define	GOLBAT 		41	
+#define	ODDISH 		42	
+#define	GLOOM 		43	
+#define	VILEPLUME 	44	
+#define	PARAS 		45	
+#define	PARASECT 	46	
+#define	VENONAT 	47	
+#define	VENOMOTH 	48	
+#define	DIGLETT 	49	
+#define	DUGTRIO 	50	
+#define	MEOWTH 		51	
+#define	PERSIAN 	52	
+#define	PSYDUCK 	53	
+#define	GOLDUCK 	54	
+#define	MANKEY 		55	
+#define	PRIMEAPE 	56	
+#define	GROWLITHE 	57	
+#define	ARCANINE 	58	
+#define	POLIWAG 	59	
+#define	POLIWHIRL 	60	
+#define	POLIWRATH 	61	
+#define	ABRA 		62	
+#define	KADABRA 	63	
+#define	ALAKAZAM 	64	
+#define	MACHOP 		65	
+#define	MACHOKE 	66	
+#define	MACHAMP 	67	
+#define	BELLSPROUT 	68	
+#define	WEEPINBELL 	69	
+#define	VICTREEBEL 	70	
+#define	TENTACOOL 	71	
+#define	TENTACRUEL 	72	
+#define	GEODUDE 	73	
+#define	GRAVELER 	74	
+#define	GOLEM 		75	
+#define	PONYTA 		76	
+#define	RAPIDASH 	77	
+#define	SLOWPOKE 	78	
+#define	SLOWBRO 	79	
+#define	MAGNEMITE 	80	
+#define	MAGNETON 	81	
+#define	FARFETCHD 	82	
+#define	DODUO 		83	
+#define	DODRIO 		84	
+#define	SEEL 		85	
+#define	DEWGONG 	86	
+#define	GRIMER 		87	
+#define	MUK 		88	
+#define	SHELLDER 	89	
+#define	CLOYSTER 	90	
+#define	GASTLY 		91	
+#define	HAUNTER 	92	
+#define	GENGAR 		93	
+#define	ONIX 		94	
+#define	DROWZEE 	95	
+#define	HYPNO 		96	
+#define	KRABBY 		97	
+#define	KINGLER 	98	
+#define	VOLTORB 	99	
+#define	ELECTRODE 	100	
+#define	EXEGGCUTE 	101	
+#define	EXEGGUTOR 	102	
+#define	CUBONE 		103	
+#define	MAROWAK 	104	
+#define	HITMONLEE 	105	
+#define	HITMONCHAN 	106	
+#define	LICKITUNG 	107	
+#define	KOFFING 	108	
+#define	WEEZING 	109	
+#define	RHYHORN 	110	
+#define	RHYDON 		111	
+#define	CHANSEY 	112	
+#define	TANGELA 	113	
+#define	KANGASKHAN 	114	
+#define	HORSEA 		115	
+#define	SEADRA 		116	
+#define	GOLDEEN 	117	
+#define	SEAKING 	118	
+#define	STARYU 		119	
+#define	STARMIE 	120	
+#define	MR_MIME 	121	
+#define	SCYTHER 	122	
+#define	JYNX 		123	
+#define	ELECTABUZZ 	124	
+#define	MAGMAR 		125	
+#define	PINSIR 		126	
+#define	TAUROS 		127	
+#define	MAGIKARP 	128	
+#define	GYARADOS 	129	
+#define	LAPRAS 		130	
+#define	DITTO 		131	
+#define	EEVEE 		132	
+#define	VAPOREON 	133	
+#define	JOLTEON 	134	
+#define	FLAREON 	135	
+#define	PORYGON 	136	
+#define	OMANYTE 	137	
+#define	OMASTAR 	138	
+#define	KABUTO 		139	
+#define	KABUTOPS 	140	
+#define	AERODACTYL 	141	
+#define	SNORLAX 	142	
+#define	ARTICUNO 	143	
+#define	ZAPDOS 		144	
+#define	MOLTRES 	145
+#define	DRATINI 	146
+#define	DRAGONAIR 	147
+#define	DRAGONITE 	148
+#define	MEWTWO 		149
+#define	MEW			150
+
+;############### POKÉMON ATTACKS ###############
+;level learned, attack id
 bulbasaur_attacks:
 	.db 11	;nombre d'attaques
 	.db 1,ATK_TACKLE
@@ -128,12 +280,16 @@ clefairy_attacks:
 #define POKE_NAME	0
 #define POKE_HP		2
 #define POKE_ATK	3
-#define POKE_DEF	4
-#define POKE_EXP	5
-#define POKE_TYPE1	6
-#define POKE_TYPE2	7
-#define POKE_EXPCURVE	8
-#define POKE_ATK_LIST	9
+#define POKE_SP		4
+#define POKE_SPD	5
+#define POKE_DEF	6
+#define POKE_EXP	7
+#define POKE_TYPE1	8
+#define POKE_TYPE2	9
+#define POKE_EXPCURVE	10
+#define POKE_ATK_LIST	11
+#define POKE_EVOLVE	13
+
 
 #define GSTATS_LENGTH ivysaur-bulbasaur
 
@@ -144,9 +300,8 @@ bulbasaur:
 	.db 45			;HP
 	.db 49			;Att
 	.db 49			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 64			;Base EXP
 	.db TYPE_GRASS	;Type 1
 	.db TYPE_POISON	;Type 2
@@ -158,9 +313,8 @@ ivysaur:
 	.db 60			;HP
 	.db 62			;Att
 	.db 63			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 141			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -172,9 +326,8 @@ venusaur:
 	.db 80			;HP
 	.db 82			;Att
 	.db 83			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 208			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -186,9 +339,8 @@ charmander:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -200,9 +352,8 @@ charmeleon:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -214,9 +365,8 @@ charizard:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -228,9 +378,8 @@ squirtle:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -242,9 +391,8 @@ wartortle:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -256,9 +404,8 @@ blastoise:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -270,9 +417,8 @@ caterpie:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -284,9 +430,8 @@ metapod:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -298,9 +443,8 @@ butterfree:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -312,9 +456,8 @@ weedle:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -326,9 +469,8 @@ kakuna:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -340,9 +482,8 @@ beedrill:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -354,9 +495,8 @@ pidgey:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -368,9 +508,8 @@ pidgeotto:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -382,9 +521,8 @@ pidgeot:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -396,9 +534,8 @@ rattata:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -410,9 +547,8 @@ raticate:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -424,9 +560,8 @@ spearow:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -438,9 +573,8 @@ fearow:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -452,9 +586,8 @@ ekans:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -466,9 +599,8 @@ arbok:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -480,9 +612,8 @@ pikachu:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -494,9 +625,8 @@ raichu:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -508,9 +638,8 @@ sandshrew:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -522,9 +651,8 @@ sandslash:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -536,9 +664,8 @@ nidoranF:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -550,9 +677,8 @@ nidorina:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -564,9 +690,8 @@ nidoqueen:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -578,9 +703,8 @@ nidoranM:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -592,9 +716,8 @@ nidorino:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -606,9 +729,8 @@ nidoking:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
@@ -620,9 +742,8 @@ clefairy:
 	.db 1			;HP
 	.db 1			;Att
 	.db 1			;Def
-	;Sp. Atk
-	;Sp. Def
-	;Speed
+	.db 1			;Special
+	.db 1			;Speed
 	.db 1			;Base EXP
 	.db TYPE_GRASS
 	.db TYPE_POISON
