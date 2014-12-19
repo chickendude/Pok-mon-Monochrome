@@ -13,16 +13,16 @@ get_pokemon_sprite_ix:
 	ret
 
 battle_wild_pokemon_intro:
-	call get_pokemon_sprite_ix		;hl = pointeur à l'id du pokémon
-	xor a
-	ld bc,POKEMON_SPRITE_SIZE
-	ld l,0
-	call large_sprite_push
+	call get_pokemon_sprite_ix		; hl = pointer to pokemon id
+	ld bc,POKEMON_SPRITE_SIZE		; b = height, c = width
+	xor a							; a = x
+	ld l,a							; l = y
+	call large_sprite_push			; draw sprite, save registers, and fastcopy
 	push ix
 		call large_sprite
 	pop ix
-	call fade_in
-
+;	call fade_in
+; scroll pokemon onto screen
 	ld b,SCREEN_WIDTH-POKEMON_SPRITE_WIDTH-POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN
 battle_wild_pokemon_intro_loop:
 	push bc
@@ -38,15 +38,14 @@ battle_wild_pokemon_intro_loop:
 	djnz battle_wild_pokemon_intro_loop
 ;afficher le sprite du pokémon sauvage
 	ld a,SCREEN_WIDTH-POKEMON_SPRITE_WIDTH-POKEMON_SPRITE_BATTLE_DISTANCE_FROM_SCREEN
-	sub b
+	ld l,b
 	ld bc,POKEMON_SPRITE_SIZE
-	ld l,0
 	call large_sprite
 ;afficher le texte du pokémon sauvage
-	ld hl,battle_wild_pokemon_intro1
-	jp draw_battle_dialogue
+	ld hl,battle_wild_text
+	jp draw_battle_dialog
 
-;sauver registres
+; save registers and call fastcopy
 large_sprite_push:
 	push af
 	push bc
@@ -60,23 +59,20 @@ large_sprite_push:
 	pop af
 	ret
 ;------------------------------------------------------------------------------------------------------------------
-
 ;- Routine d'introduction des pokémons du joueur ------------------------------------------------------------------
 battle_player_pokemon_intro:
-	call battle_search_next_player_pokemon_alive	; il faut d'abord vérifier quel est le premier pokémon en vie sur les 6 qu'on porte avec nous
-	 ret nz	; s'il n'y en a pas, tous les pokémons de l'équipe sont KO
-battle_player_pokemon_intro_disp_text:
+	call player_next_alive	; find first conscious pokémon in party
+	 ret nz					; nz means no pokémon left to fight with
+battle_player_intro_text:
 	ld a,(hl)
 	ld (current_player_pokemon),a
 	ld (starting_player_pokemon1),a
 	ld (starting_player_pokemon2),a
 	ld hl,battle_player_pokemon_intro1
-	call draw_battle_dialogue
-	jp fade_out
+	jp draw_battle_dialog
 
 battle_draw_player_back:
-player_gender = $+1
-	ld a,0
+	ld a,(player_gender)
 	or a
 	ld ix,player_woman_back_sprite
 	 jr nz,battle_draw_player_next
@@ -320,7 +316,7 @@ battle_draw_pokeball_if_already_captured:	; input : hl=id
 battle_draw_player_pokeballs:
 	xor a
 	ld (battle_draw_player_pokeballs_count),a
-	ld hl,player_pokemons
+	ld hl,player_party
 	ld b,6
 
 battle_draw_player_pokeballs_loop:

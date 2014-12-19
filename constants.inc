@@ -141,3 +141,23 @@ LVL_SLOW		= 0
 LVL_MED_SLOW	= 1
 LVL_MED_FAST	= 2
 LVL_FAST		= 3
+
+; Pokémon entry constants
+POKEMON_ENTRY_SIZE = 20		; how many bytes a pokémon entry takes up (see stats.inc)
+PE_ID		= 0
+PE_LVL		= 1
+PE_HP		= 2				; current HP takes up [2 bytes]
+PE_STATE	= 4
+PE_ATK1		= 5
+PE_ATK1PP	= 6
+PE_ATK1MPP	= 7
+PE_ATK2		= 8
+PE_ATK2PP	= 9
+PE_ATK2MPP	= 10
+PE_ATK3		= 11
+PE_ATK3PP	= 12
+PE_ATK3MPP	= 13
+PE_ATK4		= 14
+PE_ATK4PP	= 15
+PE_ATK4MPP	= 16
+PE_XP		= 17			; current experience [3 bytes]

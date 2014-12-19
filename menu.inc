@@ -107,9 +107,9 @@ check_sub_menu:
 	 ret z
 	jr update_sub_menu
 
-draw_battle_dialogue:
-	ld bc,draw_battle_dialogue
-	ld (dialogue_jump),bc
+draw_battle_dialog:
+	ld bc,draw_battle_dialog
+	ld (dialog_jump),bc
 	ld bc,$0f60			;b = height, c = width
 	ld de,$0031			;d = x, e = y
 	push hl
@@ -119,9 +119,9 @@ draw_battle_dialogue:
 	ld de,$3202
 	jr draw_menu_start
 
-draw_dialogue:
-	ld bc,draw_dialogue
-	ld (dialogue_jump),bc
+draw_dialog:
+	ld bc,draw_dialog
+	ld (dialog_jump),bc
 	ld bc,$1560
 	ld de,$002b
 	push hl
@@ -363,15 +363,16 @@ load_next_text:
 	call release_key
 	pop hl
 	inc hl							; skip the $FD (BRK)
-dialogue_jump = $+1
-	jp draw_dialogue
+	ld de,(dialog_jump)
+	push de
+	ret
 
 ;loads enemy's pokémon
 text_load_enemy:
 	inc hl
 	push hl
 		ld a,(hl)
-		ld de,opponent_pokemon_stats
+		ld de,opp_party_pokemon
 		call text_load_pokemon_data
 		ld hl,current_pokemon
 		ld de,current_pokemon_enemy

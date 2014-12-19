@@ -52,6 +52,10 @@
 	set textwrite,(iy+sgrflags)
 	res texterasebelow,(iy+textflags)
 
+
+	call battle
+
+
 	call start					; ** runs the main program and returns so we can do cleanup
 
 	ld de,INSERT_RAM

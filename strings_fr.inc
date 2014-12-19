@@ -264,7 +264,7 @@ menu_pokemon_str_sleep:
 menu_pokemon_str_para:
 	.db "PAR",0
 
-battle_wild_pokemon_intro1:
+battle_wild_text:
 	.db "Un ",ENEM,0,_NAME,NEWL
 	.db "sauvage apparait !",BRK,0
 

@@ -5,7 +5,7 @@ new_game:
 	call fade_in
 
 	ld hl,gender_str
-	call draw_dialogue
+	call draw_dialog
 
 	ld bc,$1a03			;c = width, b = height
 	push bc
@@ -67,7 +67,7 @@ new_game_valid_skip_man:
 	call fade_in
 
 	ld hl,new_game_str
-	call draw_dialogue
+	call draw_dialog
 
 ;initialize variables
 	ld a,NEW_GAME_Y

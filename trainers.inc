@@ -32,7 +32,7 @@ trainer_event:
 	; todo : check if already beaten, if not start the battle
 	; etc...
 	ld hl,trainer_intro_str
-	jp draw_battle_dialogue
+	jp draw_battle_dialog
 
 get_trainer_state:	; input : a=trainer ID ; output : carry flag is set if trainer is already beaten
 	push af

@@ -4,10 +4,10 @@ load_map:
 ;# -a = map number (0-255)
 ;# -bc = YYXX position
 ;###########################
-	add a,a				; each map takes up 2 bytes
 	ld c,a
 	ld b,0
 	ld hl,map_table
+	add hl,bc			; each map takes up 2 bytes
 	add hl,bc			; find the map in the map table
 	call ld_hl_hl		; ld hl,(hl)
 ; HL points to start of map data	
@@ -17,6 +17,11 @@ load_map:
 	ld a,(hl)
 	ld (map_height),a
 	inc hl
+	ld e,(hl)			; save map width and height
+	inc hl
+	ld d,(hl)
+	inc hl
+	ld (wild_pokemon_list),de
 	ld (map_addr),hl		; start of tilemap
 	ld hl,tiles			;*** maybe later we will have multiple tilesets? ***
 	ld (tile_addr),hl

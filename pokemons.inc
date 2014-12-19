@@ -153,7 +153,7 @@
 ;############### POKÉMON ATTACKS ###############
 ;level learned, attack id
 bulbasaur_attacks:
-	.db 11	;nombre d'attaques
+	.db 9	;nombre d'attaques
 	.db 1,ATK_TACKLE
 	.db 1,ATK_GROWL
 	.db 7,ATK_LEECH_SEED
@@ -164,11 +164,10 @@ bulbasaur_attacks:
 	.db 41,ATK_SLEEP_POWDER
 	.db 48,ATK_SOLARBEAM
 ivysaur_attacks:
-	.db 11	;nombre d'attaques
+	.db 9	;nombre d'attaques
 	.db 1,ATK_TACKLE
 	.db 1,ATK_GROWL
 	.db 1,ATK_LEECH_SEED
-	.db 7,ATK_LEECH_SEED
 	.db 13,ATK_VINE_WHIP
 	.db 22,ATK_POISONPOWDER
 	.db 30,ATK_RAZOR_LEAF
@@ -176,13 +175,11 @@ ivysaur_attacks:
 	.db 46,ATK_SLEEP_POWDER
 	.db 54,ATK_SOLARBEAM
 venusaur_attacks:
-	.db 11	;nombre d'attaques
+	.db 9	;nombre d'attaques
 	.db 1,ATK_VINE_WHIP
 	.db 1,ATK_TACKLE
 	.db 1,ATK_GROWL
 	.db 1,ATK_LEECH_SEED
-	.db 7,ATK_LEECH_SEED
-	.db 13,ATK_VINE_WHIP
 	.db 22,ATK_POISONPOWDER
 	.db 30,ATK_RAZOR_LEAF
 	.db 43,ATK_GROWTH

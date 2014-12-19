@@ -2,30 +2,27 @@
 
 ;start of a battle
 battle:
-	ld hl,pokemon_who_fought	; reset the list of pokémons who fought
+	ld hl,pokemon_who_fought		; reset the list of pokémons who fought
 	ld (hl),0
 	ld de,pokemon_who_fought+1
 	ld bc,opponent_pokemon_stats-pokemon_who_fought-1
 	ldir
-	;définir si c'est un combat contre un pokémon sauvage, un dresseur voire un autre joueur (par link)
-battle_type = $+1	;	0 = pokémon sauvage
-	ld a,0
+; define combat type: wild, trainer, linkplay
+	ld a,(battle_type)
 	or a
-	 ret nz
-	call generate_wild_pokemon
+	 ret nz								; 0 = wild pokémon battle
+	call generate_wild_pokemon			; [routines.inc]
 
 battle_intro:
+;	call fade_out
 	bcall(_grbufclr)
 	call battle_draw_player_back
-	call battle_draw_frame				;draw the player and the little text frame at the bottom
-	ld hl,opponent_pokemon_stats		;début des données du groupe de pokémon méchants
-	ld (battle_current_opponent_pokemon_address),hl
-	call battle_wild_pokemon_intro		;load the wild pokemon sprite and display some text announcing the wild pokemon
-
+	call battle_draw_frame				; draw the player and the little text frame at the bottom
+	call battle_wild_pokemon_intro		; load the wild pokemon sprite and display some text announcing the wild pokemon
 battle_start:
-	call battle_player_pokemon_intro	; /!\ cette routine se termine par un fade_out
-	call battle_draw_screen				;the 2 pokemon, HP, HP bars, etc.
-	call fade_in
+	call battle_player_pokemon_intro	; 
+	call battle_draw_screen				; the 2 pokemon, HP, HP bars, etc.
+;	call fade_in
 
 battle_loop:
 	xor a
@@ -41,7 +38,7 @@ battle_loop:
 battle_menu_pokemon_valid:
 	ld d,0
 	ld e,a
-	ld hl,player_pokemons
+	ld hl,player_party
 	add hl,de
 	ld a,(hl)
 	push af
@@ -90,7 +87,7 @@ battle_menu_pokemon_valid_add_to_list:
 battle_menu_pokemon_valid_skip:
 	pop hl
 	ld (battle_current_player_pokemon_address),hl
-	call battle_player_pokemon_intro_disp_text
+	call battle_player_intro_text
 	call battle_draw_screen
 	call fade_in
 	ret
@@ -123,7 +120,6 @@ check_enemy_ko:
 	or a
 	ret
 
-
 ;a = attack chosen (0-3)
 player_attack:
 	add a,a						;each attack takes up 2 bytes, its ID and PP left
@@ -142,7 +138,7 @@ player_attack:
 		dec (hl)				; si c'est bon on decrémente
 		call battle_draw_screen
 		ld hl,battle_str_attack
-		call draw_battle_dialogue	;draw the attack text (XXX used XXX)
+		call draw_battle_dialog	;draw the attack text (XXX used XXX)
 	pop hl
 	ld de,(battle_current_opponent_pokemon_address)
 	call check_attack_effectiveness	; vérifier en fonction des types si c'est super efficace
@@ -247,42 +243,40 @@ battle_fight_menu_next_type_loop:
 	jp fast_copy
 
 
-;- Routine qui se charge de rechercher le prochain pokémon en vie sur les 6 qu'a le joueur + le place dans la liste des pokémons ayant combattus
-battle_search_next_player_pokemon_alive:	; output : z:pokémon found ; nz:all pokémon dead ; hl = pokémon datas
-	ld hl,player_pokemons
+;- Routine qui se charge de rechercher le prochain pokémon en vie
+; sur les 6 qu'a le joueur + le place dans la liste des pokémons ayant combattus
+player_next_alive:					; output : z:pokémon found ; nz:all pokémon dead ; hl = pokémon data
+	ld hl,player_party
 	ld b,6
-
-battle_search_next_player_pokemon_alive_loop:
+player_next_alive_loop:
 	ld a,(hl)
-	or a	; vérifier qu'il y ait bien un pokémon dans l'emplacement
-	jr z,battle_search_next_player_pokemon_alive_skip
-	push bc
+	or a							; if 0, no more pokemon
+	 jr z,player_next_alive_skip
+	push bc							; b = counter
 	push hl
-	call find_pokemon_stats
-	inc hl
-	inc hl	; vérifier s'il est en vie
-	ld a,(hl)
-	or a
-	jp nz,battle_search_next_player_pokemon_alive_ok
+		call find_pokemon_stats
+		inc hl
+		inc hl						; vérifier s'il est en vie
+		ld a,(hl)
+		or a
+		 jr nz,player_next_alive_ok
 	pop hl
 	pop bc
-
-battle_search_next_player_pokemon_alive_skip:
+player_next_alive_skip:
 	inc hl
-	djnz battle_search_next_player_pokemon_alive_loop
-	or $80	; reset zero flag ; peut être inutile ?
+	djnz player_next_alive_loop
+	or $80	; reset zero flag		; peut être inutile ?
 	ret
-
-battle_search_next_player_pokemon_alive_ok:
-	dec hl
-	dec hl	; on retourne à l'ID du pokémon (depuis les PV)
-	ld (battle_current_player_pokemon_address),hl
+player_next_alive_ok:
+		dec hl
+		dec hl						; go back to pokémon id
+		ld (battle_current_player_pokemon_address),hl
 	pop hl	; on retourne au numero d'index du pokémon
+	pop bc
 	ld c,(hl)
 	inc c	; on incrémente l'index du pokémon car sinon le pokémon n°0 ne sera jamais comptabilisé
 	ld de,pokemon_who_fought
 	ld b,6
-
 battle_list_pokemon_who_fought_loop:	; on regarde si le pokémon sélectionné a déjà combattu et si non on le place dans la liste
 	ld a,(de)
 	cp c
@@ -291,13 +285,10 @@ battle_list_pokemon_who_fought_loop:	; on regarde si le pokémon sélectionné a dé
 	jr z,battle_list_pokemon_who_fought
 	inc de
 	djnz battle_list_pokemon_who_fought_loop
-
 battle_list_pokemon_who_fought:
 	ld a,c
 	ld (de),a
-
 battle_list_pokemon_who_fought_skip:
-	pop bc
 	ld hl,(battle_current_player_pokemon_address)
 	xor a	; set zero flag
 	ret
@@ -374,7 +365,7 @@ battle_handle_wild_pokemon_ko:	; hl = opponent pokemon stats
 	ld (last_player_pokemon_who_fought_address),hl
 	call battle_draw_frame		; on commence par afficher "le pokémon ennemi est KO"
 	ld hl,battle_str_opponent_ko
-	call draw_battle_dialogue
+	call draw_battle_dialog
 	ret
 ;i haven't started to handle experience
 	ld hl,pokemon_who_fought

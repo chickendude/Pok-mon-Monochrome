@@ -136,10 +136,78 @@ find_type_string_loop:
 	djnz find_type_string_loop
 	ret
 
+;###########################
+create_pokemon:
+;# Creates a pokémon and saves
+;# .. it in (pokemon_entry)
+;# Input:
+;# - b = pokédex id
+;# - a = pokémon's level
+;###########################
+	ld (pokemon_entry+PE_LVL),a		; save pokémon's lvl
+	push af
+		ld a,b
+		ld (pokemon_entry+PE_ID),a	; save pokémon's ID
+		call find_pokemon_data
+	pop af
+; hl now points to start of pokémon's data [pokemons.inc]
+	inc hl							; skip the string pointer
+	inc hl							; 
+	push hl
+		call calculate_hp			; calculate HP based on level, a = level, hl = pointer to HP
+		ld (pokemon_entry+PE_HP),hl	; save pokémon's current HP (starts off full)
+	pop hl
+	xor a
+	ld (pokemon_entry+PE_STATE),a
+; fill out attack list based on level
+	ld d,a
+	ld e,POKE_ATK_LIST-2 			; because we've already skipped two bytes (string name)
+	add hl,de
+	call ld_hl_hl					; hl now points to the list of attacks
+	ld c,(hl)						; b = number of attacks pokemon can learn by levelling up
+	inc hl							; start of attack list
+	ld c,0							; count how many attacks were processed
+	ld a,(pokemon_entry+PE_LVL)		; pokémon's current level in a
+; find the first attack that is above cur. pokemon's level
+; .. and load the previous 4 attacks, or c attacks if the pokemon
+; .. hasn't learned 4 attacks yet
+create_pokemon_attacks_loop:
+	cp (hl)
+	inc hl							; skip attack level
+	 jr c,create_pokemon_attacks	; if the attack level > pokémon's level, can't learn any more attacks
+	inc c							; how many attacks the pokemon has learned so far
+	inc hl							; skip attack id
+	djnz create_pokemon_attacks_loop
+create_pokemon_attacks:
+;first make sure that the pokemon has at least 4 attacks
+	ld a,c ;total number of attacks
+	cp 4
+	 jr c,$+4
+		ld a,4						; if more than 4 attacks have been learned, limit to the last 4
+	ld b,a
+	dec hl
+	dec hl
+	djnz $-2						; first attack the pokemon knows
+	ld b,a
+	ld de,opponent_pokemon_stats_attacks	;store attacks here
+create_pokemon_save_attacks:
+	ld a,(hl)
+	ldi								; store attack ID
+	exx
+		call find_attack_data		; a = attack id, returns hl = start of attack's data
+		inc hl						; skip type
+		inc hl						; skip state
+		ld a,(hl)					; max PP
+	exx
+	ld (de),a						; store attack PP
+	inc hl							; next attack ID
+	inc de							; next attack ID (skip level learned)
+	djnz create_pokemon_save_attacks
+	ret
+
+
 ; player values
 
-player_pokemons:		;** this has been changed to player_party, see [variables.inc]
-	.db 1,2,3,0,0,0
 player_pokemons_length:
 
 pokemon_stats:	; ID pokédex, lvl, HP (2 bytes), state (0=normal; 1=poison; 2=sleep; 3=para), (Attack ID, PP, PPMAX)*4, XP (2 bytes)

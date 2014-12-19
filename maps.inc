@@ -1,10 +1,10 @@
 map_table:	; ne sert pas encore (pour les transitions entre maps plus tard)
 	.dw map_test
 
-map_pokemons:	; les +2 sont là car l'adresse actuelle du mapper (map_addr) saute toujours les deux premiers octets (tailles)
-	.dw map_test+2,map_test_pokemons
-
-map_pokemons_end:
+;map_pokemons:	; les +2 sont là car l'adresse actuelle du mapper (map_addr) saute toujours les deux premiers octets (tailles)
+;	.dw map_test+2,map_test_pokemon
+;
+;map_pokemons_end:
 
 map_trainers:	; les +2 sont là car l'adresse actuelle du mapper (map_addr) saute toujours les deux premiers octets (tailles)
 	.dw map_test+2,map_test_trainers
@@ -13,6 +13,7 @@ map_trainers_end:
 
 map_test:
 	.db $14,$14		;map width, map height
+	.dw map_test_pokemon
 	.db $10,$10,$10,$10,$16,$19,$19,$1D,$10,$10,$10,$10,$0E,$00,$00,$0E,$08,$09,$09,$09
 	.db $10,$02,$02,$02,$24,$1B,$25,$26,$10,$10,$10,$02,$02,$00,$00,$02,$08,$09,$09,$09
 	.db $10,$02,$04,$32,$02,$02,$02,$02,$10,$10,$10,$00,$11,$00,$00,$00,$08,$09,$09,$09
@@ -34,7 +35,7 @@ map_test:
 	.db $06,$06,$06,$06,$06,$06,$06,$06,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09
 	.db $09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09,$09
 
-map_test_pokemons:	;Nb pkmn; [ID; LVLmin; amplitude LVL]
+map_test_pokemon:	;Nb pkmn; [ID; LVLmin; amplitude LVL]
 	.db 3
 	.db 0,1,5	; chenipan du niveau 1 à 6
 	.db 3,1,5

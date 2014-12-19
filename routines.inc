@@ -126,99 +126,51 @@ is_already_captured_loop:
 	or $80
 	ret
 
+
+;###########################
 generate_wild_pokemon:
-	ld hl,opponent_pokemon_stats	;reset opponent pokémons datas
+;# Creates a wild pokémon from (wild_pokemon_list)
+;###########################
+	ld hl,opp_party_number		; reset opponent pokémon's data
 	ld (hl),0
-	ld de,opponent_pokemon_stats+1
-	ld bc,opponent_pokemon_stats_length-opponent_pokemon_stats-1
+	ld de,opp_party_number+1
+	ld bc,(POKEMON_ENTRY_SIZE*6)+6
 	ldir
-	ld hl,map_pokemons
-	ld b,(map_pokemons_end-map_pokemons)/4
-	call find_map_data
-	 ret nz	;no data on encounterable Pokémons so no battle...
-generate_wild_pokemon_find_map_data_ok:
-	call ld_hl_hl	; on a les données des pokémons (ID et amplitudes des niveaux)
-	ld a,(hl)		; nombre maximum de pokémons
-	ld b,a
+; pick a pokémon from the map to load
+	ld hl,(wild_pokemon_list)	; pointer to list of current map's wild pokémon
+	ld a,(hl)					; number of pokémon that can be found here
+	ld b,a						; get a random number between 0 and b
 	call random
-	ld d,0
-	ld e,a			; on en choisit un au hasard (faudrait peut être gérer la rareté ?)
-	inc hl			; premier pokémon
-	add hl,de		; ou plus
-	add hl,de		;  |
-	add hl,de		; /		*3
-	ld a,(hl)
-	ld (opponent_pokemon_stats),a	; on a l'ID du pokémon, maintenant faut tirer un niveau au hasard
-	push af
+	ld d,b						; b = 0
+	ld e,a						; 
+	add a,a
+	add a,e						; *3
+	inc hl						; skip the number of pokemon byte
+	add hl,de					; hl points to pokémon
+	ld b,(hl)					; first byte is pokemon's ID
+	push bc						; save pokémon's id
 		inc hl
-		push hl			; niveau min
+		push hl					; minimum level
 			inc hl
-			ld b,(hl)	; niveau max
+			ld b,(hl)			; max level offset (minimum level + this = max level)
 			call random
 		pop hl
-		add a,(hl)
-		ld (opponent_pokemon_stats_lvl),a	; on a son niveau
-	pop af					; maintenant on s'occupe de ses PV
-	call find_pokemon_data
-	inc hl					;sauter deux octets du string
-	inc hl					;hl pointe sur PV
-	ld a,(opponent_pokemon_stats_lvl)
-	push hl
-		call calculate_hp	; on calcul ses pv en fonction de son niveau
-	pop hl
-	ld (opponent_pokemon_stats_hp),a
-	xor a
-	ld (opponent_pokemon_stats_state),a
-	ld d,0
-	ld e,POKE_ATK_LIST-2 	;because we've already skipped two bytes (string name)
-	add hl,de
-	call ld_hl_hl			;hl now points to the list of attacks
-	ld b,(hl)				;b = number of attacks pokemon can learn by level
-	inc hl					;start of attack list
-	ld c,0					;count how many attacks were processed
-	ld a,(opponent_pokemon_stats_lvl)
-;find the first attack that is above cur. pokemon's level
-; and load the previous 4 attacks, or c attacks if the pokemon
-; hasn't learned 4 attacks yet
-generate_wild_pokemon_loop:
-	cp (hl)
-	inc hl					;attack id
-	 jr c,generate_wild_pokemon_save_attack
-	inc c					;how many attacks the pokemon has learned so far
-	inc hl					;start of next attack's data (level learned)
-	djnz generate_wild_pokemon_loop
-
-generate_wild_pokemon_save_attack:
-;first make sure that the pokemon has at least 4 attacks
-	ld a,c ;total number of attacks
-	cp 4
-	 jr c,$+4
-		ld a,4					;if more than 4 attacks have been learned, limit to the last 4
-	ld b,a
-	dec hl
-	dec hl
-	djnz $-2					;first attack the pokemon knows
-	ld b,a
-	ld de,opponent_pokemon_stats_attacks	;store attacks here
-
-generate_wild_pokemon_save_attack_ok:
-	ld a,(hl)
-	ldi							;store attack ID
-	exx
-		call find_attack_data	;a = attack id, returns hl = start of attack's data
-		inc hl					;skip type
-		inc hl					;skip state
-		ld a,(hl)				;max PP
-	exx
-	ld (de),a					;store attack PP
-	inc hl						;next attack ID
-	inc de						;next attack ID (skip level learned)
-	djnz generate_wild_pokemon_save_attack_ok
+		add a,(hl)				; pick a level
+	pop bc						; now create the pokémon
+	call create_pokemon			; b = pokedex id, a = lvl [stats.inc]
+	ld hl,pokemon_entry			; copy pokemon_entry to opp_party_pokemon
+	ld de,opp_party_pokemon
+	ld bc,POKEMON_ENTRY_SIZE
+	ldir
+	inc c						; c = 1
+	ld hl,opp_party_number
+	ld (hl),c
+	inc hl
+	ld (hl),c
 	ret
 
 wait:
 	ei
-
 wait_loop:
 	halt
 	djnz wait_loop

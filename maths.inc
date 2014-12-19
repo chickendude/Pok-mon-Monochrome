@@ -155,7 +155,7 @@ calculate_damages_next:
 	push af
 		call battle_draw_frame
 		ld hl,battle_str_critical_hit
-		call draw_battle_dialogue
+		call draw_battle_dialog
 	pop af
 	or a
 	ret
